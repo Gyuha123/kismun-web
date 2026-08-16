@@ -163,6 +163,7 @@ a { color: inherit; }
   .hero-text h1 { white-space: normal; }
   .hero { min-height: 100vh; min-height: 100svh; }
   .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero-slogan { font-size: 22px; }
 }
 
 /* ---------- MAIN NARROW CONTENT ---------- */
