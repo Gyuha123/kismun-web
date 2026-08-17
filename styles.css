@@ -80,6 +80,8 @@ a { color: inherit; }
 
 .sitenav .logo img { height: 30px; width: auto; display: block; }
 
+.sitenav .logo .logo-text { position: relative; top: 2px; }
+
 .sitenav .links {
   display: flex;
   gap: 2px;
