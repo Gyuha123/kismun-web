@@ -71,6 +71,7 @@ a { color: inherit; }
 .sitenav .logo {
   display: flex;
   align-items: center;
+  gap: 8px;
   text-decoration: none;
   color: var(--text);
 }
@@ -648,6 +649,14 @@ a { color: inherit; }
   .sitenav.solid .logo {
     grid-column: 2;
     justify-self: center;
+    position: relative;
+  }
+  .sitenav.solid .logo .logo-icon {
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-right: 8px;
   }
   .sitenav .logo img { height: 24px; }
   .nav-toggle {
