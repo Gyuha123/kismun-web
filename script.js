@@ -16,6 +16,29 @@ document.querySelectorAll('.day-tab').forEach(function (tab) {
   });
 });
 
+// keep the conference-info box a fixed height (tallest day) so switching tabs doesn't jump
+(function () {
+  var wrap = document.querySelector('.day-panels');
+  var panels = document.querySelectorAll('.day-panel');
+  if (!wrap || !panels.length) return;
+
+  function syncHeight() {
+    wrap.style.minHeight = '';
+    var maxH = 0;
+    panels.forEach(function (p) {
+      var prevDisplay = p.style.display;
+      p.style.display = 'block';
+      if (p.scrollHeight > maxH) maxH = p.scrollHeight;
+      p.style.display = prevDisplay;
+    });
+    wrap.style.minHeight = maxH + 'px';
+  }
+
+  syncHeight();
+  window.addEventListener('resize', syncHeight);
+  window.addEventListener('load', syncHeight);
+})();
+
 // gallery swipe carousel
 (function () {
   var carousel = document.getElementById('galleryCarousel');

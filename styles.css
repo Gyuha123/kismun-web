@@ -160,10 +160,33 @@ a { color: inherit; }
 }
 
 @media (max-width: 700px) {
-  .hero-text h1 { white-space: normal; font-size: clamp(23px, 7vw, 73px); }
+  .hero-text h1 { white-space: normal; font-size: 30px; }
   .hero { min-height: 100vh; min-height: 100svh; }
   .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .hero-slogan { font-size: 13px; white-space: nowrap; }
+  .hero-slogan { font-size: 33px; white-space: nowrap; }
+
+  /* main screen content: all text 1.5x */
+  .content .about-block h3 { font-size: 22.5px; }
+  .content .about-block p { font-size: 20.25px; }
+  .content .section-heading { font-size: 22.5px; }
+  .content .gallery-hint { font-size: 18px; }
+  .content .gallery-caption { font-size: 18.75px; }
+  .content .conference-heading { font-size: 33px; }
+  .content .day-tab { font-size: 19.5px; }
+  .content .day-date { font-size: 21px; }
+  .content .schedule-time { font-size: 19.5px; }
+  .content .schedule-event { font-size: 21px; }
+  .content .schedule-note { font-size: 17.25px; }
+  .content .venue-info .name { font-size: 21px; }
+  .content .venue-info .name-kr { font-size: 18px; }
+  .content .venue-info .addr { font-size: 18.75px; }
+
+  /* letter pages: all text 1.5x */
+  .people-page .page-heading { font-size: 60px; }
+  .people-page .back-link { font-size: 19.5px; }
+  .people-page .person-name { font-size: 40.5px; }
+  .people-page .person-role { font-size: 21px; }
+  .people-page .person-letter { font-size: 20.25px; }
 }
 
 /* ---------- MAIN NARROW CONTENT ---------- */
@@ -315,6 +338,18 @@ a { color: inherit; }
 
 /* ---------- CONFERENCE INFO ---------- */
 
+.conference-heading {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 400;
+  font-size: 22px;
+  color: var(--text);
+  margin: 56px 0 6px;
+}
+
+.day-panels {
+  position: relative;
+}
+
 .day-tabs {
   display: flex;
   background: transparent;
@@ -462,7 +497,7 @@ a { color: inherit; }
 
 .info-card h4 {
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 24px;
   margin-bottom: 8px;
 }
@@ -536,7 +571,7 @@ a { color: inherit; }
 
 .person-name {
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 27px;
 }
 
@@ -622,15 +657,22 @@ a { color: inherit; }
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
     border: 1px solid var(--pill-border);
-    border-radius: 10px;
+    border-radius: 18px;
     background: rgba(255,255,255,0.06);
     cursor: pointer;
     flex-shrink: 0;
   }
-  .sitenav .allocation { grid-column: 3; justify-self: end; flex-shrink: 0; }
+  .sitenav .allocation {
+    grid-column: 3;
+    justify-self: end;
+    flex-shrink: 0;
+    padding: 18px 34px;
+    font-size: 25px;
+  }
   .sitenav.mobile-open .links {
     display: flex;
     flex-direction: column;
