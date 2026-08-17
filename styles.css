@@ -682,8 +682,8 @@ a { color: inherit; }
     grid-column: 3;
     justify-self: end;
     flex-shrink: 0;
-    padding: 10px 16px;
-    font-size: 16px;
+    padding: 12px 19px;
+    font-size: 18px;
   }
   .sitenav .allocation span { display: none; }
   .sitenav.mobile-open .links {
