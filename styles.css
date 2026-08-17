@@ -75,7 +75,7 @@ a { color: inherit; }
   text-decoration: none;
   color: var(--text);
   position: relative;
-  top: 4px;
+  top: 2px;
 }
 
 .sitenav .logo img { height: 30px; width: auto; display: block; }
