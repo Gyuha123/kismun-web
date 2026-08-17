@@ -76,7 +76,7 @@ a { color: inherit; }
   color: var(--text);
 }
 
-.sitenav .logo img { height: 25px; width: auto; display: block; }
+.sitenav .logo img { height: 28.5px; width: auto; display: block; }
 
 .sitenav .links {
   display: flex;
@@ -658,7 +658,7 @@ a { color: inherit; }
     transform: translateY(-50%);
     margin-right: 8px;
   }
-  .sitenav .logo img { height: 24px; }
+  .sitenav .logo img { height: 27.5px; }
   .nav-toggle {
     grid-column: 1;
     justify-self: start;
