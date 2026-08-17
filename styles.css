@@ -74,9 +74,11 @@ a { color: inherit; }
   gap: 8px;
   text-decoration: none;
   color: var(--text);
+  position: relative;
+  top: 2px;
 }
 
-.sitenav .logo img { height: 28.5px; width: auto; display: block; }
+.sitenav .logo img { height: 30px; width: auto; display: block; }
 
 .sitenav .links {
   display: flex;
@@ -658,7 +660,7 @@ a { color: inherit; }
     transform: translateY(-50%);
     margin-right: 8px;
   }
-  .sitenav .logo img { height: 27.5px; }
+  .sitenav .logo img { height: 30px; }
   .nav-toggle {
     grid-column: 1;
     justify-self: start;
