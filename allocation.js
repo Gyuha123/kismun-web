@@ -92,14 +92,13 @@
   }
 
   function select(d) {
-    // chairs and secretariat carry a role instead of a committee description
     committeeEl.textContent = d.c;
-    committeeFullEl.textContent = d.r || COMMITTEE_FULL[d.c] || '';
+    committeeFullEl.textContent = COMMITTEE_FULL[d.c] || '';
     committeeEl.classList.toggle('is-long', d.c.length > 12);
-    committeeFullEl.classList.toggle('is-role', !!d.r);
     committeeCard.classList.remove('is-empty');
 
-    var label = data.names[d.d] || d.d;
+    // chairs and the secretariat get their role under the UN flag instead of a country
+    var label = d.r || data.names[d.d] || d.d;
     delegationEl.textContent = label;
     if (d.d === 'UN') {
       flagEl.src = 'unflag.png';

@@ -883,13 +883,6 @@ a { color: inherit; }
   margin-right: auto;
 }
 
-.alloc-committee-full.is-role {
-  font-size: 17px;
-  font-weight: 400;
-  letter-spacing: 0.4px;
-  color: var(--text);
-}
-
 .alloc-flag-frame {
   width: 100%;
   max-width: 220px;
