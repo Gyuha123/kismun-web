@@ -1,3 +1,10 @@
+# Source spreadsheet — data is published through allocation-data.js instead
+KISMUN 2026_Delegate Allocation.xlsx
+~$*.xlsx
+
+# Only the 4x3 flag set is used by the site
+flags/1x1/
+
 # Unused source/reference files (not loaded by the live site)
 웹사이트 사진/
 메인.png

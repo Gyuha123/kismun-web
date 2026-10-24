@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>KISMUN '26 | My Allocation</title>
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://kishcmun.netlify.app/allocation.html" />
+<meta property="og:site_name" content="KISMUN '26" />
+<meta property="og:title" content="KISMUN '26 | My Allocation" />
+<meta property="og:description" content="Value Your Voice, Voice Your Value — Korean International School Model United Nations 2026" />
+<meta property="og:image" content="https://kishcmun.netlify.app/og_image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="KISMUN '26 | My Allocation" />
+<meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="sitenav solid" id="siteNav">
+  <div class="bar">
+    <a class="logo" href="index.html">
+      <img class="logo-icon" src="마크_icon.png" alt="" />
+      <img class="logo-text" src="마크_text.png" alt="KISMUN '26" />
+    </a>
+    <div class="links">
+      <a href="committee.html">committee</a>
+      <a href="staff.html">staff</a>
+      <a href="secretariat.html">secretariat</a>
+      <a href="director.html">director</a>
+    </div>
+    <a class="allocation active" href="allocation.html"><span>my </span>allocation</a>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </div>
+</nav>
+
+<div class="alloc-page">
+  <a class="back-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to home</a>
+  <h1 class="page-heading">my allocation</h1>
+
+  <div class="alloc-search-card">
+    <label class="alloc-label" for="allocInput">Search your name</label>
+    <div class="alloc-input-wrap">
+      <svg class="alloc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="allocInput" class="alloc-input" type="text" autocomplete="off" spellcheck="false"
+             placeholder="이름을 입력하세요 / Type your name" aria-label="Search your name" />
+      <button id="allocClear" class="alloc-clear" type="button" aria-label="clear" hidden>✕</button>
+    </div>
+    <div id="allocDropdown" class="alloc-dropdown" hidden></div>
+    <div class="alloc-hint">이름을 입력하면 학번(또는 소속)과 함께 후보가 표시됩니다. 본인을 선택하세요.</div>
+  </div>
+
+  <div class="alloc-result-grid">
+    <div class="alloc-card" id="allocCommitteeCard">
+      <div class="alloc-card-label">Committee</div>
+      <div class="alloc-committee" id="allocCommittee">—</div>
+    </div>
+
+    <div class="alloc-card" id="allocDelegationCard">
+      <div class="alloc-card-label">Delegation</div>
+      <div class="alloc-flag-wrap" id="allocFlagWrap">
+        <div class="alloc-flag-placeholder" id="allocFlagPlaceholder"></div>
+        <img class="alloc-flag" id="allocFlag" alt="" hidden />
+      </div>
+      <div class="alloc-delegation" id="allocDelegation">—</div>
+    </div>
+  </div>
+
+  <div class="alloc-selected" id="allocSelected" hidden></div>
+</div>
+
+<footer class="sitefooter">
+  <div class="inner">
+    <div class="brand">
+      <img src="마크_cutout_crop.png" alt="KISMUN '26" />
+      <div class="brand-text">
+        <div class="rights">© 2013-2026 KISMUN. All rights reserved.</div>
+      </div>
+    </div>
+    <a class="insta" href="https://www.instagram.com/kishcmun/" target="_blank" rel="noopener">
+      <img src="인스타로고_cutout.png" alt="Instagram" />
+    </a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="allocation-data.js"></script>
+<script src="allocation.js"></script>
+</body>
+</html>

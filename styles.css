@@ -32,6 +32,8 @@ body {
 
 img { max-width: 100%; display: block; }
 
+[hidden] { display: none !important; }
+
 a { color: inherit; }
 
 .container {
@@ -591,6 +593,209 @@ a { color: inherit; }
 
 .staff-letters .person-letter,
 .staff-letters .person-letter .quote { color: var(--text); }
+
+/* ---------- MY ALLOCATION ---------- */
+
+.alloc-page { max-width: 900px; margin: 0 auto; padding: 70px 40px 100px; }
+
+.alloc-search-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px 28px 22px;
+  margin-top: 28px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+}
+
+.alloc-label {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 12px;
+}
+
+.alloc-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--pill-border);
+  border-radius: var(--radius-full);
+  padding: 0 18px;
+  background: rgba(255,255,255,0.05);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.alloc-input-wrap:focus-within {
+  border-color: rgba(255,255,255,0.45);
+  background: rgba(255,255,255,0.08);
+}
+
+.alloc-search-icon { width: 20px; height: 20px; color: var(--text-faint); flex-shrink: 0; }
+
+.alloc-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 21px;
+  font-weight: 300;
+  padding: 16px 0;
+  min-width: 0;
+}
+
+.alloc-input::placeholder { color: var(--text-faint); }
+
+.alloc-clear {
+  border: none;
+  background: transparent;
+  color: var(--text-faint);
+  font-size: 17px;
+  cursor: pointer;
+  padding: 6px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.alloc-clear:hover { color: var(--text); }
+
+.alloc-dropdown {
+  position: absolute;
+  left: 28px;
+  right: 28px;
+  margin-top: 10px;
+  z-index: 20;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: #12142a;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  overflow: hidden;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.alloc-option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+  text-align: left;
+  padding: 14px 20px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-soft);
+  transition: background 0.15s ease;
+}
+
+.alloc-option:last-child { border-bottom: none; }
+.alloc-option:hover,
+.alloc-option.active { background: rgba(255,255,255,0.08); }
+
+.alloc-option-name { font-size: 19.5px; font-weight: 400; }
+.alloc-option-id { font-size: 16.5px; color: var(--text-faint); white-space: nowrap; }
+
+.alloc-noresult { padding: 16px 20px; font-size: 16.5px; color: var(--text-faint); }
+
+.alloc-hint { margin-top: 14px; font-size: 15px; color: var(--text-faint); line-height: 1.6; }
+
+.alloc-result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.alloc-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 26px 28px 32px;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+  transition: border-color 0.25s ease;
+}
+
+.alloc-card.filled { border-color: rgba(255,255,255,0.35); }
+
+.alloc-card-label {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  align-self: flex-start;
+}
+
+.alloc-committee {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: clamp(34px, 6vw, 54px);
+  font-weight: 500;
+  line-height: 1.15;
+  color: var(--text);
+  margin: auto 0;
+  word-break: break-word;
+}
+
+.alloc-flag-wrap {
+  width: 100%;
+  max-width: 230px;
+  aspect-ratio: 4 / 3;
+  margin: auto 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alloc-flag {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 6px 22px rgba(0,0,0,0.45);
+}
+
+.alloc-flag-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  border: 1px dashed var(--border);
+  background: rgba(255,255,255,0.02);
+}
+
+.alloc-delegation {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: clamp(20px, 2.6vw, 27px);
+  font-weight: 500;
+  color: var(--text);
+  margin-top: auto;
+  word-break: break-word;
+}
+
+.alloc-selected {
+  margin-top: 18px;
+  text-align: center;
+  font-size: 16.5px;
+  color: var(--text-dim);
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 700px) {
+  .alloc-page { padding: 40px 20px 70px; }
+  .alloc-search-card { padding: 22px 20px 18px; }
+  .alloc-dropdown { left: 20px; right: 20px; }
+  .alloc-result-grid { grid-template-columns: 1fr; }
+  .alloc-card { min-height: 220px; }
+}
 
 /* ---------- FOOTER ---------- */
 
