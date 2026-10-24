@@ -92,15 +92,20 @@
   }
 
   function select(d) {
+    // chairs and secretariat carry a role instead of a committee description
     committeeEl.textContent = d.c;
-    committeeFullEl.textContent = COMMITTEE_FULL[d.c] || '';
+    committeeFullEl.textContent = d.r || COMMITTEE_FULL[d.c] || '';
+    committeeEl.classList.toggle('is-long', d.c.length > 12);
+    committeeFullEl.classList.toggle('is-role', !!d.r);
     committeeCard.classList.remove('is-empty');
 
-    var code = data.flags[d.d];
     var label = data.names[d.d] || d.d;
     delegationEl.textContent = label;
-    if (code) {
-      flagEl.src = 'flags/4x3/' + code + '.svg';
+    if (d.d === 'UN') {
+      flagEl.src = 'unflag.png';
+      flagEl.alt = 'United Nations flag';
+    } else if (data.flags[d.d]) {
+      flagEl.src = 'flags/4x3/' + data.flags[d.d] + '.svg';
       flagEl.alt = label + ' flag';
     } else {
       flagEl.removeAttribute('src');
