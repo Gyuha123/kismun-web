@@ -32,6 +32,23 @@
   var matches = [];
   var activeIndex = -1;
 
+  // the full guidance does not fit a phone-width input, so move it into the
+  // hint line there instead of letting the placeholder get cut off
+  var hint = document.querySelector('.alloc-hint');
+  var WIDE_PLACEHOLDER = 'Type your name (KIS: 한글 이름 / SIKS, TAS: English name)';
+  var NARROW_PLACEHOLDER = 'Type your name (한글 / English)';
+  var WIDE_HINT = 'Every result shows a student number or school, so you can pick the right person.';
+  var NARROW_HINT = 'KIS: 한글 이름 · SIKS, TAS: English name. Every result shows a student number or school.';
+  var narrow = window.matchMedia('(max-width: 700px)');
+
+  function applyCopy() {
+    input.placeholder = narrow.matches ? NARROW_PLACEHOLDER : WIDE_PLACEHOLDER;
+    if (hint) hint.textContent = narrow.matches ? NARROW_HINT : WIDE_HINT;
+  }
+  applyCopy();
+  if (narrow.addEventListener) narrow.addEventListener('change', applyCopy);
+  else if (narrow.addListener) narrow.addListener(applyCopy);
+
   function norm(s) {
     return (s || '').toString().toLowerCase().replace(/\s+/g, '');
   }
