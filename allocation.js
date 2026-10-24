@@ -1,18 +1,32 @@
-// my allocation — name search with live dropdown, then show committee + delegation flag
+// my allocation — name autocomplete, then reveal committee + delegation flag
 (function () {
   var data = window.KISMUN_ALLOCATION;
   var input = document.getElementById('allocInput');
   if (!data || !input) return;
 
+  var COMMITTEE_FULL = {
+    'UNHRC(1)': 'United Nations Human Rights Council',
+    'UNHRC(2)': 'United Nations Human Rights Council',
+    'ECOSOC': 'Economic and Social Council',
+    'WHO(1)': 'World Health Organization',
+    'WHO(2)': 'World Health Organization',
+    'UNODC': 'United Nations Office on Drugs and Crime',
+    'ITU': 'International Telecommunication Union',
+    'SPECPOL': 'Special Political and Decolonization Committee',
+    'HSC': 'Historical Security Council'
+  };
+
   var dropdown = document.getElementById('allocDropdown');
   var clearBtn = document.getElementById('allocClear');
-  var committeeEl = document.getElementById('allocCommittee');
-  var delegationEl = document.getElementById('allocDelegation');
-  var flagEl = document.getElementById('allocFlag');
-  var flagPlaceholder = document.getElementById('allocFlagPlaceholder');
-  var selectedEl = document.getElementById('allocSelected');
+  var chip = document.getElementById('allocChip');
+  var chipName = document.getElementById('allocChipName');
+  var chipId = document.getElementById('allocChipId');
   var committeeCard = document.getElementById('allocCommitteeCard');
   var delegationCard = document.getElementById('allocDelegationCard');
+  var committeeEl = document.getElementById('allocCommittee');
+  var committeeFullEl = document.getElementById('allocCommitteeFull');
+  var delegationEl = document.getElementById('allocDelegation');
+  var flagEl = document.getElementById('allocFlag');
 
   var MAX_RESULTS = 12;
   var matches = [];
@@ -48,7 +62,6 @@
         '<span class="alloc-option-id"></span>' +
         '</button>';
     }).join('');
-    // fill text through textContent so names are never treated as markup
     Array.prototype.forEach.call(dropdown.children, function (btn, i) {
       btn.querySelector('.alloc-option-name').textContent = matches[i].n;
       btn.querySelector('.alloc-option-id').textContent = matches[i].s;
@@ -57,31 +70,37 @@
   }
 
   function showNoResult() {
-    dropdown.innerHTML = '<div class="alloc-noresult">검색 결과가 없습니다 / No match found</div>';
+    dropdown.innerHTML = '<div class="alloc-noresult">No match found</div>';
     dropdown.hidden = false;
   }
 
   function select(d) {
     committeeEl.textContent = d.c;
-    committeeCard.classList.add('filled');
+    committeeFullEl.textContent = COMMITTEE_FULL[d.c] || '';
+    committeeCard.classList.remove('is-empty');
 
     var code = data.flags[d.d];
     var label = data.names[d.d] || d.d;
     delegationEl.textContent = label;
-    delegationCard.classList.add('filled');
-
     if (code) {
       flagEl.src = 'flags/4x3/' + code + '.svg';
-      flagEl.alt = label;
-      flagEl.hidden = false;
-      flagPlaceholder.hidden = true;
+      flagEl.alt = label + ' flag';
     } else {
-      flagEl.hidden = true;
-      flagPlaceholder.hidden = false;
+      flagEl.removeAttribute('src');
+      flagEl.alt = '';
     }
+    delegationCard.classList.remove('is-empty');
 
-    selectedEl.textContent = d.n + ' · ' + d.s;
-    selectedEl.hidden = false;
+    chipName.textContent = d.n;
+    chipId.textContent = d.s;
+    chip.hidden = false;
+
+    // restart the reveal animation on every new pick
+    [committeeCard, delegationCard].forEach(function (el) {
+      el.classList.remove('revealed');
+      void el.offsetWidth;
+      el.classList.add('revealed');
+    });
 
     input.value = d.n;
     matches = [];
@@ -97,15 +116,15 @@
     dropdown.hidden = true;
     dropdown.innerHTML = '';
     clearBtn.hidden = true;
-    committeeEl.textContent = '—';
-    delegationEl.textContent = '—';
-    flagEl.hidden = true;
+    chip.hidden = true;
+    committeeCard.classList.add('is-empty');
+    delegationCard.classList.add('is-empty');
+    committeeCard.classList.remove('revealed');
+    delegationCard.classList.remove('revealed');
+    committeeEl.textContent = '';
+    committeeFullEl.textContent = '';
+    delegationEl.textContent = '';
     flagEl.removeAttribute('src');
-    flagPlaceholder.hidden = false;
-    selectedEl.hidden = true;
-    selectedEl.textContent = '';
-    committeeCard.classList.remove('filled');
-    delegationCard.classList.remove('filled');
     input.focus();
   }
 
@@ -150,7 +169,7 @@
   clearBtn.addEventListener('click', reset);
 
   document.addEventListener('click', function (e) {
-    if (!e.target.closest('.alloc-search-card')) dropdown.hidden = true;
+    if (!e.target.closest('.alloc-search')) dropdown.hidden = true;
   });
 
   input.addEventListener('focus', function () {

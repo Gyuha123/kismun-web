@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,44 +31,67 @@
       <a href="secretariat.html">secretariat</a>
       <a href="director.html">director</a>
     </div>
-    <a class="allocation active" href="allocation.html"><span>my </span>allocation</a>
+    <a class="allocation" href="allocation.html"><span>my </span>allocation</a>
     <div class="nav-toggle" id="navToggle">☰</div>
   </div>
 </nav>
 
 <div class="alloc-page">
   <a class="back-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to home</a>
-  <h1 class="page-heading">my allocation</h1>
 
-  <div class="alloc-search-card">
-    <label class="alloc-label" for="allocInput">Search your name</label>
+  <header class="alloc-head">
+    <h1 class="alloc-title">my allocation</h1>
+    <p class="alloc-subtitle">Find your committee and delegation for KISMUN 2026.</p>
+  </header>
+
+  <section class="alloc-search" id="allocSearch">
     <div class="alloc-input-wrap">
       <svg class="alloc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input id="allocInput" class="alloc-input" type="text" autocomplete="off" spellcheck="false"
-             placeholder="이름을 입력하세요 / Type your name" aria-label="Search your name" />
-      <button id="allocClear" class="alloc-clear" type="button" aria-label="clear" hidden>✕</button>
+             placeholder="Type your name" aria-label="Search your name" />
+      <button id="allocClear" class="alloc-clear" type="button" aria-label="Clear search" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
     </div>
     <div id="allocDropdown" class="alloc-dropdown" hidden></div>
-    <div class="alloc-hint">이름을 입력하면 학번(또는 소속)과 함께 후보가 표시됩니다. 본인을 선택하세요.</div>
+    <p class="alloc-hint">KIS students are listed in Korean, SIKS and TAS students in English. Every result shows a student number or school, so you can pick the right person.</p>
+  </section>
+
+  <div class="alloc-chip" id="allocChip" hidden>
+    <span class="alloc-chip-name" id="allocChipName"></span>
+    <span class="alloc-chip-dot"></span>
+    <span class="alloc-chip-id" id="allocChipId"></span>
   </div>
 
-  <div class="alloc-result-grid">
-    <div class="alloc-card" id="allocCommitteeCard">
-      <div class="alloc-card-label">Committee</div>
-      <div class="alloc-committee" id="allocCommittee">—</div>
-    </div>
-
-    <div class="alloc-card" id="allocDelegationCard">
-      <div class="alloc-card-label">Delegation</div>
-      <div class="alloc-flag-wrap" id="allocFlagWrap">
-        <div class="alloc-flag-placeholder" id="allocFlagPlaceholder"></div>
-        <img class="alloc-flag" id="allocFlag" alt="" hidden />
+  <section class="alloc-result" id="allocResult">
+    <article class="alloc-card is-empty" id="allocCommitteeCard">
+      <span class="alloc-tag">Committee</span>
+      <div class="alloc-card-body">
+        <div class="alloc-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+          <span>Awaiting search</span>
+        </div>
+        <div class="alloc-reveal">
+          <div class="alloc-committee" id="allocCommittee"></div>
+          <div class="alloc-committee-full" id="allocCommitteeFull"></div>
+        </div>
       </div>
-      <div class="alloc-delegation" id="allocDelegation">—</div>
-    </div>
-  </div>
+    </article>
 
-  <div class="alloc-selected" id="allocSelected" hidden></div>
+    <article class="alloc-card is-empty" id="allocDelegationCard">
+      <span class="alloc-tag">Delegation</span>
+      <div class="alloc-card-body">
+        <div class="alloc-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>
+          <span>Awaiting search</span>
+        </div>
+        <div class="alloc-reveal">
+          <div class="alloc-flag-frame"><img class="alloc-flag" id="allocFlag" alt="" /></div>
+          <div class="alloc-delegation" id="allocDelegation"></div>
+        </div>
+      </div>
+    </article>
+  </section>
 </div>
 
 <footer class="sitefooter">
