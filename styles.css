@@ -594,6 +594,137 @@ a { color: inherit; }
 .staff-letters .person-letter,
 .staff-letters .person-letter .quote { color: var(--text); }
 
+/* ---------- CHAIR REPORTS ---------- */
+
+.reports { margin-top: 56px; }
+
+.reports-head { margin-bottom: 20px; }
+
+.reports-title {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+  color: var(--text);
+}
+
+.reports-sub {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--text-dim);
+  font-weight: 300;
+}
+
+.report-list { display: flex; flex-direction: column; gap: 12px; }
+
+.report-card {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 24px;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0));
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.report-card:hover {
+  border-color: rgba(255,255,255,0.38);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.34);
+}
+
+.report-card:active { transform: translateY(0); }
+
+.report-num {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255,255,255,0.05);
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+}
+
+.report-text { flex: 1; min-width: 0; display: block; }
+
+.report-title {
+  display: block;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.report-kr {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-faint);
+  font-weight: 300;
+}
+
+.report-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.report-size {
+  font-size: 13px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  letter-spacing: 0.3px;
+}
+
+.report-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--pill-border);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.report-btn svg { width: 19px; height: 19px; }
+
+.report-card:hover .report-btn {
+  background: rgba(255,255,255,0.16);
+  border-color: rgba(255,255,255,0.4);
+}
+
+@media (max-width: 700px) {
+  .reports { margin-top: 44px; }
+  .reports-title { font-size: 30px; }
+  .reports-sub { font-size: 17px; }
+  .report-card {
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 18px 20px;
+    border-radius: 16px;
+  }
+  .report-num { width: 40px; height: 40px; font-size: 15px; }
+  .report-text { flex: 1 1 100%; order: 3; }
+  .report-title { font-size: 19px; }
+  .report-kr { font-size: 16px; }
+  .report-action { margin-left: auto; gap: 12px; }
+  .report-size { font-size: 14px; }
+}
+
 /* ---------- MY ALLOCATION ---------- */
 
 .alloc-page {
