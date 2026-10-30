@@ -113,32 +113,35 @@ a { color: inherit; }
 }
 
 .sitenav .links a:hover { background: rgba(255, 255, 255, 0.12); }
-.sitenav .links a.active { background: rgba(255, 255, 255, 0.16); font-weight: 500; }
+.sitenav .links a.active {
+  background: rgba(255, 255, 255, 0.16);
+  font-weight: 500;
+  /* no fade — the hand-off from the sliding pill back to this static
+     highlight must be instant, or there's a one-frame blink between them */
+  transition: none;
+}
 
-/* 6. 현재 페이지를 가리키는 회색 타원 — 페이지 이동 시 이전 위치에서
-   지금 위치로 미끄러져 들어오며 생동감을 준다 (script.js가 위치를 계산) */
+/* 현재 섹션의 회색 타원은 위의 a.active 배경(순수 CSS)이 그린다 — JS를
+   기다리지 않으니 첫 화면부터 그 자리에 있고, 같은 섹션 안에서 이동할 땐
+   아무것도 움직이지 않는다. 다른 섹션으로 넘어갈 때만 각 페이지의 인라인
+   스크립트가 이 pill을 잠깐 만들어 이전 자리에서 미끄러뜨린 뒤 지운다. */
 .nav-pill {
   position: absolute;
   z-index: 0;
   top: 5px;
   left: 0;
   height: calc(100% - 10px);
-  width: 0;
   border-radius: var(--radius-full);
   background: rgba(255, 255, 255, 0.16);
   pointer-events: none;
-  opacity: 0;
 }
-
-.nav-pill.is-placed { opacity: 1; }
 
 .nav-pill.is-ready {
   transition: transform 0.4s cubic-bezier(.2,.7,.3,1), width 0.4s cubic-bezier(.2,.7,.3,1);
 }
 
-@media (min-width: 861px) {
-  .sitenav .links a.active { background: none; }
-}
+/* while the pill slides in, it stands in for the static highlight */
+.sitenav .links.is-sliding a.active { background: none; }
 
 .sitenav .allocation {
   text-decoration: none;
