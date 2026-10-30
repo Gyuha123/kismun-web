@@ -18,6 +18,12 @@
 <meta name="twitter:title" content="KISMUN '26" />
 <meta name="twitter:description" content="Value Your Voice, Voice Your Value" />
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&amp;display=swap" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -70,9 +76,24 @@
   }
   place(from);
   links.classList.add('is-sliding');
-  pill.getBoundingClientRect();          // commit the start position first
-  pill.classList.add('is-ready');
-  place(to);
+
+  // start gliding the moment this page is actually revealed — with the
+  // cross-document view transition the old page stays on screen until then,
+  // so starting earlier would hide most of the slide behind it
+  var started = false;
+  function go() {
+    if (started) return;
+    started = true;
+    pill.getBoundingClientRect();        // commit the start position first
+    pill.classList.add('is-ready');
+    place(to);
+  }
+  if ('onpagereveal' in window) {
+    window.addEventListener('pagereveal', function () { requestAnimationFrame(go); }, { once: true });
+    setTimeout(go, 1500);                // safety net
+  } else {
+    go();
+  }
 
   var done = false;
   function finish() {
@@ -82,7 +103,7 @@
     if (pill.parentNode) pill.parentNode.removeChild(pill);
   }
   pill.addEventListener('transitionend', finish);
-  setTimeout(finish, 600);
+  setTimeout(finish, 2200);
 })();
 </script>
 
