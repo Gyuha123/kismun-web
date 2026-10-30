@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | HSC</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/hsc.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="hsc">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,9 +37,43 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
+    <p class="pagehero-eyebrow">Committee</p>
+    <h1 class="pagehero-title">HSC</h1>
+    <p class="pagehero-sub">Historical Security Council</p>
+  </div>
+</header>
+
 <div class="people-page">
-  <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
-  <h1 class="page-heading">HSC</h1>
+
+  <!-- background guide -->
+  <section class="reports">
+    <div class="reports-head">
+      <h2 class="reports-title">Background Guide</h2>
+      <p class="reports-sub">Read these before the conference.</p>
+    </div>
+    <div class="report-list">
+      <article class="report-row">
+        <div class="report-index">01</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 1</p>
+          <h3 class="report-title"><a href="reports/hsc_01.pdf" target="_blank" rel="noopener">The Arab Spring (2011)</a></h3>
+          <p class="report-kr">아랍의 봄(2011)</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 24 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/hsc_01.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/hsc_01.pdf" download="KISMUN26_HSC_01_The Arab Spring (2011).pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- /background guide -->
+
 
   <div class="person-card">
     <div class="person-head">
@@ -50,7 +85,8 @@
     </div>
     <div class="person-letter">
       <p>Honorable delegates, chairs, staff, and directors, welcome to KISMUN 2026. I am Janghyun Kim, the Head Chair of the Historical Security Council. It is a great honor to serve as your chair, and an even greater one to stand before a room of voices waiting to be heard.</p>
-      <p>History has never been written by those who stayed silent. Every turning point in your own future will start when you believe that what you have to say is worth saying. That is the heart of this year's conference slogan: 'Value Your Voice, Voice Your Value'.</p>
+      <p class="pull-quote">History has never been written by those who stayed silent.</p>
+      <p>Every turning point in your own future will start when you believe that what you have to say is worth saying. That is the heart of this year's conference slogan: 'Value Your Voice, Voice Your Value'.</p>
       <p>This committee asks something rare of its delegates. We will step into the shoes of those who shaped it, and decide whether history bends the same way twice. Over the three days of this conference, we will write our own story. So bring your passion, your conviction, and your voice. Let this council be the place where you learn what your voice is worth, and how much it can change.</p>
       <p>Once again, welcome to KISMUN 2026. Let us write this chapter of history together.</p>
       <p>With gratitude,<br>Janghyun Kim<br>Head Chair of the Historical Security Council<br>KISMUN 2026</p>
@@ -68,32 +104,12 @@
     <div class="person-letter">
       <p>Honorable chairs, delegates, staff and respected directors, I am Jeongin Son, the Deputy Chair of HSC. It's my true honor to serve as your chair and to welcome you all to KISMUN 2026.</p>
       <p>My MUN journey started back in 2023, when I was just 13 years old, and the first MUN conference was KISMUN 23. Personally, when I first participated in the MUN conference, I experienced many challenges that I believed would never be solved, I was a delegate who was always afraid to make speeches and give a poi's in worry of "what if I make a mistake".</p>
-      <p>But conference after conference, I slowly learned that mistakes were never something to be afraid of. Instead, that was simply a part of growing into a better delegate. Every speech I gave taught me something new.</p>
+      <p>But conference after conference, I slowly learned that mistakes were never something to be afraid of. Instead, that was simply a part of growing into a better delegate.</p>
+      <p class="pull-quote">Every speech I gave taught me something new.</p>
       <p>This is exactly the spirit I hope to bring into HSC this year. I want this committee to be a place where delegates feel safe to speak, to try new things, and even to make mistakes without fear about anything. I believe that a committee grows the most when every delegate feels comfortable enough to participate actively.</p>
       <p>Best regards,<br>Jeongin Son<br>Deputy Chair of Historical Security Council<br>KISMUN 2026</p>
     </div>
   </div>
-  <!-- chair reports -->
-  <section class="reports">
-    <div class="reports-head">
-      <h2 class="reports-title">Chair Report</h2>
-      <p class="reports-sub">Background guide for each agenda of this committee — 1 report, tap to download.</p>
-    </div>
-    <div class="report-list">
-      <a class="report-card" href="reports/hsc_01.pdf" download="KISMUN26_HSC_01_The Arab Spring (2011).pdf">
-        <span class="report-num">01</span>
-        <span class="report-text">
-          <span class="report-title">The Arab Spring (2011)</span>
-          <span class="report-kr">아랍의 봄(2011)</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 14.0 MB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </section>
-  <!-- /chair reports -->
 </div>
 
 <footer class="sitefooter">

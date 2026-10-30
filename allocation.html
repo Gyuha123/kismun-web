@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | My Allocation</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/allocation.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="allocation">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,61 +37,51 @@
   </div>
 </nav>
 
-<div class="alloc-page">
-  <a class="back-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to home</a>
+<header class="pagehero pagehero-tall">
+  <div class="pagehero-inner">
+    <a class="back-link" href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to home</a>
+    <p class="pagehero-eyebrow">KISMUN 2026</p>
+    <h1 class="pagehero-title">my allocation</h1>
+    <p class="pagehero-sub">Look up your committee, your delegation, and your assigned classroom for both the workshop day and the KISMUN conference day.</p>
 
-  <header class="alloc-head">
-    <h1 class="alloc-title">my allocation</h1>
-    <p class="alloc-subtitle">Find your committee and delegation for KISMUN 2026.</p>
-  </header>
-
-  <section class="alloc-search" id="allocSearch">
-    <div class="alloc-input-wrap">
-      <svg class="alloc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-      <input id="allocInput" class="alloc-input" type="text" autocomplete="off" spellcheck="false"
-             placeholder="Type your name (KIS: 한글 이름 / SIKS, TAS: English name)" aria-label="Search your name" />
-      <button id="allocClear" class="alloc-clear" type="button" aria-label="Clear search" hidden>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
-    </div>
-    <div id="allocDropdown" class="alloc-dropdown" hidden></div>
-    <p class="alloc-hint">Every result shows a student number or school, so you can pick the right person.</p>
-  </section>
-
-  <div class="alloc-chip" id="allocChip" hidden>
-    <span class="alloc-chip-name" id="allocChipName"></span>
-    <span class="alloc-chip-dot"></span>
-    <span class="alloc-chip-id" id="allocChipId"></span>
+    <section class="alloc-search" id="allocSearch">
+      <div class="alloc-input-wrap">
+        <svg class="alloc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="allocInput" class="alloc-input" type="text" autocomplete="off" spellcheck="false"
+               placeholder="Search your name" aria-label="Search your name" />
+        <button id="allocClear" class="alloc-clear" type="button" aria-label="Clear search" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="allocDropdown" class="alloc-dropdown" hidden></div>
+      <p class="alloc-hint">KIS &mdash; 한글 이름 &nbsp;/&nbsp; SIKS, TAS &mdash; English name</p>
+    </section>
   </div>
+</header>
 
-  <section class="alloc-result" id="allocResult">
-    <article class="alloc-card is-empty" id="allocCommitteeCard">
-      <span class="alloc-tag">Committee</span>
-      <div class="alloc-card-body">
-        <div class="alloc-placeholder">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
-          <span>Awaiting search</span>
-        </div>
-        <div class="alloc-reveal">
-          <div class="alloc-committee" id="allocCommittee"></div>
-          <div class="alloc-committee-full" id="allocCommitteeFull"></div>
-        </div>
-      </div>
-    </article>
+<div class="alloc-page">
 
-    <article class="alloc-card is-empty" id="allocDelegationCard">
-      <span class="alloc-tag">Delegation</span>
-      <div class="alloc-card-body">
-        <div class="alloc-placeholder">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>
-          <span>Awaiting search</span>
-        </div>
-        <div class="alloc-reveal">
-          <div class="alloc-flag-frame"><img class="alloc-flag" id="allocFlag" alt="" /></div>
-          <div class="alloc-delegation" id="allocDelegation"></div>
-        </div>
+
+  <section class="alloc-result" id="allocResult" hidden>
+    <p class="alloc-for"><span id="allocChipName"></span> <span class="alloc-for-id" id="allocChipId"></span></p>
+    <dl class="alloc-lines">
+      <div class="alloc-line">
+        <dt>Committee</dt>
+        <dd><a class="alloc-committee-link" id="allocCommitteeLink" href="#"><span id="allocCommittee"></span><span class="alloc-go" aria-hidden="true">&#8594;</span></a><span class="alloc-committee-full" id="allocCommitteeFull"></span></dd>
       </div>
-    </article>
+      <div class="alloc-line">
+        <dt>Delegation</dt>
+        <dd><img id="allocFlag" class="alloc-flag" alt="" hidden /><span id="allocDelegation"></span></dd>
+      </div>
+      <div class="alloc-line alloc-line-room" id="allocRoomWorkshopLine" hidden>
+        <dt>Workshop Day Room</dt>
+        <dd id="allocRoomWorkshop"></dd>
+      </div>
+      <div class="alloc-line alloc-line-room" id="allocRoomKismunLine" hidden>
+        <dt>KISMUN Day Room</dt>
+        <dd id="allocRoomKismun"></dd>
+      </div>
+    </dl>
   </section>
 </div>
 

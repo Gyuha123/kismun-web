@@ -18,36 +18,42 @@
 
   var dropdown = document.getElementById('allocDropdown');
   var clearBtn = document.getElementById('allocClear');
-  var chip = document.getElementById('allocChip');
+  var result = document.getElementById('allocResult');
   var chipName = document.getElementById('allocChipName');
   var chipId = document.getElementById('allocChipId');
-  var committeeCard = document.getElementById('allocCommitteeCard');
-  var delegationCard = document.getElementById('allocDelegationCard');
   var committeeEl = document.getElementById('allocCommittee');
   var committeeFullEl = document.getElementById('allocCommitteeFull');
   var delegationEl = document.getElementById('allocDelegation');
   var flagEl = document.getElementById('allocFlag');
+  var committeeLink = document.getElementById('allocCommitteeLink');
+  var roomWorkshopLine = document.getElementById('allocRoomWorkshopLine');
+  var roomKismunLine = document.getElementById('allocRoomKismunLine');
+  var roomWorkshopEl = document.getElementById('allocRoomWorkshop');
+  var roomKismunEl = document.getElementById('allocRoomKismun');
+
+  var COMMITTEE_PAGE = {
+    'UNHRC(1)': 'unhrc.html', 'UNHRC(2)': 'unhrc2.html', 'ECOSOC': 'ecosoc.html',
+    'WHO(1)': 'who1.html', 'WHO(2)': 'who2.html', 'UNODC': 'unodc.html',
+    'ITU': 'itu.html', 'SPECPOL': 'specpol.html', 'HSC': 'hsc.html'
+  };
+
+  // classroom assignments by committee, exactly as printed on the official
+  // room-allocation slides — Korean room names are kept as-is, untranslated
+  var ROOMS = {
+    'UNHRC(1)': { workshop: '시청각실',     kismun: '교과 1실' },
+    'UNHRC(2)': { workshop: '8-1 교실',     kismun: '교과 4실' },
+    'ECOSOC':   { workshop: '8-5 교실',     kismun: '미술실 A' },
+    'WHO(1)':   { workshop: '8-3 교실',     kismun: '신한정보관' },
+    'WHO(2)':   { workshop: '신한정보관',    kismun: '교과 3실' },
+    'UNODC':    { workshop: '8-4 교실',     kismun: '시청각실' },
+    'ITU':      { workshop: '교과 1실',     kismun: '과학실' },
+    'SPECPOL':  { workshop: '8-2 교실',     kismun: '음악실 A' },
+    'HSC':      { workshop: 'AI 컴퓨터실',  kismun: '회의실 (교장실 옆)' }
+  };
 
   var MAX_RESULTS = 12;
   var matches = [];
   var activeIndex = -1;
-
-  // the full guidance does not fit a phone-width input, so move it into the
-  // hint line there instead of letting the placeholder get cut off
-  var hint = document.querySelector('.alloc-hint');
-  var WIDE_PLACEHOLDER = 'Type your name (KIS: 한글 이름 / SIKS, TAS: English name)';
-  var NARROW_PLACEHOLDER = 'Type your name (한글 / English)';
-  var WIDE_HINT = 'Every result shows a student number or school, so you can pick the right person.';
-  var NARROW_HINT = 'KIS: 한글 이름 · SIKS, TAS: English name. Every result shows a student number or school.';
-  var narrow = window.matchMedia('(max-width: 700px)');
-
-  function applyCopy() {
-    input.placeholder = narrow.matches ? NARROW_PLACEHOLDER : WIDE_PLACEHOLDER;
-    if (hint) hint.textContent = narrow.matches ? NARROW_HINT : WIDE_HINT;
-  }
-  applyCopy();
-  if (narrow.addEventListener) narrow.addEventListener('change', applyCopy);
-  else if (narrow.addListener) narrow.addListener(applyCopy);
 
   function norm(s) {
     return (s || '').toString().toLowerCase().replace(/\s+/g, '');
@@ -94,34 +100,56 @@
   function select(d) {
     committeeEl.textContent = d.c;
     committeeFullEl.textContent = COMMITTEE_FULL[d.c] || '';
-    committeeEl.classList.toggle('is-long', d.c.length > 12);
-    committeeCard.classList.remove('is-empty');
+
+    // 위원회 페이지가 있는 경우에만 링크로 만든다 (Secretariat 등은 해당 없음)
+    var page = COMMITTEE_PAGE[d.c];
+    if (page) {
+      committeeLink.href = page;
+      committeeLink.classList.add('is-link');
+    } else {
+      committeeLink.removeAttribute('href');
+      committeeLink.classList.remove('is-link');
+    }
 
     // chairs and the secretariat get their role under the UN flag instead of a country
     var label = d.r || data.names[d.d] || d.d;
     delegationEl.textContent = label;
     if (d.d === 'UN') {
       flagEl.src = 'unflag.png';
-      flagEl.alt = 'United Nations flag';
+      flagEl.alt = '';
+      flagEl.hidden = false;
     } else if (data.flags[d.d]) {
       flagEl.src = 'flags/4x3/' + data.flags[d.d] + '.svg';
-      flagEl.alt = label + ' flag';
+      flagEl.alt = '';
+      flagEl.hidden = false;
     } else {
       flagEl.removeAttribute('src');
-      flagEl.alt = '';
+      flagEl.hidden = true;
     }
-    delegationCard.classList.remove('is-empty');
+
+    // only committees with a printed room assignment show these two lines —
+    // Secretariat / chair entries (d.c === 'Secretariat') have none
+    var rooms = ROOMS[d.c];
+    if (rooms) {
+      roomWorkshopEl.textContent = rooms.workshop;
+      roomKismunEl.textContent = rooms.kismun;
+      roomWorkshopLine.hidden = false;
+      roomKismunLine.hidden = false;
+    } else {
+      roomWorkshopEl.textContent = '';
+      roomKismunEl.textContent = '';
+      roomWorkshopLine.hidden = true;
+      roomKismunLine.hidden = true;
+    }
 
     chipName.textContent = d.n;
     chipId.textContent = d.s;
-    chip.hidden = false;
 
-    // restart the reveal animation on every new pick
-    [committeeCard, delegationCard].forEach(function (el) {
-      el.classList.remove('revealed');
-      void el.offsetWidth;
-      el.classList.add('revealed');
-    });
+    // restart the reveal on every new pick
+    result.hidden = false;
+    result.classList.remove('revealed');
+    void result.offsetWidth;
+    result.classList.add('revealed');
 
     input.value = d.n;
     matches = [];
@@ -137,15 +165,17 @@
     dropdown.hidden = true;
     dropdown.innerHTML = '';
     clearBtn.hidden = true;
-    chip.hidden = true;
-    committeeCard.classList.add('is-empty');
-    delegationCard.classList.add('is-empty');
-    committeeCard.classList.remove('revealed');
-    delegationCard.classList.remove('revealed');
+    result.hidden = true;
+    result.classList.remove('revealed');
     committeeEl.textContent = '';
     committeeFullEl.textContent = '';
     delegationEl.textContent = '';
     flagEl.removeAttribute('src');
+    flagEl.hidden = true;
+    roomWorkshopEl.textContent = '';
+    roomKismunEl.textContent = '';
+    roomWorkshopLine.hidden = true;
+    roomKismunLine.hidden = true;
     input.focus();
   }
 

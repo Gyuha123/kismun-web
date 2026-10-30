@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | UNODC</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/unodc.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="unodc">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,9 +37,58 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
+    <p class="pagehero-eyebrow">Committee</p>
+    <h1 class="pagehero-title">UNODC</h1>
+    <p class="pagehero-sub">United Nations Office on Drugs and Crime</p>
+  </div>
+</header>
+
 <div class="people-page">
-  <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
-  <h1 class="page-heading">UNODC</h1>
+
+  <!-- background guide -->
+  <section class="reports">
+    <div class="reports-head">
+      <h2 class="reports-title">Background Guide</h2>
+      <p class="reports-sub">Read these before the conference.</p>
+    </div>
+    <div class="report-list">
+      <article class="report-row">
+        <div class="report-index">01</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 1</p>
+          <h3 class="report-title"><a href="reports/unodc_01.pdf" target="_blank" rel="noopener">Eradicating Illegal Organ Trafficking Networks in the Black Market</a></h3>
+          <p class="report-kr">암시장 내 불법 장기밀매 조직 근절</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 25 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/unodc_01.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/unodc_01.pdf" download="KISMUN26_UNODC_01_Eradicating Illegal Organ Trafficking Networks in the Black Market.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+      <article class="report-row">
+        <div class="report-index">02</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 2</p>
+          <h3 class="report-title"><a href="reports/unodc_02.pdf" target="_blank" rel="noopener">Strengthening International Action against Synthetic Drug Trafficking</a></h3>
+          <p class="report-kr">합성 마약 밀매 근절을 위한 국제 공조 강화</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 24 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/unodc_02.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/unodc_02.pdf" download="KISMUN26_UNODC_02_Strengthening International Action against Synthetic Drug Trafficking.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- /background guide -->
+
 
   <div class="person-card">
     <div class="person-head">
@@ -50,7 +100,9 @@
     </div>
     <div class="person-letter">
       <p>Honorable chairs, fellow delegates, esteemed staff and respected directors. I am So Hyun Park, the Chair of UNODC. It is a great honor to serve as a Head Chair and hope to have a wonderful debate during the 3 days journey.</p>
-      <p>I started my MUN journey in 2024, when I was 14 years old. Honestly, I was a student who did not give high quality of speech and POI. I was hesitant to give a speech and POI as I was nervous to speak in front of the number of people. Even though I had a lot of MUN experience, I had less confidence, but I tried to overcome my fear. Then, I realized the power of voice. My speech and POI can convince others to reconsider their opinions, which encourages me to debate actively. Through KISMUN 2026 slogan: "Value your voice, Voice your value.", I hope delegates realize the power of their voice and not to be afraid to speak in front of people.</p>
+      <p>I started my MUN journey in 2024, when I was 14 years old. Honestly, I was a student who did not give high quality of speech and POI. I was hesitant to give a speech and POI as I was nervous to speak in front of the number of people. Even though I had a lot of MUN experience, I had less confidence, but I tried to overcome my fear. Then, I realized the power of voice.</p>
+      <p class="pull-quote">My speech and POI can convince others to reconsider their opinions, which encourages me to debate actively.</p>
+      <p>Through KISMUN 2026 slogan: "Value your voice, Voice your value.", I hope delegates realize the power of their voice and not to be afraid to speak in front of people.</p>
       <p>I am aware that for some delegates, KISMUN will be a great challenge. However, I highly encourage you to try your best, so your voice can value everyone. I am looking forward to delegates attempting rather than giving up their POI and speech and also push themselves harder during the debate.</p>
       <p>Sincerely,<br>So Hyun Park<br>Head Chair of United Nations Office on Drugs and Crime<br>KISMUN 2026</p>
     </div>
@@ -67,43 +119,13 @@
     <div class="person-letter">
       <p>Honorable chairs, fellow delegates and staff members. I am Bona Lee, the Deputy Chair of UNODC. It is an honor to serve as a Chair in UNODC.</p>
       <p>When I first started my MUN journey, I was obsessed with the idea of being perfect. I used to write down every single word of my speeches in advance, rehearsing them until my hands stopped shaking. But as I attended more conferences, I realized that diplomacy isn't about being flawless. It's about the process, researching the issues deeply, stepping up even when you're uncertain, and turning every debate into a learning experience.</p>
-      <p>This is why I want everyone to remember one main thing. Value your voice, Voice your value. Great ideas mean nothing if they just stay inside your head. You have to put them out. Your voice only has power when you choose to use it. Therefore, don't be afraid to make mistakes. Just raise your placard, step up, and show everyone what you've got.</p>
+      <p>This is why I want everyone to remember one main thing. Value your voice, Voice your value. Great ideas mean nothing if they just stay inside your head. You have to put them out.</p>
+      <p class="pull-quote">Your voice only has power when you choose to use it.</p>
+      <p>Therefore, don't be afraid to make mistakes. Just raise your placard, step up, and show everyone what you've got.</p>
       <p>Whether this is your first conference or not, I encourage you to push your boundaries. Stand tall at the podium, trust your preparations, and let the room hear what you have to say.</p>
       <p>Best regards,<br>Bona Lee<br>Deputy Chair of United Nations Office on Drugs and Crime<br>KISMUN 2026.</p>
     </div>
   </div>
-  <!-- chair reports -->
-  <section class="reports">
-    <div class="reports-head">
-      <h2 class="reports-title">Chair Report</h2>
-      <p class="reports-sub">Background guide for each agenda of this committee — 2 reports, tap to download.</p>
-    </div>
-    <div class="report-list">
-      <a class="report-card" href="reports/unodc_01.pdf" download="KISMUN26_UNODC_01_Eradicating Illegal Organ Trafficking Networks in the Black Market.pdf">
-        <span class="report-num">01</span>
-        <span class="report-text">
-          <span class="report-title">Eradicating Illegal Organ Trafficking Networks in the Black Market</span>
-          <span class="report-kr">암시장 내 불법 장기밀매 조직 근절</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 1.9 MB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-      <a class="report-card" href="reports/unodc_02.pdf" download="KISMUN26_UNODC_02_Strengthening International Action against Synthetic Drug Trafficking.pdf">
-        <span class="report-num">02</span>
-        <span class="report-text">
-          <span class="report-title">Strengthening International Action against Synthetic Drug Trafficking</span>
-          <span class="report-kr">합성 마약 밀매 근절을 위한 국제 공조 강화</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 304 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </section>
-  <!-- /chair reports -->
 </div>
 
 <footer class="sitefooter">

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | WHO(1)</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/who1.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="who">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,9 +37,58 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
+    <p class="pagehero-eyebrow">Committee</p>
+    <h1 class="pagehero-title">WHO(1)</h1>
+    <p class="pagehero-sub">World Health Organization</p>
+  </div>
+</header>
+
 <div class="people-page">
-  <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
-  <h1 class="page-heading">WHO(1)</h1>
+
+  <!-- background guide -->
+  <section class="reports">
+    <div class="reports-head">
+      <h2 class="reports-title">Background Guide</h2>
+      <p class="reports-sub">Read these before the conference.</p>
+    </div>
+    <div class="report-list">
+      <article class="report-row">
+        <div class="report-index">01</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 1</p>
+          <h3 class="report-title"><a href="reports/who1_01.pdf" target="_blank" rel="noopener">Strengthening Chronic Disease Management through the Global Standardization of Healthcare Systems</a></h3>
+          <p class="report-kr">보건 의료 체계의 국제 표준화를 통한 만성질환 관리 강화</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 30 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/who1_01.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/who1_01.pdf" download="KISMUN26_WHO (1)_01_Strengthening Chronic Disease Management through the Global Standardization of Healthcare Systems.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+      <article class="report-row">
+        <div class="report-index">02</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 2</p>
+          <h3 class="report-title"><a href="reports/who1_02.pdf" target="_blank" rel="noopener">Combating Social Exclusion and Employment Discrimination Against Individuals with Medical Conditions</a></h3>
+          <p class="report-kr">의학적 질환을 가진 개인에 대한 사회적 배제 및 고용 차별 해소</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 25 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/who1_02.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/who1_02.pdf" download="KISMUN26_WHO (1)_02_Combating Social Exclusion and Employment Discrimination Against Individuals with Medical Conditions.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- /background guide -->
+
 
   <div class="person-card">
     <div class="person-head">
@@ -50,7 +100,9 @@
     </div>
     <div class="person-letter">
       <p>Honorable chairs, fellow delegates, and distinguished staff, I am Hyo Seok Choi, the Head Chair of WHO(1). I am honored to serve as a chair for KISMUN 26, and I hope that our committee will have a brilliant debate over the days.</p>
-      <p>MUN can sometimes feel overwhelming for delegates, with difficult topics and formal procedures. When I first started my MUN journey, I felt the same. I was a quiet and shy delegate, and I hesitated before when I raised my placard. Although some people may think otherwise, I believe that MUN is about taking the initiative to speak up, and growing and speaking more with every debate.</p>
+      <p>MUN can sometimes feel overwhelming for delegates, with difficult topics and formal procedures. When I first started my MUN journey, I felt the same.</p>
+      <p class="pull-quote">I was a quiet and shy delegate, and I hesitated before when I raised my placard.</p>
+      <p>Although some people may think otherwise, I believe that MUN is about taking the initiative to speak up, and growing and speaking more with every debate.</p>
       <p>This year's slogan, "Value Your Voice, Voice Your Value.", reminds us that every thought you share, no matter how small, carries invaluable significance. In WHO, we focus on major global health issues that impact precious lives around the world. Because every life holds immeasurable value, every voice in this committee is crucial regarding bringing meaningful solutions to the debate.</p>
       <p>As your chair, I am fully dedicated to creating a supportive and engaging environment for all delegates, and I look forward to listening to the passionate speeches over the next 3 days.</p>
       <p>Best regards,<br>Hyoseok Choi<br>Head Chair of World Health Organization(1)<br>KISMUN 2026</p>
@@ -74,38 +126,6 @@
       <p>With anticipation,<br>SeeYoung Van<br>Deputy Chair of the World Health Organization<br>KISMUN 2026</p>
     </div>
   </div>
-  <!-- chair reports -->
-  <section class="reports">
-    <div class="reports-head">
-      <h2 class="reports-title">Chair Report</h2>
-      <p class="reports-sub">Background guide for each agenda of this committee — 2 reports, tap to download.</p>
-    </div>
-    <div class="report-list">
-      <a class="report-card" href="reports/who1_01.pdf" download="KISMUN26_WHO (1)_01_Strengthening Chronic Disease Management through the Global Standardization of Healthcare Systems.pdf">
-        <span class="report-num">01</span>
-        <span class="report-text">
-          <span class="report-title">Strengthening Chronic Disease Management through the Global Standardization of Healthcare Systems</span>
-          <span class="report-kr">보건 의료 체계의 국제 표준화를 통한 만성질환 관리 강화</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 590 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-      <a class="report-card" href="reports/who1_02.pdf" download="KISMUN26_WHO (1)_02_Combating Social Exclusion and Employment Discrimination Against Individuals with Medical Conditions.pdf">
-        <span class="report-num">02</span>
-        <span class="report-text">
-          <span class="report-title">Combating Social Exclusion and Employment Discrimination Against Individuals with Medical Conditions</span>
-          <span class="report-kr">의학적 질환을 가진 개인에 대한 사회적 배제 및 고용 차별 해소</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 336 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </section>
-  <!-- /chair reports -->
 </div>
 
 <footer class="sitefooter">

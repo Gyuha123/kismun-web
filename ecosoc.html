@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | ECOSOC</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/ecosoc.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="ecosoc">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,9 +37,58 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
+    <p class="pagehero-eyebrow">Committee</p>
+    <h1 class="pagehero-title">ECOSOC</h1>
+    <p class="pagehero-sub">Economic and Social Council</p>
+  </div>
+</header>
+
 <div class="people-page">
-  <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
-  <h1 class="page-heading">ECOSOC</h1>
+
+  <!-- background guide -->
+  <section class="reports">
+    <div class="reports-head">
+      <h2 class="reports-title">Background Guide</h2>
+      <p class="reports-sub">Read these before the conference.</p>
+    </div>
+    <div class="report-list">
+      <article class="report-row">
+        <div class="report-index">01</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 1</p>
+          <h3 class="report-title"><a href="reports/ecosoc_01.pdf" target="_blank" rel="noopener">Integrating Smart Infrastructure into Urban Planning for Sustainable Development</a></h3>
+          <p class="report-kr">지속가능한 발전을 위한 도시계획 내 스마트 인프라 통합</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 26 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/ecosoc_01.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/ecosoc_01.pdf" download="KISMUN26_ECOSOC_01_Integrating Smart Infrastructure into Urban Planning for Sustainable Development .pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+      <article class="report-row">
+        <div class="report-index">02</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 2</p>
+          <h3 class="report-title"><a href="reports/ecosoc_02.pdf" target="_blank" rel="noopener">Promoting Financial Inclusion in Developing Nations through Central Bank Digital Currencies (CBDCs)</a></h3>
+          <p class="report-kr">중앙은행 디지털화폐(CBDC)를 통한 개발도상국의 금융포용성 증진</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 22 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/ecosoc_02.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/ecosoc_02.pdf" download="KISMUN26_ECOSOC_02_Promoting Financial Inclusion in Developing Nations through Central Bank Digital Currencies (CBDCs).pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- /background guide -->
+
 
   <div class="person-card">
     <div class="person-head">
@@ -50,8 +100,10 @@
     </div>
     <div class="person-letter">
       <p>Hello Delegates, my name is Dongwon Seo, and I will be serving as the Head Chair of the Economic and Social Council (ECOSOC) at KISMUN 2026. It is my great pleasure to welcome you to KISMUN 2026.</p>
-      <p>This conference marks my 14th MUN and probably my last in my MUN career. I am excited to end my journey by serving as your Chair, and I am delighted to share this final conference with all of you. I hope a memorable experience for every delegate. Remember: Voice your Value, Value your Voice.</p>
-      <p>To make this conference memorable I strongly encourage you to read the Chair report carefully before attending the Conference. It contains the essential background information and key solutions to understand the topics and prepare for the debate and resolution writing. I also highly recommend participating in the workshops that will be held 3 or 4 weeks before KISMUN 2026, since a large portion of the resolution will be written during these sessions.</p>
+      <p>This conference marks my 14th MUN and probably my last in my MUN career. I am excited to end my journey by serving as your Chair, and I am delighted to share this final conference with all of you. I hope a memorable experience for every delegate.</p>
+      <p class="pull-quote">Remember: Voice your Value, Value your Voice.</p>
+      <p>To make this conference memorable I strongly encourage you to read the Chair report carefully before attending the Conference. It contains the essential background information and key solutions to understand the topics and prepare for the debate and resolution writing.</p>
+      <p>I also highly recommend participating in the workshops that will be held 3 or 4 weeks before KISMUN 2026, since a large portion of the resolution will be written during these sessions.</p>
       <p>If you have any questions regarding the conference, the committee, or the topic, please do not hesitate to contact me at tuna080046@gmail.com. Once again, Welcome to KISMUN 2026 and I will be looking forward to meeting you all and witness tense debates, creative clauses. MEET YOU AT KISMUN 2026!</p>
       <p>With my most cordial welcome,<br>Dongwon Seo<br>Head Chair of the Economic and Social Council<br>KISMUN 2026</p>
     </div>
@@ -73,38 +125,6 @@
       <p>Sincerely,<br>Siwon Jin<br>Deputy Chair of the United Nations Economic and Social Council<br>KISMUN 2026</p>
     </div>
   </div>
-  <!-- chair reports -->
-  <section class="reports">
-    <div class="reports-head">
-      <h2 class="reports-title">Chair Report</h2>
-      <p class="reports-sub">Background guide for each agenda of this committee — 2 reports, tap to download.</p>
-    </div>
-    <div class="report-list">
-      <a class="report-card" href="reports/ecosoc_01.pdf" download="KISMUN26_ECOSOC_01_Integrating Smart Infrastructure into Urban Planning for Sustainable Development .pdf">
-        <span class="report-num">01</span>
-        <span class="report-text">
-          <span class="report-title">Integrating Smart Infrastructure into Urban Planning for Sustainable Development</span>
-          <span class="report-kr">지속가능한 발전을 위한 도시계획 내 스마트 인프라 통합</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 890 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-      <a class="report-card" href="reports/ecosoc_02.pdf" download="KISMUN26_ECOSOC_02_Promoting Financial Inclusion in Developing Nations through Central Bank Digital Currencies (CBDCs).pdf">
-        <span class="report-num">02</span>
-        <span class="report-text">
-          <span class="report-title">Promoting Financial Inclusion in Developing Nations through Central Bank Digital Currencies (CBDCs)</span>
-          <span class="report-kr">중앙은행 디지털화폐(CBDC)를 통한 개발도상국의 금융포용성 증진</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 919 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </section>
-  <!-- /chair reports -->
 </div>
 
 <footer class="sitefooter">

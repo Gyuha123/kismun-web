@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | Staff</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/staff.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="staff">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,27 +37,34 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <p class="pagehero-eyebrow">KISMUN 2026</p>
+    <h1 class="pagehero-title">staff</h1>
+    <p class="pagehero-sub">Departments that keep the conference running.</p>
+  </div>
+</header>
+
 <div class="grid-page">
-  <h1 class="page-heading">staff</h1>
   <div class="card-grid cols-3">
 
-    <div class="info-card">
+    <a class="info-card" href="admin.html">
       <h4>Admin</h4>
       <p>Operations team</p>
-      <a class="more-btn" href="admin.html">↗ more</a>
-    </div>
+      <span class="info-card-cta">View department <span class="info-card-arrow" aria-hidden="true">↗</span></span>
+    </a>
 
-    <div class="info-card">
+    <a class="info-card" href="pmc.html">
       <h4>PMC</h4>
       <p>Public Media &amp; Web Develop</p>
-      <a class="more-btn" href="pmc.html">↗ more</a>
-    </div>
+      <span class="info-card-cta">View department <span class="info-card-arrow" aria-hidden="true">↗</span></span>
+    </a>
 
-    <div class="info-card">
+    <a class="info-card" href="press.html">
       <h4>PRESS</h4>
       <p>Journal &amp; Photograph</p>
-      <a class="more-btn" href="press.html">↗ more</a>
-    </div>
+      <span class="info-card-cta">View department <span class="info-card-arrow" aria-hidden="true">↗</span></span>
+    </a>
 
   </div>
 </div>

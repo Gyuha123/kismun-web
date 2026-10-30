@@ -5,6 +5,68 @@ document.querySelectorAll('.nav-toggle').forEach(function (btn) {
   });
 });
 
+// nav pill — the gray ellipse that marks the current section slides over
+// from wherever it sat on the page you came from, so moving between
+// committee / staff / secretariat / director feels continuous across
+// full page loads instead of a flat swap.
+(function () {
+  var links = document.querySelector('.sitenav .links');
+  if (!links) return;
+
+  var items = Array.prototype.slice.call(links.querySelectorAll('a'));
+  var activeIndex = items.findIndex(function (a) { return a.classList.contains('active'); });
+  if (activeIndex === -1) return; // index / allocation have no section to mark
+
+  // only the desktop pill nav has real widths to measure — the mobile
+  // dropdown keeps its own static highlight instead
+  if (links.offsetWidth === 0) return;
+
+  var pill = document.createElement('span');
+  pill.className = 'nav-pill';
+  pill.setAttribute('aria-hidden', 'true');
+  links.insertBefore(pill, links.firstChild);
+
+  function setRect(i) {
+    var a = items[i];
+    pill.style.transform = 'translateX(' + a.offsetLeft + 'px)';
+    pill.style.width = a.offsetWidth + 'px';
+  }
+
+  var STORE_KEY = 'kismunNavPillIndex';
+  var fromRaw = sessionStorage.getItem(STORE_KEY);
+  var fromIndex = fromRaw === null ? -1 : parseInt(fromRaw, 10);
+  sessionStorage.setItem(STORE_KEY, String(activeIndex));
+
+  if (fromIndex >= 0 && fromIndex < items.length && fromIndex !== activeIndex) {
+    // land exactly where the pill was on the page we came from (no
+    // transition yet), then let it glide over to the real tab
+    setRect(fromIndex);
+    pill.classList.add('is-placed');
+    requestAnimationFrame(function () {
+      pill.classList.add('is-ready');
+      requestAnimationFrame(function () { setRect(activeIndex); });
+    });
+  } else {
+    setRect(activeIndex);
+    pill.classList.add('is-placed', 'is-ready');
+  }
+
+  window.addEventListener('resize', function () { setRect(activeIndex); });
+
+  // the nav links are first laid out in a fallback font before the Clash
+  // Grotesk webfont swaps in; if that swap changes the links' widths, the
+  // pill (measured against the fallback metrics) would sit slightly off —
+  // re-measure once webfonts are actually ready, snapped with no
+  // transition so the correction itself is never visible as a shake
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      pill.classList.remove('is-ready');
+      setRect(activeIndex);
+      requestAnimationFrame(function () { pill.classList.add('is-ready'); });
+    });
+  }
+})();
+
 // conference day tabs
 document.querySelectorAll('.day-tab').forEach(function (tab) {
   tab.addEventListener('click', function () {
@@ -16,28 +78,6 @@ document.querySelectorAll('.day-tab').forEach(function (tab) {
   });
 });
 
-// keep the conference-info box a fixed height (tallest day) so switching tabs doesn't jump
-(function () {
-  var wrap = document.querySelector('.day-panels');
-  var panels = document.querySelectorAll('.day-panel');
-  if (!wrap || !panels.length) return;
-
-  function syncHeight() {
-    wrap.style.minHeight = '';
-    var maxH = 0;
-    panels.forEach(function (p) {
-      var prevDisplay = p.style.display;
-      p.style.display = 'block';
-      if (p.scrollHeight > maxH) maxH = p.scrollHeight;
-      p.style.display = prevDisplay;
-    });
-    wrap.style.minHeight = maxH + 'px';
-  }
-
-  syncHeight();
-  window.addEventListener('resize', syncHeight);
-  window.addEventListener('load', syncHeight);
-})();
 
 // gallery swipe carousel
 (function () {

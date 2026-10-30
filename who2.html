@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | WHO(2)</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/who2.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="who">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,9 +37,58 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
+    <p class="pagehero-eyebrow">Committee</p>
+    <h1 class="pagehero-title">WHO(2)</h1>
+    <p class="pagehero-sub">World Health Organization</p>
+  </div>
+</header>
+
 <div class="people-page">
-  <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
-  <h1 class="page-heading">WHO(2)</h1>
+
+  <!-- background guide -->
+  <section class="reports">
+    <div class="reports-head">
+      <h2 class="reports-title">Background Guide</h2>
+      <p class="reports-sub">Read these before the conference.</p>
+    </div>
+    <div class="report-list">
+      <article class="report-row">
+        <div class="report-index">01</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 1</p>
+          <h3 class="report-title"><a href="reports/who2_01.pdf" target="_blank" rel="noopener">Combating Unlicensed and Illegal Medical Procedures by Establishing Clear Regulation Policies</a></h3>
+          <p class="report-kr">명확한 규제 정책 수립을 통한 무면허 및 불법 의료 시술 근절</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 30 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/who2_01.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/who2_01.pdf" download="KISMUN26_WHO (2)_01_Combating Unlicensed and Illegal Medical Procedures by Establishing Clear Regulation Policies.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+      <article class="report-row">
+        <div class="report-index">02</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 2</p>
+          <h3 class="report-title"><a href="reports/who2_02.pdf" target="_blank" rel="noopener">Reducing Inequalities in Global Healthcare Systems in Developing Countries Through Enhanced Global Partnership</a></h3>
+          <p class="report-kr">국제 협력 강화를 통한 개발도상국 보건 의료 체계의 불평등 완화</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 17 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/who2_02.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/who2_02.pdf" download="KISMUN26_WHO(2)_02_Reducing Inequalities in Global Healthcare Systems in Developing Countries Through Enhanced Global Partnership.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- /background guide -->
+
 
   <div class="person-card">
     <div class="person-head">
@@ -50,7 +100,8 @@
     </div>
     <div class="person-letter">
       <p>Honorable chairs, esteemed delegates, staff, and respected directors, I am Oh Sion, Head Chair of WHO(2) at KISMUN 2026, and it is a distinct privilege to welcome you as members of the committee.</p>
-      <p>I would like to begin by sharing a part of my own journey. I used to be quite introverted and standing in front of a big audience was genuinely intimidating. I often worried that I might make a mistake while speaking, so expressing my thoughts in front of others felt more difficult than it seemed to be for those around me. Since I began participating in Model United Nations later than many of my peers, I often doubted whether I could keep up and lacked confidence in myself. My perspective began to change when a senior member of the LDP shared a few words that encouraged me to trust my own potential. Those words gave me a reason to believe that I could improve, and from that point onward, I continued to place myself in unfamiliar situations even when I felt uncertain. Each experience taught me that confidence can be built when we choose to act despite our hesitation.</p>
+      <p>I would like to begin by sharing a part of my own journey. I used to be quite introverted and standing in front of a big audience was genuinely intimidating. I often worried that I might make a mistake while speaking, so expressing my thoughts in front of others felt more difficult than it seemed to be for those around me. Since I began participating in Model United Nations later than many of my peers, I often doubted whether I could keep up and lacked confidence in myself. My perspective began to change when a senior member of the LDP shared a few words that encouraged me to trust my own potential. Those words gave me a reason to believe that I could improve, and from that point onward, I continued to place myself in unfamiliar situations even when I felt uncertain.</p>
+      <p class="pull-quote">Each experience taught me that confidence can be built when we choose to act despite our hesitation.</p>
       <p>As I have learned through my own experience, every contribution carries its own significance. A single statement may encourage someone, inspire a new idea, or influence the direction of a discussion and shape how people engage with one another. This is what our conference slogan, "Value Your Voice, Voice Your Value," is intended to convey to others: the belief that each voice deserves a meaningful role in the conversation and should be expressed with sincerity and confidence.</p>
       <p>I once found it difficult to deliver even a few sentences, but now I have the opportunity to serve as your Chair. As this will also be my first time chairing, I may be inexperienced in this role, but I will do my best to assist you throughout the conference and fulfill my responsibilities with dedication. I look forward to meeting each of you and witnessing the perspectives you will bring to WHO(2).</p>
       <p>Best,<br>Sion Oh<br>Head Chair of WHO(2)<br>KISMUN 2026</p>
@@ -67,44 +118,13 @@
     </div>
     <div class="person-letter">
       <p>Honorable delegates, staff members, and most respected directors, I am the Deputy Chair of WHO2, Kim Sunjung. It's my pleasure to serve as your chair and welcome to KISMUN 2026.</p>
-      <p>I've started my KISMUN journey at the UNDP committee, 2023. I was so afraid to even make a POI and so, have kept my hands down for the majority of the time. However, the Chairs helped me to gain courage. Looking back at that hesitant delegate in 2023, I never imagined I would one day stand before you as a Chair. That experience taught me that MUN is not about being a perfect speaker from day one, but about stepping out of your comfort zone, finding your voice, and growing through collaboration.</p>
+      <p>I've started my KISMUN journey at the UNDP committee, 2023. I was so afraid to even make a POI and so, have kept my hands down for the majority of the time. However, the Chairs helped me to gain courage. Looking back at that hesitant delegate in 2023, I never imagined I would one day stand before you as a Chair.</p>
+      <p class="pull-quote">MUN is not about being a perfect speaker from day one, but about stepping out of your comfort zone, finding your voice, and growing through collaboration.</p>
       <p>I believe that there will be some who will struggle, maybe even KISMUN 2026 being your start of a MUN adventure. Despite facing challenges, this will be the time for your growth and a chance to actually be entertained by.</p>
       <p>I will be looking forward to a fruitful debate and I, as well, will try my best to make the debate as exciting and meaningful for all of you. See you all in KISMUN 2026!!</p>
       <p>Best regards,<br>Sunjung Kim<br>Deputy Chair of World Health Organization(2)<br>KISMUN 2026</p>
     </div>
   </div>
-  <!-- chair reports -->
-  <section class="reports">
-    <div class="reports-head">
-      <h2 class="reports-title">Chair Report</h2>
-      <p class="reports-sub">Background guide for each agenda of this committee — 2 reports, tap to download.</p>
-    </div>
-    <div class="report-list">
-      <a class="report-card" href="reports/who2_01.pdf" download="KISMUN26_WHO (2)_01_Combating Unlicensed and Illegal Medical Procedures by Establishing Clear Regulation Policies.pdf">
-        <span class="report-num">01</span>
-        <span class="report-text">
-          <span class="report-title">Combating Unlicensed and Illegal Medical Procedures by Establishing Clear Regulation Policies</span>
-          <span class="report-kr">명확한 규제 정책 수립을 통한 무면허 및 불법 의료 시술 근절</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 2.1 MB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-      <a class="report-card" href="reports/who2_02.pdf" download="KISMUN26_WHO(2)_02_Reducing Inequalities in Global Healthcare Systems in Developing Countries Through Enhanced Global Partnership.pdf">
-        <span class="report-num">02</span>
-        <span class="report-text">
-          <span class="report-title">Reducing Inequalities in Global Healthcare Systems in Developing Countries Through Enhanced Global Partnership</span>
-          <span class="report-kr">국제 협력 강화를 통한 개발도상국 보건 의료 체계의 불평등 완화</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 371 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </section>
-  <!-- /chair reports -->
 </div>
 
 <footer class="sitefooter">

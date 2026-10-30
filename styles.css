@@ -10,8 +10,8 @@
   --border: rgba(255, 255, 255, 0.14);
   --border-soft: rgba(255, 255, 255, 0.08);
   --text: #f4f5f8;
-  --text-dim: #a6a9bc;
-  --text-faint: #6d7086;
+  --text-dim: #c6c9d6;
+  --text-faint: #8b8fa3;
   --pill: rgba(255, 255, 255, 0.08);
   --pill-border: rgba(255, 255, 255, 0.18);
   --placeholder: #d9d9dc;
@@ -20,14 +20,18 @@
   --radius-full: 999px;
 }
 
-html { scroll-behavior: smooth; }
+/* tells the browser to paint its own default canvas/scrollbar dark
+   immediately, before this stylesheet or any fonts have even loaded —
+   without it, every full-page navigation on this dark site briefly
+   flashes the browser's default white canvas in between pages */
+html { scroll-behavior: smooth; color-scheme: dark; background: #0b0d18; }
 
 body {
   background: var(--bg);
   color: var(--text);
   font-family: "Clash Grotesk Variable", "Clash Grotesk", -apple-system, "Segoe UI", sans-serif;
-  font-weight: 300;
-  line-height: 1.5;
+  font-weight: 400;
+  line-height: 1.65;
 }
 
 img { max-width: 100%; display: block; }
@@ -85,6 +89,7 @@ a { color: inherit; }
 .sitenav .logo .logo-text { position: relative; top: 2.3px; }
 
 .sitenav .links {
+  position: relative;
   display: flex;
   gap: 2px;
   background: rgba(255, 255, 255, 0.06);
@@ -95,6 +100,8 @@ a { color: inherit; }
 }
 
 .sitenav .links a {
+  position: relative;
+  z-index: 1;
   color: #e7e8ee;
   text-decoration: none;
   padding: 7px 15px;
@@ -108,19 +115,50 @@ a { color: inherit; }
 .sitenav .links a:hover { background: rgba(255, 255, 255, 0.12); }
 .sitenav .links a.active { background: rgba(255, 255, 255, 0.16); font-weight: 500; }
 
+/* 6. 현재 페이지를 가리키는 회색 타원 — 페이지 이동 시 이전 위치에서
+   지금 위치로 미끄러져 들어오며 생동감을 준다 (script.js가 위치를 계산) */
+.nav-pill {
+  position: absolute;
+  z-index: 0;
+  top: 5px;
+  left: 0;
+  height: calc(100% - 10px);
+  width: 0;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.nav-pill.is-placed { opacity: 1; }
+
+.nav-pill.is-ready {
+  transition: transform 0.4s cubic-bezier(.2,.7,.3,1), width 0.4s cubic-bezier(.2,.7,.3,1);
+}
+
+@media (min-width: 861px) {
+  .sitenav .links a.active { background: none; }
+}
+
 .sitenav .allocation {
   text-decoration: none;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--pill-border);
+  background: var(--text);
+  color: #0b0d18;
+  border: 1px solid var(--text);
   border-radius: var(--radius-full);
   padding: 9px 17px;
   font-size: 12.5px;
+  font-weight: 500;
   white-space: nowrap;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sitenav .allocation:hover { background: rgba(255, 255, 255, 0.16); }
+.sitenav .allocation:hover {
+  background: #ffffff;
+  border-color: #ffffff;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.18);
+}
 
 .nav-toggle { display: none; }
 
@@ -204,11 +242,31 @@ a { color: inherit; }
   padding: 90px 24px 60px;
 }
 
+/* -- full-bleed section bands -- */
+
+.band { width: 100%; }
+
+.band > .content { padding: 74px 24px; }
+
+.band:first-of-type > .content { padding-top: 90px; }
+
+.band:last-of-type > .content { padding-bottom: 86px; }
+
+.band-raised {
+  background: #10131f;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+@media (max-width: 700px) {
+  .band > .content { padding: 56px 24px; }
+}
+
 .about-block { margin-bottom: 34px; }
 
 .about-block h3 {
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 22.5px;
   color: var(--text);
   margin-bottom: 8px;
@@ -217,7 +275,7 @@ a { color: inherit; }
 .about-block p {
   color: var(--text-dim);
   font-size: 20.25px;
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.65;
 }
 
@@ -376,7 +434,7 @@ a { color: inherit; }
   border-radius: var(--radius-full);
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-size: 19.5px;
-  font-weight: 600;
+  font-weight: 500;
   letter-spacing: 0.5px;
   color: var(--text-dim);
   cursor: pointer;
@@ -409,7 +467,7 @@ a { color: inherit; }
 .day-date {
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-size: 21px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text);
   margin-bottom: 14px;
 }
@@ -473,14 +531,14 @@ a { color: inherit; }
   gap: 14px;
 }
 
-.venue-info .name { font-size: 21px; font-weight: 600; color: var(--text); }
+.venue-info .name { font-size: 21px; font-weight: 500; color: var(--text); }
 .venue-info .name-kr { font-size: 18px; color: var(--text-faint); margin-top: 2px; }
 .venue-info hr { border: none; border-top: 1px solid var(--border-soft); }
 .venue-info .addr { font-size: 18.75px; color: var(--text-dim); line-height: 1.6; }
 
 /* ---------- CARD GRID PAGES (committee / staff) ---------- */
 
-.grid-page { max-width: 1160px; margin: 0 auto; padding: 70px 40px 100px; }
+.grid-page { max-width: 900px; margin: 0 auto; padding: 70px 40px 100px; }
 
 .card-grid {
   display: grid;
@@ -494,12 +552,13 @@ a { color: inherit; }
 .info-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 26px 24px;
+  padding: 30px 26px 22px;
   display: flex;
   flex-direction: column;
-  min-height: 190px;
+  text-decoration: none;
+  color: inherit;
   background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
-  transition: border-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
 }
 
 .info-card:hover { border-color: rgba(255,255,255,0.35); transform: translateY(-2px); }
@@ -507,32 +566,38 @@ a { color: inherit; }
 .info-card h4 {
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-weight: 500;
-  font-size: 24px;
-  margin-bottom: 8px;
+  font-size: 32px;
+  margin-bottom: 10px;
 }
 
 .info-card p {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-dim);
-  font-weight: 300;
-  flex-grow: 1;
+  font-weight: 400;
 }
 
-.more-btn {
-  margin-top: 18px;
-  align-self: stretch;
-  text-align: center;
-  text-decoration: none;
-  color: var(--text);
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-full);
-  padding: 11px 0;
+/* the whole card is the link; a bottom row ("view department") replaces
+   the old floating corner arrow, so the card resolves at its own natural
+   height instead of leaving blank space under short text */
+.info-card-cta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft);
   font-size: 13px;
-  transition: background 0.2s ease;
+  color: var(--text-faint);
+  transition: color 0.2s ease;
 }
 
-.more-btn:hover { background: rgba(255,255,255,0.12); }
+.info-card-arrow {
+  font-size: 15px;
+  transition: transform 0.25s cubic-bezier(.2,.7,.3,1);
+}
+
+.info-card:hover .info-card-cta { color: var(--text); }
+.info-card:hover .info-card-arrow { transform: translate(3px, -3px); }
 
 /* ---------- DIRECTOR / SECRETARIAT PAGES ---------- */
 
@@ -586,144 +651,13 @@ a { color: inherit; }
 
 .person-role { color: var(--text-dim); font-size: 21px; margin-top: 4px; }
 
-.person-letter { font-size: 20.25px; color: var(--text-dim); line-height: 1.75; font-weight: 300; }
+.person-letter { font-size: 20.25px; color: var(--text-dim); line-height: 1.75; font-weight: 400; }
 .person-letter p { margin-bottom: 14px; }
 .person-letter p:last-child { margin-bottom: 0; }
 .person-letter .quote { font-style: italic; color: var(--text); }
 
 .staff-letters .person-letter,
 .staff-letters .person-letter .quote { color: var(--text); }
-
-/* ---------- CHAIR REPORTS ---------- */
-
-.reports { margin-top: 56px; }
-
-.reports-head { margin-bottom: 20px; }
-
-.reports-title {
-  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
-  font-weight: 500;
-  font-size: 26px;
-  color: var(--text);
-}
-
-.reports-sub {
-  margin-top: 8px;
-  font-size: 15px;
-  color: var(--text-dim);
-  font-weight: 300;
-}
-
-.report-list { display: flex; flex-direction: column; gap: 12px; }
-
-.report-card {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  padding: 20px 24px;
-  text-decoration: none;
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0));
-  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.report-card:hover {
-  border-color: rgba(255,255,255,0.38);
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(0,0,0,0.34);
-}
-
-.report-card:active { transform: translateY(0); }
-
-.report-num {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  border: 1px solid var(--border-soft);
-  background: rgba(255,255,255,0.05);
-  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  color: var(--text-dim);
-}
-
-.report-text { flex: 1; min-width: 0; display: block; }
-
-.report-title {
-  display: block;
-  font-size: 17px;
-  font-weight: 400;
-  line-height: 1.45;
-  color: var(--text);
-}
-
-.report-kr {
-  display: block;
-  margin-top: 6px;
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--text-faint);
-  font-weight: 300;
-}
-
-.report-action {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.report-size {
-  font-size: 13px;
-  color: var(--text-faint);
-  white-space: nowrap;
-  letter-spacing: 0.3px;
-}
-
-.report-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 1px solid var(--pill-border);
-  background: rgba(255,255,255,0.06);
-  color: var(--text);
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.report-btn svg { width: 19px; height: 19px; }
-
-.report-card:hover .report-btn {
-  background: rgba(255,255,255,0.16);
-  border-color: rgba(255,255,255,0.4);
-}
-
-@media (max-width: 700px) {
-  .reports { margin-top: 44px; }
-  .reports-title { font-size: 30px; }
-  .reports-sub { font-size: 17px; }
-  .report-card {
-    flex-wrap: wrap;
-    gap: 14px;
-    padding: 18px 20px;
-    border-radius: 16px;
-  }
-  .report-num { width: 40px; height: 40px; font-size: 15px; }
-  .report-text { flex: 1 1 100%; order: 3; }
-  .report-title { font-size: 19px; }
-  .report-kr { font-size: 16px; }
-  .report-action { margin-left: auto; gap: 12px; }
-  .report-size { font-size: 14px; }
-}
 
 /* ---------- MY ALLOCATION ---------- */
 
@@ -763,7 +697,7 @@ a { color: inherit; }
   margin-top: 12px;
   font-size: 17px;
   color: var(--text-dim);
-  font-weight: 300;
+  font-weight: 400;
 }
 
 /* ---- search ---- */
@@ -807,7 +741,7 @@ a { color: inherit; }
   color: var(--text);
   font-family: inherit;
   font-size: 19px;
-  font-weight: 300;
+  font-weight: 400;
   letter-spacing: 0.2px;
   padding: 18px 0;
 }
@@ -837,7 +771,7 @@ a { color: inherit; }
   text-align: center;
   font-size: 13.5px;
   color: var(--text-faint);
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .alloc-dropdown {
@@ -851,7 +785,8 @@ a { color: inherit; }
   background: #141830;
   box-shadow: 0 22px 54px rgba(0, 0, 0, 0.6);
   overflow: hidden auto;
-  max-height: 320px;
+  max-height: min(430px, 56vh);
+  overscroll-behavior: contain;
   animation: alloc-pop 0.16s ease-out;
 }
 
@@ -1008,7 +943,7 @@ a { color: inherit; }
   font-size: 14px;
   line-height: 1.5;
   color: var(--text-dim);
-  font-weight: 300;
+  font-weight: 400;
   max-width: 260px;
   margin-left: auto;
   margin-right: auto;
@@ -1050,8 +985,14 @@ a { color: inherit; }
 /* ---------- FOOTER ---------- */
 
 .sitefooter {
+  margin-top: 0;
   border-top: 1px solid var(--border-soft);
-  margin-top: 40px;
+}
+
+/* when the page ends on a band, that band's own border-bottom already acts
+   as the seam into the footer — don't draw a second line right under it */
+.band:last-of-type + .sitefooter {
+  border-top: 0;
 }
 
 .sitefooter .inner {
@@ -1100,7 +1041,11 @@ a { color: inherit; }
   .sitenav .links { display: none; }
   .sitenav .bar {
     display: grid;
-    grid-template-columns: 1fr auto 1fr;
+    /* minmax(0, 1fr), not plain 1fr — a bare 1fr track still won't shrink
+       past its content's own min-content width, which on very narrow
+       phones (~390-420px) left the allocation pill pushing the row wider
+       than the viewport and clipping it */
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     grid-auto-flow: dense;
     align-items: center;
     padding: 18px 20px;
@@ -1170,4 +1115,670 @@ a { color: inherit; }
   .card-grid, .card-grid.cols-3 { grid-template-columns: 1fr; }
   .person-head { flex-direction: column; align-items: flex-start; }
   .sitenav .allocation span { display: none; }
+}
+
+/* ---------- FILM GRAIN ---------- */
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* =========================================================
+   ATMOSPHERE SYSTEM
+   시스템(폰트·간격·컴포넌트)은 고정, 표현(색·크기·리듬)만 변주
+   ========================================================= */
+
+:root {
+  --accent: #7e8ad8;
+  --hero-x: 20%;
+}
+
+[data-accent="unhrc"]   { --accent: #a99bf0; --hero-x: 18%; }
+[data-accent="ecosoc"]  { --accent: #d9a441; --hero-x: 72%; }
+[data-accent="who"]     { --accent: #46b4d4; --hero-x: 30%; }
+[data-accent="unodc"]   { --accent: #cf6f91; --hero-x: 64%; }
+[data-accent="itu"]     { --accent: #8f7ef5; --hero-x: 24%; }
+[data-accent="specpol"] { --accent: #52b98e; --hero-x: 78%; }
+[data-accent="hsc"]     { --accent: #c0705f; --hero-x: 44%; }
+[data-accent="director"]    { --accent: #5b7fd4; --hero-x: 26%; }
+[data-accent="secretariat"] { --accent: #9a8ef0; --hero-x: 70%; }
+[data-accent="staff"]       { --accent: #4fa8c4; --hero-x: 36%; }
+[data-accent="committee"]   { --accent: #7e8ad8; --hero-x: 58%; }
+[data-accent="admin"]       { --accent: #4fa8c4; --hero-x: 30%; }
+[data-accent="press"]       { --accent: #cf6f91; --hero-x: 68%; }
+[data-accent="pmc"]         { --accent: #8f7ef5; --hero-x: 42%; }
+[data-accent="allocation"]  { --accent: #35b4a6; --hero-x: 50%; }
+
+/* -- ambient light behind every page -- */
+
+body {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1100px 760px at 10% -10%, rgba(116, 134, 224, 0.17), transparent 66%),
+    radial-gradient(820px 620px at 94% 2%, rgba(158, 122, 228, 0.12), transparent 66%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* -- page hero: 메인의 그라데이션·블러·그레인을 하위 페이지로 -- */
+
+.pagehero {
+  position: relative;
+  z-index: 3;
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(to bottom, transparent 42%, var(--bg) 97%),
+    radial-gradient(44% 64% at var(--hero-x) 4%,
+      color-mix(in srgb, var(--accent) 60%, #ffffff) 0%,
+      color-mix(in srgb, var(--accent) 24%, transparent) 38%,
+      transparent 72%),
+    radial-gradient(64% 76% at 84% 74%,
+      color-mix(in srgb, var(--accent) 30%, #6f7fd8) 0%,
+      transparent 68%),
+    linear-gradient(168deg,
+      color-mix(in srgb, var(--accent) 24%, #272f5e) 0%,
+      #171c38 52%,
+      var(--bg) 100%);
+}
+
+.pagehero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 40px 66px;
+}
+
+.pagehero .back-link { margin-bottom: 26px; color: rgba(255, 255, 255, 0.62); }
+.pagehero .back-link:hover { color: #fff; }
+
+.pagehero-eyebrow {
+  font-size: 12px;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.58);
+  margin-bottom: 14px;
+}
+
+.pagehero-title {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: clamp(36px, 5.2vw, 62px);
+  line-height: 1.04;
+  letter-spacing: -0.4px;
+  color: #fff;
+  text-shadow: 0 6px 34px rgba(0, 0, 0, 0.22);
+}
+
+.pagehero-sub {
+  margin-top: 14px;
+  font-size: 17px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.66);
+  max-width: 540px;
+}
+
+.pagehero + .people-page,
+.pagehero + .grid-page,
+.pagehero + .alloc-page { padding-top: 54px; }
+
+@media (max-width: 700px) {
+  .pagehero-inner { padding: 24px 24px 50px; }
+  .pagehero-eyebrow { font-size: 13px; }
+  .pagehero-sub { font-size: 18px; }
+  .pagehero + .people-page,
+  .pagehero + .grid-page,
+  .pagehero + .alloc-page { padding-top: 40px; }
+}
+
+/* -- committee index: 잡지 목차형 리스트 -- */
+
+.index-list { border-top: 1px solid var(--border-soft); }
+
+.index-row {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 20px;
+  padding: 26px 2px;
+  border-bottom: 1px solid var(--border-soft);
+  text-decoration: none;
+  color: var(--text);
+  transition: color 0.25s ease;
+}
+
+.index-num {
+  font-size: 14px;
+  letter-spacing: 1.6px;
+  color: var(--text-faint);
+  transition: color 0.25s ease;
+}
+
+.index-abbr {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.index-full {
+  grid-column: 2;
+  margin-top: 5px;
+  font-size: 16px;
+  color: var(--text-dim);
+}
+
+.index-arrow {
+  grid-row: 1 / span 2;
+  grid-column: 3;
+  align-self: center;
+  font-size: 17px;
+  color: var(--text-faint);
+  transition: transform 0.3s cubic-bezier(.2,.7,.3,1), color 0.25s ease;
+}
+
+.index-row:hover .index-arrow { transform: translateX(6px); color: var(--text); }
+.index-row:hover .index-num { color: var(--text-dim); }
+
+@media (max-width: 700px) {
+  .index-row { grid-template-columns: 38px minmax(0, 1fr) auto; padding: 22px 2px; gap: 0 14px; }
+  .index-abbr { font-size: 25px; }
+  .index-full { font-size: 16px; }
+  .index-num { font-size: 15px; }
+}
+
+/* -- background guide (chair report) -- */
+
+.reports { margin: 4px 0 64px; }
+
+.reports-head { margin-bottom: 8px; }
+
+.reports-title {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: 27px;
+  color: var(--text);
+}
+
+.reports-sub { margin-top: 8px; font-size: 16px; color: var(--text-dim); }
+
+.report-list { border-top: 1px solid var(--border-soft); margin-top: 22px; }
+
+.report-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  gap: 0 24px;
+  align-items: start;
+  padding: 24px 2px;
+  border-bottom: 1px solid var(--border-soft);
+  transition: background 0.25s ease;
+}
+
+.report-row:hover .report-title a { color: #ffffff; }
+.report-title a { transition: color 0.25s ease; }
+
+/* 커미티 목차 리스트와 같은 체계의 큰 숫자 — 장식 아이콘 대신 타이포로 순서를 표시 */
+.report-index {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--text-faint);
+  padding-top: 3px;
+  transition: color 0.25s ease;
+}
+
+.report-row:hover .report-index { color: var(--text-dim); }
+
+.report-label {
+  font-size: 12.5px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 7px;
+}
+
+.report-title { margin: 0; }
+
+.report-title a {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.report-kr {
+  margin-top: 7px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-faint);
+}
+
+.report-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  padding-top: 27px;
+}
+
+.report-meta {
+  font-size: 13.5px;
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+.report-actions { display: flex; gap: 8px; }
+
+.report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 15px;
+  border: 1px solid var(--pill-border);
+  border-radius: var(--radius-full);
+  font-size: 13.5px;
+  color: var(--text-dim);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.report-btn:hover,
+.report-row:hover .report-btn-primary {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.34);
+  color: var(--text);
+}
+
+.report-btn-primary:hover {
+  background: var(--text);
+  border-color: var(--text);
+  color: #0b0d18;
+}
+
+@media (max-width: 700px) {
+  .report-row {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 0 14px;
+    padding: 22px 2px;
+  }
+  .report-index { font-size: 26px; }
+  .report-title a { font-size: 19px; }
+  .report-kr { font-size: 16px; }
+  .report-side {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    gap: 12px;
+  }
+  .report-meta { font-size: 15px; }
+  .report-btn { font-size: 14px; padding: 9px 15px; }
+}
+
+@media (max-width: 420px) {
+  .report-side { flex-wrap: wrap; }
+  .report-actions { width: 100%; }
+  .report-btn { flex: 1; justify-content: center; }
+}
+
+
+/* -- light band: 밝고 어두운 구간을 섞어 호흡 만들기 -- */
+
+.band-raised {
+  background: rgba(255, 255, 255, 0.025);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.band-light {
+  --text: #11142a;
+  --text-dim: #4a4f66;
+  --text-faint: #7b8094;
+  --border: rgba(10, 14, 32, 0.16);
+  --border-soft: rgba(10, 14, 32, 0.1);
+  --pill-border: rgba(10, 14, 32, 0.2);
+  color: var(--text);
+  background: linear-gradient(180deg, #eef0f7 0%, #e4e7f2 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(10, 14, 32, 0.12);
+}
+
+/* -- stats: 긴 글 사이에 큰 숫자로 강약 -- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin: 46px 0 6px;
+  padding-top: 34px;
+  border-top: 1px solid var(--border-soft);
+}
+
+/* a single short digit ("9") left-aligned under a much longer label
+   ("COMMITTEES") reads as off-balance; centering each column keeps every
+   stat visually anchored under its own label regardless of digit count */
+.stats > div { text-align: center; }
+
+.stat-num {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: clamp(34px, 4.6vw, 58px);
+  line-height: 1;
+  letter-spacing: -1.5px;
+  color: var(--text);
+}
+
+.stat-label {
+  margin-top: 9px;
+  font-size: 13px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+@media (max-width: 560px) {
+  .stats { grid-template-columns: 1fr; gap: 26px; }
+  .stat-label { font-size: 15px; }
+}
+
+/* -- blurred gallery photo as section backdrop -- */
+
+.band-photo { position: relative; isolation: isolate; overflow: hidden; }
+
+.band-photo::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: -8%;
+  background-image: var(--band-photo);
+  background-size: cover;
+  background-position: center;
+  filter: blur(42px) saturate(1.35);
+  opacity: 0.55;
+  transform: scale(1.08);
+}
+
+.band-photo::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(180deg,
+    var(--bg) 0%, rgba(11, 13, 24, 0.46) 30%, rgba(11, 13, 24, 0.5) 70%, var(--bg) 100%);
+}
+
+/* =========================================================
+   덜어내기 패스: 빛은 위에만, 아래는 글자와 여백만
+   ========================================================= */
+
+/* -- 의장 인사말: 박스 제거, 사진 확대, 인용구만 포인트 -- */
+
+.person-card {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  margin-top: 0;
+  padding-top: 46px;
+  border-top: 1px solid var(--border-soft);
+}
+
+.person-card:first-of-type { border-top: 0; padding-top: 8px; }
+
+.person-head { gap: 26px; margin-bottom: 30px; }
+
+.person-photo {
+  width: 164px;
+  height: 219px;
+  border-radius: 6px;
+  box-shadow: none;
+}
+
+.person-name { font-size: 31px; font-weight: 500; }
+.person-role { font-size: 17px; color: var(--text-faint); margin-top: 6px; }
+
+.person-letter {
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--text-dim);
+  max-width: 65ch;
+}
+
+.person-letter p { margin-bottom: 20px; }
+
+.staff-letters .person-letter { color: var(--text-dim); }
+
+@media (max-width: 700px) {
+  .people-page .person-name { font-size: 29px; }
+  .people-page .person-role { font-size: 17px; }
+  .people-page .person-letter { font-size: 17px; }
+  .person-photo { width: 132px; height: 176px; }
+  .person-head { gap: 18px; margin-bottom: 24px; }
+  .person-card { padding-top: 36px; }
+}
+
+/* -- 1. 본문 영역의 효과 제거: 글로우·그림자·빛은 히어로에만 -- */
+
+.people-page::before,
+.alloc-page::before { display: none; }
+
+.info-card {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.info-card:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+/* -- 6. 의도하지 않은 빈 공간 제거 -- */
+
+
+
+.band:last-of-type > .content { padding-bottom: 72px; }
+
+/* -- my allocation: 검색창을 히어로 안으로, 결과는 두 줄로 -- */
+
+.pagehero-tall .pagehero-inner { padding-bottom: 54px; }
+
+.pagehero .alloc-search {
+  max-width: 520px;
+  margin: 30px 0 0;
+  position: relative;
+  z-index: 10;
+}
+
+.pagehero .alloc-input-wrap {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.pagehero .alloc-hint {
+  margin-top: 12px;
+  text-align: left;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+/* bottom padding matches .people-page / .grid-page so the footer sits the
+   same distance from content on every page, not just this one */
+.alloc-page { max-width: 900px; margin: 0 auto; padding: 0 40px 100px; }
+
+.alloc-result {
+  display: block;
+  max-width: 560px;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.alloc-result.revealed { opacity: 1; transform: none; transition: opacity 0.45s ease, transform 0.45s ease; }
+
+.alloc-for {
+  font-size: 15px;
+  color: var(--text-faint);
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.alloc-for-id::before { content: "·"; margin: 0 7px; }
+
+.alloc-lines { border-top: 1px solid var(--border-soft); }
+
+.alloc-line {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 0 20px;
+  align-items: baseline;
+  padding: 24px 2px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.alloc-line dt {
+  font-size: 14px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.alloc-line dd {
+  display: block;
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.alloc-committee-full {
+  display: block;
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-dim);
+  max-width: none;
+  margin: 7px 0 0;
+  text-align: left;
+}
+
+.alloc-flag {
+  width: 40px;
+  height: auto;
+  border-radius: 3px;
+  display: inline-block;
+  vertical-align: -5px;
+  margin-right: 13px;
+}
+
+/* room rows carry longer labels ("Workshop Day Room") than Committee /
+   Delegation — give them a little more room before wrapping. Compound
+   selector so this wins regardless of where later .alloc-line rules land */
+.alloc-line.alloc-line-room { grid-template-columns: 168px minmax(0, 1fr); }
+.alloc-line-room dd { font-size: 24px; }
+
+@media (max-width: 700px) {
+  .pagehero .alloc-search { margin-top: 26px; }
+  .pagehero .alloc-hint { font-size: 15px; }
+  .alloc-page { padding: 0 24px 100px; }
+  .alloc-line { grid-template-columns: 1fr; gap: 10px; padding: 20px 2px; }
+  .alloc-line dt { font-size: 15px; }
+  .alloc-line dd { font-size: 26px; }
+  .alloc-committee-full { font-size: 16px; }
+}
+
+/* -- allocation: 폭 정렬 · 라벨 베이스라인 · 위원회 바로가기 -- */
+
+.pagehero .alloc-search,
+.alloc-result { max-width: 560px; }
+
+.alloc-line { grid-template-columns: 150px minmax(0, 1fr); align-items: start; }
+
+.alloc-line dt { padding-top: 7px; }
+
+.alloc-committee-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.alloc-go { opacity: 0; font-size: 20px; transition: opacity 0.25s ease, transform 0.3s cubic-bezier(.2,.7,.3,1); }
+
+.alloc-committee-link.is-link .alloc-go { opacity: 0.45; }
+.alloc-committee-link.is-link:hover .alloc-go { opacity: 1; transform: translateX(5px); }
+
+/* -- 5. 리스트 hover: 글자가 살짝 밝아지고 화살표가 움직인다 -- */
+
+.index-abbr,
+.index-full { transition: color 0.25s ease; }
+.index-full { color: var(--text-faint); }
+.index-row:hover .index-full { color: var(--text-dim); }
+
+/* -- 6. 히어로 빛 위치를 페이지마다 다르게 -- */
+
+[data-accent="committee"]   { --hero-x: 78%; }
+[data-accent="secretariat"] { --hero-x: 50%; }
+[data-accent="director"]    { --hero-x: 22%; }
+[data-accent="staff"]       { --hero-x: 66%; }
+
+/* -- 2. my allocation: 다른 커미티/인사말 히어로와 완전히 다른 구성 --
+   (위에서 쏟아지는 코너 글로우 대신, 검색창 자체를 아래에서 비추는
+   teal 계열 스포트라이트 + 수평 스캔 밴드로 "검색 도구" 느낌을 분리) */
+
+.pagehero[data-accent="allocation"] {
+  background-image:
+    linear-gradient(to bottom, transparent 40%, var(--bg) 97%),
+    radial-gradient(640px 260px at 50% 92%,
+      rgba(255, 255, 255, 0.14) 0%, transparent 72%),
+    radial-gradient(52% 64% at 50% 0%,
+      color-mix(in srgb, var(--accent) 62%, #ffffff) 0%,
+      color-mix(in srgb, var(--accent) 24%, transparent) 42%,
+      transparent 76%),
+    linear-gradient(200deg,
+      color-mix(in srgb, var(--accent) 20%, #142a30) 0%,
+      #0f1b26 55%,
+      var(--bg) 100%);
+}
+
+/* -- 인사말 pull quote: 페이지의 숨 쉬는 지점 -- */
+
+.person-letter .pull-quote,
+.person-letter .quote {
+  display: block;
+  font-style: normal;
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: 25px;
+  line-height: 1.45;
+  color: var(--text);
+  max-width: 22ch;
+  margin: 26px 0 26px -20px;
+  padding-left: 20px;
+  border-left: 1px solid var(--border);
+}
+
+/* a short standalone quote (no body text around it, e.g. staff pages)
+   needs less top margin since there is no preceding paragraph to clear */
+.person-letter .quote:first-child { margin-top: 2px; }
+
+@media (max-width: 700px) {
+  .person-letter .pull-quote,
+  .person-letter .quote {
+    font-size: 23px;
+    max-width: none;
+    margin: 22px 0 22px 0;
+    padding-left: 16px;
+  }
+  .person-letter .quote:first-child { margin-top: 0; }
 }

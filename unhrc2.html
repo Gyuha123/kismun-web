@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | UNHRC(2)</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/unhrc2.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="unhrc">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,9 +37,58 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
+    <p class="pagehero-eyebrow">Committee</p>
+    <h1 class="pagehero-title">UNHRC(2)</h1>
+    <p class="pagehero-sub">United Nations Human Rights Council</p>
+  </div>
+</header>
+
 <div class="people-page">
-  <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
-  <h1 class="page-heading">UNHRC(2)</h1>
+
+  <!-- background guide -->
+  <section class="reports">
+    <div class="reports-head">
+      <h2 class="reports-title">Background Guide</h2>
+      <p class="reports-sub">Read these before the conference.</p>
+    </div>
+    <div class="report-list">
+      <article class="report-row">
+        <div class="report-index">01</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 1</p>
+          <h3 class="report-title"><a href="reports/unhrc_01.pdf" target="_blank" rel="noopener">Addressing the Human Rights Implications of Generative AI through Combating Deepfakes and Digital Violence</a></h3>
+          <p class="report-kr">딥페이크와 디지털 폭력 대응을 통한 생성형 인공지능의 인권적 영향 해결</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 25 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/unhrc_01.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/unhrc_01.pdf" download="KISMUN26_UNHRC_01_Addressing the Human Rights Implications of Generative AI through Combating Deepfakes and Digital Violence.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+      <article class="report-row">
+        <div class="report-index">02</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 2</p>
+          <h3 class="report-title"><a href="reports/unhrc_02.pdf" target="_blank" rel="noopener">Promoting Climate Justice for Marginalized Communities Affected by Environmental Disasters</a></h3>
+          <p class="report-kr">환경재난 피해 취약계층을 위한 기후정의 증진</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 28 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/unhrc_02.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/unhrc_02.pdf" download="KISMUN26_UNHRC_02_Promoting Climate Justice for Marginalized Communities Affected by Environmental Disasters.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- /background guide -->
+
 
   <div class="person-card">
     <div class="person-head">
@@ -54,7 +104,7 @@
       <p>My name is Euna Ko, and I am delighted to welcome you to the United Nations Human Rights Council.</p>
       <p>This conference marks my fourteenth and final MUN, which makes it especially meaningful to me. I had originally planned to conclude this journey as a delegate, but an unexpected opportunity has given me the privilege of serving as Chair of UNHRC, a committee for which I hold a special affection. It is a lovely surprise to finish my journey this way, and I am happy to share it with all of you.</p>
       <p>Having served as Secretary-General of KISMUN 2025, I have seen how each delegate brings something special to a conference. I look forward to hearing your ideas and seeing you work together throughout our discussions. Whether this is your first MUN or you have attended many before, I hope you feel welcome, comfortable asking questions, and confident sharing your thoughts.</p>
-      <p>I am grateful to spend my final MUN with you, and I hope we leave with wonderful memories of our time together.</p>
+      <p class="pull-quote">I am grateful to spend my final MUN with you, and I hope we leave with wonderful memories of our time together.</p>
       <p>Warm regards,<br>Euna Ko<br>Chair of United Nations Human Rights Council<br>KISMUN 2026</p>
     </div>
   </div>
@@ -72,43 +122,12 @@
       <p>My name is Lee Eun Seo, and I am truly honored and excited to serve as a Chair of the UNHRC at KISMUN 2026.</p>
       <p>It feels a little surreal to say that this will be my fourth KISMUN, my third as an LDP member, and my second as a Chair. I can still remember walking into my first KISMUN feeling nervous and unsure of what to expect. Now, I am incredibly grateful to be on the other side of the committee, welcoming delegates who might be feeling exactly the same way.</p>
       <p>If you are nervous about speaking, raising your placard, or making a mistake, don't worry. We have all been there. KISMUN is a place to challenge yourself, meet new people, and slowly find the confidence to speak up.</p>
-      <p>This year's theme, "Voice your Value, Value your Voice," captures exactly what I hope you take away from this conference. Your ideas do not have to be perfect to be worth sharing, so don't be afraid to make your voice heard.</p>
+      <p>This year's theme, "Voice your Value, Value your Voice," captures exactly what I hope you take away from this conference.</p>
+      <p class="pull-quote">Your ideas do not have to be perfect to be worth sharing, so don't be afraid to make your voice heard.</p>
       <p>If you have any questions or concerns, please do not hesitate to reach out to me at eseoo.4.study@gmail.com. I would be more than happy to help, and I look forward to meeting you all at KISMUN 2026!</p>
       <p>Warmly,<br>Lee Eun Seo<br>Chair of United Nations Human Rights Council<br>KISMUN 2026</p>
     </div>
   </div>
-  <!-- chair reports -->
-  <section class="reports">
-    <div class="reports-head">
-      <h2 class="reports-title">Chair Report</h2>
-      <p class="reports-sub">Background guide for each agenda of this committee — 2 reports, tap to download.</p>
-    </div>
-    <div class="report-list">
-      <a class="report-card" href="reports/unhrc_01.pdf" download="KISMUN26_UNHRC_01_Addressing the Human Rights Implications of Generative AI through Combating Deepfakes and Digital Violence.pdf">
-        <span class="report-num">01</span>
-        <span class="report-text">
-          <span class="report-title">Addressing the Human Rights Implications of Generative AI through Combating Deepfakes and Digital Violence</span>
-          <span class="report-kr">딥페이크와 디지털 폭력 대응을 통한 생성형 인공지능의 인권적 영향 해결</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 9.5 MB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-      <a class="report-card" href="reports/unhrc_02.pdf" download="KISMUN26_UNHRC_02_Promoting Climate Justice for Marginalized Communities Affected by Environmental Disasters.pdf">
-        <span class="report-num">02</span>
-        <span class="report-text">
-          <span class="report-title">Promoting Climate Justice for Marginalized Communities Affected by Environmental Disasters</span>
-          <span class="report-kr">환경재난 피해 취약계층을 위한 기후정의 증진</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 13.7 MB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </section>
-  <!-- /chair reports -->
 </div>
 
 <footer class="sitefooter">

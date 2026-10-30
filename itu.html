@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
 <title>KISMUN '26 | ITU</title>
 <meta property="og:type" content="website" />
 <meta property="og:url" content="https://kishcmun.netlify.app/itu.html" />
@@ -17,7 +18,7 @@
 <meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-accent="itu">
 
 <nav class="sitenav solid" id="siteNav">
   <div class="bar">
@@ -36,9 +37,58 @@
   </div>
 </nav>
 
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
+    <p class="pagehero-eyebrow">Committee</p>
+    <h1 class="pagehero-title">ITU</h1>
+    <p class="pagehero-sub">International Telecommunication Union</p>
+  </div>
+</header>
+
 <div class="people-page">
-  <a class="back-link" href="committee.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to committee</a>
-  <h1 class="page-heading">ITU</h1>
+
+  <!-- background guide -->
+  <section class="reports">
+    <div class="reports-head">
+      <h2 class="reports-title">Background Guide</h2>
+      <p class="reports-sub">Read these before the conference.</p>
+    </div>
+    <div class="report-list">
+      <article class="report-row">
+        <div class="report-index">01</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 1</p>
+          <h3 class="report-title"><a href="reports/itu_01.pdf" target="_blank" rel="noopener">Ensuring the Sustainable Management of Earth’s Orbit by Mitigating Space Debris and Optimizing Frequency Allocation</a></h3>
+          <p class="report-kr">우주 물체 잔해물 저감 및 주파수 할당 최적화를 통한 지구 궤도의 지속가능한 관리</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 24 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/itu_01.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/itu_01.pdf" download="KISMUN26_ITU_01_Ensuring the Sustainable Management of Earth’s Orbit by Mitigating Space Debris and Optimizing Frequency Allocation.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+      <article class="report-row">
+        <div class="report-index">02</div>
+        <div class="report-body">
+          <p class="report-label">Agenda 2</p>
+          <h3 class="report-title"><a href="reports/itu_02.pdf" target="_blank" rel="noopener">Promoting Future Connectivity through Accelerating 6G Research and Global Spectrum Allocation</a></h3>
+          <p class="report-kr">6G 연구 가속화 및 글로벌 주파수 자원 배분을 통한 미래 연결성 증진</p>
+        </div>
+        <div class="report-side">
+          <span class="report-meta">PDF &middot; 29 pages</span>
+          <div class="report-actions">
+            <a class="report-btn" href="reports/itu_02.pdf" target="_blank" rel="noopener">View &#8599;</a>
+            <a class="report-btn report-btn-primary" href="reports/itu_02.pdf" download="KISMUN26_ITU_02_Promoting Future Connectivity through Accelerating 6G Research and Global Spectrum Allocation.pdf">Download &#8595;</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <!-- /background guide -->
+
 
   <div class="person-card">
     <div class="person-head">
@@ -50,7 +100,9 @@
     </div>
     <div class="person-letter">
       <p>Honorable delegates, fellow chairs, and esteemed staff members, I am Hyo Min Lee, the Head Chair of ITU. It is a great honor to have you delegates and serve as a chair. In order for the debaters to proceed flawlessly, I will perform with my best to guarantee comfort and joy.</p>
-      <p>In a fast-changing society, technology works as a significant pivot. I strongly believe that it is a great chance for you to obtain a wide range of knowledge and a far-sighted perspective to be a suitable future citizen. Mentioning my overall Model United Nation journey, it started off as an embarrassing experience. I thought there would never be MUN in my life. But, eventually, through multiple trials and practices, I truly enjoy it. The key method is not grandiose nor surprising. It is pulling out courage within the value you hold on to. A single mistake does not change who you are. Rather than being discouraged, focusing on modifications to make or improvements you have achieved is needed.</p>
+      <p>In a fast-changing society, technology works as a significant pivot. I strongly believe that it is a great chance for you to obtain a wide range of knowledge and a far-sighted perspective to be a suitable future citizen. Mentioning my overall Model United Nation journey, it started off as an embarrassing experience. I thought there would never be MUN in my life. But, eventually, through multiple trials and practices, I truly enjoy it. The key method is not grandiose nor surprising.</p>
+      <p class="pull-quote">It is pulling out courage within the value you hold on to.</p>
+      <p>A single mistake does not change who you are. Rather than being discouraged, focusing on modifications to make or improvements you have achieved is needed.</p>
       <p>I am honestly looking forward to delegates' bold speeches, courageous POIs, and respecting manners during three days of conference. Like KISMUN'2026 agenda, voice out your limitless values and possibilities and value your power of voice.</p>
       <p>Best regards,<br>Hyo Min Lee<br>The Head Chair of International Telecommunication Union<br>KISMUN 2026</p>
     </div>
@@ -67,45 +119,14 @@
     <div class="person-letter">
       <p>Honorable Chairs, distinguished delegates, and fellow staff,</p>
       <p>Welcome to KISMUN. My name is Yujin Shin, and I am honored to serve as the Deputy Chair of ITU.</p>
-      <p>As this year's KISMUN slogan, "Value your voice, voice your value," says, always value your own words. Whether your speech comes with hesitation or a trembling voice, every attempt you make in this committee is a valuable opportunity for growth.</p>
+      <p>As this year's KISMUN slogan, "Value your voice, voice your value," says, always value your own words.</p>
+      <p class="pull-quote">Whether your speech comes with hesitation or a trembling voice, every attempt you make in this committee is a valuable opportunity for growth.</p>
       <p>Today, telecommunication serves as an essential medium that connects people and amplifies various voices. Just as communication technology bridges gaps, ITU provides a platform for you to express and expand your ideas. Grounded in scientific facts, fairness, and a progressive perspective, ITU strives for practical, innovative policy solutions.</p>
       <p>Preparing for this committee has been an incredibly fun and rewarding for me as well. I am truly grateful to all of you for making this journey meaningful.</p>
       <p>I encourage you to challenge yourselves and make your voices heard. Thank you!</p>
       <p>Best regards,<br>Yujin Shin<br>Deputy Chair of International Telecommunication Union<br>KISMUN 2026</p>
     </div>
   </div>
-  <!-- chair reports -->
-  <section class="reports">
-    <div class="reports-head">
-      <h2 class="reports-title">Chair Report</h2>
-      <p class="reports-sub">Background guide for each agenda of this committee — 2 reports, tap to download.</p>
-    </div>
-    <div class="report-list">
-      <a class="report-card" href="reports/itu_01.pdf" download="KISMUN26_ITU_01_Ensuring the Sustainable Management of Earth’s Orbit by Mitigating Space Debris and Optimizing Frequency Allocation.pdf">
-        <span class="report-num">01</span>
-        <span class="report-text">
-          <span class="report-title">Ensuring the Sustainable Management of Earth’s Orbit by Mitigating Space Debris and Optimizing Frequency Allocation</span>
-          <span class="report-kr">우주 물체 잔해물 저감 및 주파수 할당 최적화를 통한 지구 궤도의 지속가능한 관리</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 550 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-      <a class="report-card" href="reports/itu_02.pdf" download="KISMUN26_ITU_02_Promoting Future Connectivity through Accelerating 6G Research and Global Spectrum Allocation.pdf">
-        <span class="report-num">02</span>
-        <span class="report-text">
-          <span class="report-title">Promoting Future Connectivity through Accelerating 6G Research and Global Spectrum Allocation</span>
-          <span class="report-kr">6G 연구 가속화 및 글로벌 주파수 자원 배분을 통한 미래 연결성 증진</span>
-        </span>
-        <span class="report-action">
-          <span class="report-size">PDF · 887 KB</span>
-          <span class="report-btn" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M4 20h16"/></svg></span>
-        </span>
-      </a>
-    </div>
-  </section>
-  <!-- /chair reports -->
 </div>
 
 <footer class="sitefooter">
