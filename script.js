@@ -52,19 +52,6 @@ document.querySelectorAll('.nav-toggle').forEach(function (btn) {
   }
 
   window.addEventListener('resize', function () { setRect(activeIndex); });
-
-  // the nav links are first laid out in a fallback font before the Clash
-  // Grotesk webfont swaps in; if that swap changes the links' widths, the
-  // pill (measured against the fallback metrics) would sit slightly off —
-  // re-measure once webfonts are actually ready, snapped with no
-  // transition so the correction itself is never visible as a shake
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () {
-      pill.classList.remove('is-ready');
-      setRect(activeIndex);
-      requestAnimationFrame(function () { pill.classList.add('is-ready'); });
-    });
-  }
 })();
 
 // conference day tabs
