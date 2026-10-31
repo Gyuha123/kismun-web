@@ -144,9 +144,6 @@ a { color: inherit; }
   pointer-events: none;
 }
 
-.nav-pill.is-ready {
-  transition: transform 0.24s cubic-bezier(.3,.7,.2,1), width 0.24s cubic-bezier(.3,.7,.2,1);
-}
 
 /* while the pill slides in, it stands in for the static highlight */
 .sitenav .links.is-sliding a.active { background: none; }
