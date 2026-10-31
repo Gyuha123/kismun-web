@@ -23,6 +23,17 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" />
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&amp;display=swap" />
 <link rel="stylesheet" href="styles.css" />
+<script type="speculationrules">
+{
+  "prerender": [{
+    "where": { "and": [
+      { "href_matches": "/*.html" },
+      { "not": { "href_matches": "/reports/*" } }
+    ]},
+    "eagerness": "moderate"
+  }]
+}
+</script>
 </head>
 <body data-accent="allocation">
 
@@ -45,62 +56,72 @@
 <script>
 /* nav pill: slides only when moving to a DIFFERENT section (committee /
    staff / secretariat / director). Inline right after the nav so it runs
-   before the first paint — never waits on script.js over the network. */
+   before the first paint — never waits on script.js over the network.
+   When the page was prerendered in the background (see speculationrules
+   below), everything waits until the user actually lands on it. */
 (function () {
   var links = document.querySelector('.sitenav .links');
   if (!links) return;
   var items = [].slice.call(links.querySelectorAll('a'));
   var to = -1;
   for (var k = 0; k < items.length; k++) if (items[k].classList.contains('active')) to = k;
-  var KEY = 'kismunNavPillIndex', from;
-  try {
-    from = sessionStorage.getItem(KEY);
-    if (to < 0) { sessionStorage.removeItem(KEY); return; }
-    sessionStorage.setItem(KEY, String(to));
-  } catch (e) { return; }
-  from = from === null ? -1 : parseInt(from, 10);
-  // same section (e.g. committee -> SPECPOL, staff -> PMC): the static CSS
-  // highlight is already in place, nothing moves
-  if (from < 0 || from >= items.length || from === to || !links.offsetWidth) return;
 
-  var pill = document.createElement('span');
-  pill.className = 'nav-pill';
-  pill.setAttribute('aria-hidden', 'true');
-  links.insertBefore(pill, links.firstChild);
-  function place(i) {
-    pill.style.transform = 'translateX(' + items[i].offsetLeft + 'px)';
-    pill.style.width = items[i].offsetWidth + 'px';
-  }
-  place(from);
-  links.classList.add('is-sliding');
+  var revealed = false, onReveal = null;
+  addEventListener('pagereveal', function () {
+    revealed = true;
+    if (onReveal) requestAnimationFrame(onReveal);
+  }, { once: true });
 
-  // start gliding the moment this page is actually revealed — with the
-  // cross-document view transition the old page stays on screen until then,
-  // so starting earlier would hide most of the slide behind it
-  var started = false;
-  function go() {
-    if (started) return;
-    started = true;
-    pill.getBoundingClientRect();        // commit the start position first
-    pill.classList.add('is-ready');
-    place(to);
+  function init() {
+    var KEY = 'kismunNavPillIndex', from;
+    try {
+      from = sessionStorage.getItem(KEY);
+      if (to < 0) { sessionStorage.removeItem(KEY); return; }
+      sessionStorage.setItem(KEY, String(to));
+    } catch (e) { return; }
+    from = from === null ? -1 : parseInt(from, 10);
+    // same section (e.g. committee -> SPECPOL, staff -> PMC): the static
+    // CSS highlight is already in place, nothing moves
+    if (from < 0 || from >= items.length || from === to || !links.offsetWidth) return;
+
+    var pill = document.createElement('span');
+    pill.className = 'nav-pill';
+    pill.setAttribute('aria-hidden', 'true');
+    links.insertBefore(pill, links.firstChild);
+    function place(i) {
+      pill.style.transform = 'translateX(' + items[i].offsetLeft + 'px)';
+      pill.style.width = items[i].offsetWidth + 'px';
+    }
+    place(from);
+    links.classList.add('is-sliding');
+
+    var started = false, done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      links.classList.remove('is-sliding');
+      if (pill.parentNode) pill.parentNode.removeChild(pill);
+    }
+    function go() {
+      if (started) return;
+      started = true;
+      pill.getBoundingClientRect();      // commit the start position first
+      pill.classList.add('is-ready');
+      place(to);
+      pill.addEventListener('transitionend', finish);
+      setTimeout(finish, 700);
+    }
+    // glide only once the page is on screen, so the motion isn't spent
+    // while the previous page is still being shown
+    if (revealed || !('onpagereveal' in window)) requestAnimationFrame(go);
+    else { onReveal = go; setTimeout(go, 1200); }
   }
-  if ('onpagereveal' in window) {
-    window.addEventListener('pagereveal', function () { requestAnimationFrame(go); }, { once: true });
-    setTimeout(go, 1500);                // safety net
+
+  if (document.prerendering) {
+    document.addEventListener('prerenderingchange', init, { once: true });
   } else {
-    go();
+    init();
   }
-
-  var done = false;
-  function finish() {
-    if (done) return;
-    done = true;
-    links.classList.remove('is-sliding');
-    if (pill.parentNode) pill.parentNode.removeChild(pill);
-  }
-  pill.addEventListener('transitionend', finish);
-  setTimeout(finish, 2200);
 })();
 </script>
 
@@ -134,7 +155,11 @@
     <dl class="alloc-lines">
       <div class="alloc-line">
         <dt>Committee</dt>
-        <dd><a class="alloc-committee-link" id="allocCommitteeLink" href="#"><span id="allocCommittee"></span><span class="alloc-go" aria-hidden="true">&#8594;</span></a><span class="alloc-committee-full" id="allocCommitteeFull"></span></dd>
+        <dd>
+          <span id="allocCommittee"></span>
+          <span class="alloc-committee-full" id="allocCommitteeFull"></span>
+          <a class="alloc-committee-cta" id="allocCommitteeLink" href="#" hidden>Visit <span id="allocCommitteeCtaName"></span> page <span class="alloc-cta-arrow" aria-hidden="true">&#8594;</span></a>
+        </dd>
       </div>
       <div class="alloc-line">
         <dt>Delegation</dt>

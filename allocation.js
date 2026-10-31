@@ -26,6 +26,7 @@
   var delegationEl = document.getElementById('allocDelegation');
   var flagEl = document.getElementById('allocFlag');
   var committeeLink = document.getElementById('allocCommitteeLink');
+  var committeeCtaName = document.getElementById('allocCommitteeCtaName');
   var roomWorkshopLine = document.getElementById('allocRoomWorkshopLine');
   var roomKismunLine = document.getElementById('allocRoomKismunLine');
   var roomWorkshopEl = document.getElementById('allocRoomWorkshop');
@@ -101,14 +102,15 @@
     committeeEl.textContent = d.c;
     committeeFullEl.textContent = COMMITTEE_FULL[d.c] || '';
 
-    // 위원회 페이지가 있는 경우에만 링크로 만든다 (Secretariat 등은 해당 없음)
+    // 위원회 페이지가 있는 경우에만 버튼을 보여준다 (Secretariat 등은 해당 없음)
     var page = COMMITTEE_PAGE[d.c];
     if (page) {
       committeeLink.href = page;
-      committeeLink.classList.add('is-link');
+      committeeCtaName.textContent = d.c;
+      committeeLink.hidden = false;
     } else {
       committeeLink.removeAttribute('href');
-      committeeLink.classList.remove('is-link');
+      committeeLink.hidden = true;
     }
 
     // chairs and the secretariat get their role under the UN flag instead of a country
@@ -169,6 +171,8 @@
     result.classList.remove('revealed');
     committeeEl.textContent = '';
     committeeFullEl.textContent = '';
+    committeeLink.hidden = true;
+    committeeLink.removeAttribute('href');
     delegationEl.textContent = '';
     flagEl.removeAttribute('src');
     flagEl.hidden = true;

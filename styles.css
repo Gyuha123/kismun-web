@@ -1737,18 +1737,38 @@ body {
 
 .alloc-line dt { padding-top: 7px; }
 
-.alloc-committee-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  color: inherit;
+/* the committee page link says what it does in words — a bare arrow next
+   to the name read as decoration for the full-name line, so few tapped it */
+.alloc-committee-cta {
+  display: inline-block;
+  margin-top: 16px;
+  padding: 9px 18px;
+  border: 1px solid var(--pill-border);
+  border-radius: var(--radius-full);
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text);
   text-decoration: none;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
 }
 
-.alloc-go { opacity: 0; font-size: 20px; transition: opacity 0.25s ease, transform 0.3s cubic-bezier(.2,.7,.3,1); }
+.alloc-committee-cta[hidden] { display: none; }
 
-.alloc-committee-link.is-link .alloc-go { opacity: 0.45; }
-.alloc-committee-link.is-link:hover .alloc-go { opacity: 1; transform: translateX(5px); }
+.alloc-cta-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  transition: transform 0.3s cubic-bezier(.2,.7,.3,1);
+}
+
+.alloc-committee-cta:hover {
+  background: var(--text);
+  border-color: var(--text);
+  color: #0b0d18;
+}
+
+.alloc-committee-cta:hover .alloc-cta-arrow { transform: translateX(4px); }
 
 /* -- 5. 리스트 hover: 글자가 살짝 밝아지고 화살표가 움직인다 -- */
 
