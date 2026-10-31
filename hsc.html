@@ -54,67 +54,110 @@
   </div>
 </nav>
 <script>
-/* nav pill: slides only when moving to a DIFFERENT section (committee /
-   staff / secretariat / director). Inline right after the nav so it runs
-   before the first paint — never waits on script.js over the network.
-   When the page was prerendered in the background (see speculationrules
-   below), everything waits until the user actually lands on it. */
+/* nav pill: the gray ellipse glides between committee / staff / secretariat
+   / director. It starts moving the instant a tab is clicked, and the page
+   being left stores where the ellipse actually is on screen, so the next
+   page continues from that exact spot — rapid clicking stays continuous.
+   Moves within a section (committee -> SPECPOL, staff -> PMC) never slide.
+   Inline right after the nav so it runs before the first paint; when the
+   page was prerendered in the background, it waits until it is shown. */
 (function () {
   var links = document.querySelector('.sitenav .links');
   if (!links) return;
   var items = [].slice.call(links.querySelectorAll('a'));
-  var to = -1;
-  for (var k = 0; k < items.length; k++) if (items[k].classList.contains('active')) to = k;
+  var active = links.querySelector('a.active');
+  var KEY = 'kismunNavPill';
+  var pill = null, revealed = false, onReveal = null;
 
-  var revealed = false, onReveal = null;
-  addEventListener('pagereveal', function () {
+  addEventListener('pagereveal', function (e) {
     revealed = true;
-    if (onReveal) requestAnimationFrame(onReveal);
+    // a skipped transition (e.g. back/forward) is fine — don't surface it as an error
+    if (e.viewTransition) {
+      e.viewTransition.ready.catch(function () {});
+      e.viewTransition.finished.catch(function () {});
+    }
+    if (onReveal) onReveal();
   }, { once: true });
 
-  function init() {
-    var KEY = 'kismunNavPillIndex', from;
-    try {
-      from = sessionStorage.getItem(KEY);
-      if (to < 0) { sessionStorage.removeItem(KEY); return; }
-      sessionStorage.setItem(KEY, String(to));
-    } catch (e) { return; }
-    from = from === null ? -1 : parseInt(from, 10);
-    // same section (e.g. committee -> SPECPOL, staff -> PMC): the static
-    // CSS highlight is already in place, nothing moves
-    if (from < 0 || from >= items.length || from === to || !links.offsetWidth) return;
-
-    var pill = document.createElement('span');
-    pill.className = 'nav-pill';
-    pill.setAttribute('aria-hidden', 'true');
-    links.insertBefore(pill, links.firstChild);
-    function place(i) {
-      pill.style.transform = 'translateX(' + items[i].offsetLeft + 'px)';
-      pill.style.width = items[i].offsetWidth + 'px';
+  function rectOf(a) { return { x: a.offsetLeft, w: a.offsetWidth }; }
+  function visual() {            // where the highlight is on screen right now
+    if (pill) {
+      var p = pill.getBoundingClientRect(), l = links.getBoundingClientRect();
+      return { x: p.left - l.left - links.clientLeft, w: p.width };
     }
-    place(from);
+    return active ? rectOf(active) : null;
+  }
+  function setRect(r) {
+    pill.style.transform = 'translateX(' + r.x + 'px)';
+    pill.style.width = r.w + 'px';
+  }
+  function cleanup() {
+    links.classList.remove('is-sliding');
+    if (pill && pill.parentNode) pill.parentNode.removeChild(pill);
+    pill = null;
+  }
+  function place(r) {            // put the ellipse somewhere with no motion
+    if (!pill) {
+      pill = document.createElement('span');
+      pill.className = 'nav-pill';
+      pill.setAttribute('aria-hidden', 'true');
+      links.insertBefore(pill, links.firstChild);
+    }
+    pill.classList.remove('is-ready');
+    setRect(r);
     links.classList.add('is-sliding');
+    pill.getBoundingClientRect();
+  }
+  function glide(r, settle) {    // animate from wherever it is now to r
+    pill.classList.add('is-ready');
+    setRect(r);
+    if (!settle) return;
+    var p = pill, end = function () { if (pill === p) cleanup(); };
+    p.addEventListener('transitionend', end, { once: true });
+    setTimeout(end, 450);
+  }
 
-    var started = false, done = false;
-    function finish() {
-      if (done) return;
-      done = true;
-      links.classList.remove('is-sliding');
-      if (pill.parentNode) pill.parentNode.removeChild(pill);
+  function init() {
+    if (!links.offsetWidth) {    // mobile dropdown: keep its static highlight
+      try { sessionStorage.removeItem(KEY); } catch (e) {}
+      return;
     }
-    function go() {
-      if (started) return;
-      started = true;
-      pill.getBoundingClientRect();      // commit the start position first
-      pill.classList.add('is-ready');
-      place(to);
-      pill.addEventListener('transitionend', finish);
-      setTimeout(finish, 700);
+    var from = null;
+    try { from = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) {}
+    var target = active ? rectOf(active) : null;
+    if (from && target && Math.abs(from.x - target.x) > 1) {
+      place(from);
+      var started = false;
+      var go = function () {
+        if (started) return;     // reveal event and the safety timer can both fire
+        started = true;
+        if (pill) glide(target, true);
+      };
+      if (revealed || !('onpagereveal' in window)) go();
+      else { onReveal = go; setTimeout(go, 1000); }
     }
-    // glide only once the page is on screen, so the motion isn't spent
-    // while the previous page is still being shown
-    if (revealed || !('onpagereveal' in window)) requestAnimationFrame(go);
-    else { onReveal = go; setTimeout(go, 1200); }
+
+    // start moving the moment a tab is pressed, on this page already
+    links.addEventListener('click', function (e) {
+      var a = e.target.closest('a');
+      if (!a || a === active || e.defaultPrevented || e.button !== 0 ||
+          e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var now = visual();
+      if (!now) return;
+      place(now);
+      glide(rectOf(a), false);
+    });
+
+    // hand the ellipse's real on-screen position to the next page
+    addEventListener('pagehide', function () {
+      try {
+        var v = visual();
+        if (v) sessionStorage.setItem(KEY, JSON.stringify(v));
+        else sessionStorage.removeItem(KEY);
+      } catch (e) {}
+    });
+    // coming back via the back button restores this page as it was left
+    addEventListener('pageshow', function (e) { if (e.persisted) cleanup(); });
   }
 
   if (document.prerendering) {
