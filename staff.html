@@ -66,7 +66,10 @@
   var links = document.querySelector('.sitenav .links');
   if (!links) return;
   var active = links.querySelector('a.active');
-  var KEY = 'kismunNavPill';
+  // the hand-off lives in localStorage, not sessionStorage: a prerendered
+  // page only gets a copy of sessionStorage taken when the prerender began,
+  // so it would never see what the page being left wrote afterwards
+  var KEY = 'kismunNavPill', MAX_AGE = 3000;
   var STIFF = 420, DAMP = 2 * Math.sqrt(420);   // critically damped, ~0.25s settle
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var pill = null, raf = 0, last = 0;
@@ -112,12 +115,29 @@
     var dt = last ? Math.min((t - last) / 1000, 0.05) : 1 / 60;
     last = t;
     step(dt);
+    if (!isFinite(s.x) || !isFinite(s.w) || !isFinite(s.vx) || !isFinite(s.vw)) { settle(); return; }
     draw();
     var rest = Math.abs(s.tx - s.x) < 0.4 && Math.abs(s.tw - s.w) < 0.4 &&
                Math.abs(s.vx) < 8 && Math.abs(s.vw) < 8;
     if (rest && active && Math.abs(s.tx - active.offsetLeft) < 1) settle();
     else if (rest) { s.x = s.tx; s.w = s.tw; s.vx = s.vw = 0; draw(); raf = 0; }
     else raf = requestAnimationFrame(frame);
+  }
+  function save() {
+    try {
+      if (s && isFinite(s.x) && isFinite(s.vx)) localStorage.setItem(KEY, JSON.stringify(
+        { x: s.x, w: s.w, vx: s.vx, vw: s.vw, t: Date.now() }));
+      else localStorage.removeItem(KEY);
+    } catch (e) {}
+  }
+  function read() {              // ignore anything stale, malformed or from an older version
+    try {
+      sessionStorage.removeItem(KEY);
+      var v = JSON.parse(localStorage.getItem(KEY) || 'null');
+      var ok = v && [v.x, v.w, v.vx, v.vw, v.t].every(function (n) { return typeof n === 'number' && isFinite(n); }) &&
+               v.w > 0 && Date.now() - v.t >= 0 && Date.now() - v.t < MAX_AGE;
+      return ok ? v : null;
+    } catch (e) { return null; }
   }
   function run() { if (!raf) { last = 0; raf = requestAnimationFrame(frame); } }
   function aim(r) {
@@ -130,19 +150,19 @@
 
   function init() {
     if (!links.offsetWidth) {                    // mobile dropdown keeps its static highlight
-      try { sessionStorage.removeItem(KEY); } catch (e) {}
+      try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {}
       return;
     }
     var home = active ? rectOf(active) : null;
-    var from = null;
-    try { from = JSON.parse(sessionStorage.getItem(KEY) || 'null'); } catch (e) {}
+    var from = read();
     settle();
     if (from && home && (Math.abs(from.x - home.x) > 1 || Math.abs(from.vx) > 8)) {
       // pick up exactly where the previous page left off, including the
-      // time that passed while the pages were swapping
+      // time that passed while the pages were swapping (the spring was
+      // already heading for this tab, so simulating that time is exact)
       s = { x: from.x, w: from.w, vx: from.vx, vw: from.vw, tx: home.x, tw: home.w };
-      var gap = Math.min(Math.max((Date.now() - from.t) / 1000, 0), 0.12);
-      if (!reduce && gap > 0) step(gap);
+      var gap = Math.min((Date.now() - from.t) / 1000, 1);
+      if (!reduce && gap > 0) for (var g = gap; g > 0; g -= 0.05) step(Math.min(g, 0.05));
       aim(home);
     }
 
@@ -154,10 +174,11 @@
       if (!s) return;
       pressed = a;
       aim(rectOf(a));
+      save();
     });
     links.addEventListener('click', function (e) {
       var a = e.target.closest('a');
-      if (a && s && !e.defaultPrevented) aim(rectOf(a));   // keyboard activation too
+      if (a && s && !e.defaultPrevented) { aim(rectOf(a)); save(); }   // keyboard activation too
       pressed = null;
     });
     addEventListener('pointerup', function () {
@@ -168,14 +189,9 @@
     });
     addEventListener('pointercancel', function () { if (pressed && home) { pressed = null; aim(home); } });
 
-    // hand position + velocity to the next page
-    addEventListener('pagehide', function () {
-      try {
-        if (s) sessionStorage.setItem(KEY, JSON.stringify(
-          { x: s.x, w: s.w, vx: s.vx, vw: s.vw, t: Date.now() }));
-        else sessionStorage.removeItem(KEY);
-      } catch (e) {}
-    });
+    // hand position + velocity to the next page (also saved on press/click
+    // above, since a prerendered page can take over before this fires)
+    addEventListener('pagehide', save);
     // back/forward cache restores this page as it was left
     addEventListener('pageshow', function (e) { if (e.persisted) settle(); });
   }
