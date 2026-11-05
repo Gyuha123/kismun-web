@@ -1841,3 +1841,41 @@ body {
   }
   .person-letter .quote:first-child { margin-top: 0; }
 }
+
+/* -- allocation button: home page = glass like the links pill; every other
+   page = white outline; phones = smaller so it doesn't crowd the logo -- */
+
+.sitenav.overlay .allocation {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--pill-border);
+  color: var(--text);
+  box-shadow: none;
+}
+
+.sitenav.overlay .allocation:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.42);
+  box-shadow: none;
+}
+
+.sitenav:not(.overlay) .allocation,
+.sitenav.solid .allocation {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: #ffffff;
+}
+
+.sitenav:not(.overlay) .allocation:hover,
+.sitenav.solid .allocation:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #ffffff;
+  box-shadow: none;
+}
+
+@media (max-width: 860px) {
+  .sitenav .allocation {
+    padding: 8px 13px;
+    font-size: 14px;
+    line-height: 1.2;
+  }
+}

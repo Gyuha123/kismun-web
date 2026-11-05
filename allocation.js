@@ -41,8 +41,8 @@
   // classroom assignments by committee, exactly as printed on the official
   // room-allocation slides — Korean room names are kept as-is, untranslated
   var ROOMS = {
-    'UNHRC(1)': { workshop: '시청각실',     kismun: '교과 1실' },
-    'UNHRC(2)': { workshop: '8-1 교실',     kismun: '교과 4실' },
+    'UNHRC(1)': { workshop: '시청각실',     kismun: '교과 4실' },
+    'UNHRC(2)': { workshop: '8-1 교실',     kismun: '교과 1실' },
     'ECOSOC':   { workshop: '8-5 교실',     kismun: '미술실 A' },
     'WHO(1)':   { workshop: '8-3 교실',     kismun: '신한정보관' },
     'WHO(2)':   { workshop: '신한정보관',    kismun: '교과 3실' },
