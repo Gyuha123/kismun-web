@@ -244,12 +244,29 @@
         <dt>Delegation</dt>
         <dd>
           <span class="alloc-flag-row">
-            <a id="allocFlagLink" class="alloc-flag-link" aria-label="Raise Placard">
-              <img id="allocFlag" class="alloc-flag" alt="" hidden />
-            </a>
+            <img id="allocFlag" class="alloc-flag" alt="" hidden />
             <span id="allocDelegation"></span>
-            <a id="allocPlacardHint" class="alloc-placard-hint" hidden>Raise Placard</a>
+            <button type="button" id="allocVoteBtn" class="alloc-placard-hint" hidden>Raise Placard</button>
           </span>
+        </dd>
+      </div>
+      <div class="alloc-line alloc-vote-line" id="allocVoteLine" hidden>
+        <dt>Vote</dt>
+        <dd>
+          <p class="alloc-vote-topic" id="allocVoteTopic"></p>
+          <form id="allocVoteCodeForm" class="alloc-vote-form" hidden>
+            <label class="alloc-vote-label" for="allocVoteCode">Enter your country's 4-digit code</label>
+            <div class="alloc-vote-row">
+              <input id="allocVoteCode" class="alloc-vote-input" type="text" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="off" />
+              <button type="submit" class="alloc-vote-btn">Confirm</button>
+            </div>
+          </form>
+          <div class="alloc-vote-choices" id="allocVoteChoices" hidden>
+            <button type="button" class="alloc-vote-btn" data-choice="for">For</button>
+            <button type="button" class="alloc-vote-btn" data-choice="against">Against</button>
+            <button type="button" class="alloc-vote-btn" data-choice="abstain">Abstain</button>
+          </div>
+          <p class="alloc-vote-msg" id="allocVoteMsg" aria-live="polite"></p>
         </dd>
       </div>
       <div class="alloc-line alloc-line-room" id="allocRoomWorkshopLine" hidden>
@@ -280,6 +297,7 @@
 
 <script src="script.js"></script>
 <script src="allocation-data.js"></script>
+<script src="vote-data.js"></script>
 <script src="allocation.js"></script>
 </body>
 </html>

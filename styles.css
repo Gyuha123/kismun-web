@@ -1912,44 +1912,6 @@ body {
 .alloc-placard-hint:hover { color: #ffffff; }
 .alloc-placard-hint[hidden] { display: none; }
 
-/* -- placard page (delegate) -- */
-.placard-page { max-width: 900px; margin: 0 auto; padding: 0 40px 100px; }
-
-.placard-flag { max-width: 360px; margin: 4px 0 32px; }
-.placard-flag[hidden] { display: none; }
-.placard-flag img {
-  width: 100%;
-  height: auto;
-  border-radius: 6px;
-  display: block;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
-}
-
-.placard-message { font-size: 17px; color: var(--text-dim); margin-bottom: 24px; }
-.placard-message[hidden] { display: none; }
-
-.placard-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 240px;
-  padding: 16px 34px;
-  border-radius: var(--radius-full);
-  border: 1px solid #ffffff;
-  background: #ffffff;
-  color: #0b0d18;
-  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
-}
-.placard-btn:hover:not(:disabled) { background: transparent; color: #ffffff; }
-.placard-btn:disabled { opacity: 0.45; cursor: default; }
-.placard-btn[hidden] { display: none; }
-
-.placard-status { margin-top: 18px; font-size: 16px; color: var(--text-dim); min-height: 1.5em; }
-
 /* -- placard desk (admin) -- */
 .pa-page { max-width: 900px; margin: 0 auto; padding: 40px 40px 100px; }
 
@@ -2043,8 +2005,7 @@ body {
 }
 
 @media (max-width: 700px) {
-  .placard-page, .pa-page { padding-left: 24px; padding-right: 24px; }
-  .placard-btn { width: 100%; min-width: 0; }
+  .pa-page { padding-left: 24px; padding-right: 24px; }
   .pa-row { flex-direction: column; }
   .pa-bar { flex-wrap: wrap; }
 }
@@ -2084,9 +2045,175 @@ body {
 
 .alloc-placard-hint[hidden] { display: none; }
 
-/* -- placard page: keep the flag clear of the hero's lower edge -- */
-.pagehero + .placard-page { padding-top: 64px; }
+@media (max-width: 700px) {
+}
+
+/* -- vote panel on the allocation result (code, then For / Against / Abstain) -- */
+.alloc-placard-hint {
+  font-family: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.alloc-vote-line dd {
+  display: block;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.alloc-vote-topic { color: var(--text); margin-bottom: 14px; }
+
+.alloc-vote-label {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 10px;
+}
+
+.alloc-vote-row { display: flex; gap: 10px; max-width: 340px; }
+
+.alloc-vote-input {
+  flex: 1;
+  min-width: 0;
+  padding: 11px 16px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--pill-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 18px;
+  letter-spacing: 6px;
+  text-align: center;
+}
+.alloc-vote-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.5); }
+
+.alloc-vote-btn {
+  padding: 11px 20px;
+  border-radius: var(--radius-full);
+  border: 1px solid #ffffff;
+  background: transparent;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.alloc-vote-btn:hover:not(:disabled) { background: #ffffff; color: #0b0d18; }
+.alloc-vote-btn:disabled { opacity: 0.45; cursor: default; }
+
+.alloc-vote-choices { display: flex; gap: 10px; flex-wrap: wrap; }
+.alloc-vote-choices[hidden], .alloc-vote-form[hidden] { display: none; }
+
+.alloc-vote-msg { margin-top: 14px; min-height: 1.4em; color: var(--text); }
+
+/* =========================================================
+   VOTE BOARD (full screen, projected)
+   ========================================================= */
+.board { max-width: 1400px; margin: 0 auto; padding: 36px 48px 56px; }
+
+.board-head { margin-bottom: 26px; }
+.board-eyebrow { font-size: 14px; letter-spacing: 2.6px; text-transform: uppercase; color: var(--text-faint); }
+.board-topic {
+  margin-top: 10px;
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: clamp(30px, 4.2vw, 56px);
+  line-height: 1.1;
+  color: var(--text);
+}
+.board-open { margin-top: 12px; font-size: 18px; color: var(--text-faint); }
+.board-open.is-open { color: #4fb38a; }
+
+.board-tally {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 30px;
+}
+.tally {
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.025);
+}
+.tally-num {
+  display: block;
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-weight: 500;
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1;
+}
+.tally-label { display: block; margin-top: 8px; font-size: 14px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--text-faint); }
+.tally-for .tally-num { color: #4fb38a; }
+.tally-against .tally-num { color: #e0707a; }
+.tally-abstain .tally-num { color: #d9a441; }
+.tally-none .tally-num { color: var(--text-dim); }
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 18px 16px;
+}
+.bd-tile { display: flex; flex-direction: column; gap: 9px; transition: opacity 0.4s ease, filter 0.4s ease; }
+.bd-tile img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 5px;
+  transition: box-shadow 0.4s ease;
+}
+.bd-tile span { font-size: 14px; line-height: 1.3; color: var(--text-dim); }
+
+.bd-tile.is-none img { filter: grayscale(1); opacity: 0.32; }
+.bd-tile.is-none span { color: var(--text-faint); }
+
+.bd-tile.is-for img { box-shadow: 0 0 0 3px #4fb38a, 0 0 26px rgba(79, 179, 138, 0.45); }
+.bd-tile.is-against img { box-shadow: 0 0 0 3px #e0707a, 0 0 26px rgba(224, 112, 122, 0.45); }
+.bd-tile.is-abstain img { box-shadow: 0 0 0 3px #d9a441, 0 0 26px rgba(217, 164, 65, 0.45); }
+.bd-tile.is-for span { color: #8fd6b5; }
+.bd-tile.is-against span { color: #f0a0a7; }
+.bd-tile.is-abstain span { color: #ecc87f; }
+
+.board-note { margin-top: 18px; color: var(--text-faint); }
 
 @media (max-width: 700px) {
-  .pagehero + .placard-page { padding-top: 48px; }
+  .board { padding: 24px 18px 40px; }
+  .board-tally { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* =========================================================
+   VOTE DESK (admin)
+   ========================================================= */
+.pa-block { padding: 26px 0; border-bottom: 1px solid var(--border-soft); }
+.pa-block:first-child { padding-top: 0; }
+.pa-block .pa-row { margin-top: 4px; }
+.pa-status { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.pa-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.pa-count.is-open { color: #4fb38a; }
+.pa-btn:disabled { opacity: 0.4; cursor: default; }
+
+.pa-summary { display: flex; gap: 26px; flex-wrap: wrap; font-size: 18px; color: var(--text-dim); }
+.pa-summary strong { font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif; font-weight: 500; font-size: 24px; color: var(--text); margin-left: 4px; }
+
+.pa-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 16px; }
+.pa-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  font-size: 15px;
+  color: var(--text-faint);
+}
+.pa-item.is-for { color: #8fd6b5; border-color: rgba(79, 179, 138, 0.5); }
+.pa-item.is-against { color: #f0a0a7; border-color: rgba(224, 112, 122, 0.5); }
+.pa-item.is-abstain { color: #ecc87f; border-color: rgba(217, 164, 65, 0.5); }
+
+.pa-danger .pa-label { color: #e0a090; }

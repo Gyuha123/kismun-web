@@ -5,14 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="color-scheme" content="dark" />
 <meta name="robots" content="noindex" />
-<title>KISMUN '26 | Placard Desk</title>
+<title>KISMUN '26 | Vote Desk</title>
 <meta property="og:type" content="website" />
-
+<meta property="og:url" content="https://kishcmun.netlify.app/allocation.html" />
 <meta property="og:site_name" content="KISMUN '26" />
-<meta property="og:title" content="KISMUN '26 | Placard Desk" />
+<meta property="og:title" content="KISMUN '26 | Vote Desk" />
 <meta property="og:description" content="Value Your Voice, Voice Your Value — Korean International School Model United Nations 2026" />
+<meta property="og:image" content="https://kishcmun.netlify.app/og_image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="KISMUN '26 | Placard Desk" />
+<meta name="twitter:title" content="KISMUN '26 | Vote Desk" />
+<meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="preconnect" href="https://api.fontshare.com" />
@@ -54,7 +58,7 @@
 <header class="pagehero">
   <div class="pagehero-inner">
     <p class="pagehero-eyebrow">KISMUN 2026 &middot; Desk</p>
-    <h1 class="pagehero-title">Placard</h1>
+    <h1 class="pagehero-title">Vote desk</h1>
   </div>
 </header>
 
@@ -72,13 +76,51 @@
   </section>
 
   <section class="pa-panel" id="paPanel" hidden>
-    <div class="pa-bar">
-      <p class="pa-count" id="paCount">0 raised</p>
-      <button type="button" class="pa-btn pa-btn-ghost" id="paClear">All clear</button>
+
+    <div class="pa-block">
+      <p class="pa-label">Topic</p>
+      <form id="topicForm" class="pa-row">
+        <input id="topicInput" class="pa-input" type="text" maxlength="200" placeholder="e.g. Resolution 1/2026" />
+        <button type="submit" class="pa-btn">Save topic</button>
+      </form>
+      <p class="pa-error" id="topicNote" aria-live="polite"></p>
     </div>
-    <p class="pa-empty" id="paEmpty" hidden>No placards raised yet.</p>
-    <div class="pa-grid" id="paGrid"></div>
-    <p class="pa-error" id="paNote" aria-live="polite"></p>
+
+    <div class="pa-block pa-status">
+      <div>
+        <p class="pa-label">Voting</p>
+        <p class="pa-count" id="voteState">Closed</p>
+      </div>
+      <div class="pa-actions">
+        <button type="button" class="pa-btn" id="openBtn">Open voting</button>
+        <button type="button" class="pa-btn pa-btn-ghost" id="closeBtn">Close voting</button>
+      </div>
+    </div>
+
+    <div class="pa-block">
+      <p class="pa-label">Live summary</p>
+      <div class="pa-summary">
+        <span>For <strong id="sFor">0</strong></span>
+        <span>Against <strong id="sAgainst">0</strong></span>
+        <span>Abstain <strong id="sAbstain">0</strong></span>
+        <span>Not voted <strong id="sNone">0</strong></span>
+      </div>
+    </div>
+
+    <div class="pa-block">
+      <p class="pa-label">Delegations</p>
+      <ul class="pa-list" id="paList"></ul>
+    </div>
+
+    <div class="pa-block pa-danger">
+      <p class="pa-label">Maintenance</p>
+      <div class="pa-actions">
+        <button type="button" class="pa-btn pa-btn-ghost" id="resetBtn">All clear (reset votes)</button>
+        <button type="button" class="pa-btn pa-btn-ghost" id="unblockBtn">Unblock all networks</button>
+      </div>
+      <p class="pa-error" id="paNote" aria-live="polite"></p>
+    </div>
+
   </section>
 
 </main>
@@ -99,7 +141,7 @@
 
 <script src="script.js"></script>
 <script src="allocation-data.js"></script>
-<script src="placard-data.js"></script>
-<script src="placard-admin.js"></script>
+<script src="vote-data.js"></script>
+<script src="desk.js"></script>
 </body>
 </html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="noindex" />
+<title>KISMUN '26 | Vote Board</title>
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://kishcmun.netlify.app/allocation.html" />
+<meta property="og:site_name" content="KISMUN '26" />
+<meta property="og:title" content="KISMUN '26 | Vote Board" />
+<meta property="og:description" content="Value Your Voice, Voice Your Value — Korean International School Model United Nations 2026" />
+<meta property="og:image" content="https://kishcmun.netlify.app/og_image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="KISMUN '26 | Vote Board" />
+<meta name="twitter:image" content="https://kishcmun.netlify.app/og_image.jpg" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&amp;display=swap" />
+<link rel="stylesheet" href="styles.css" />
+<script type="speculationrules">
+{
+  "prerender": [{
+    "where": { "and": [
+      { "href_matches": "/*.html" },
+      { "not": { "href_matches": "/reports/*" } }
+    ]},
+    "eagerness": "moderate"
+  }]
+}
+</script>
+</head>
+<body class="board-body">
+
+<main class="board">
+  <header class="board-head">
+    <p class="board-eyebrow">KISMUN 2026 &middot; Vote</p>
+    <h1 class="board-topic" id="boardTopic">Waiting for the topic</h1>
+    <p class="board-open" id="boardOpen"></p>
+  </header>
+
+  <section class="board-tally" aria-label="Summary">
+    <div class="tally tally-for"><span class="tally-num" id="nFor">0</span><span class="tally-label">For</span></div>
+    <div class="tally tally-against"><span class="tally-num" id="nAgainst">0</span><span class="tally-label">Against</span></div>
+    <div class="tally tally-abstain"><span class="tally-num" id="nAbstain">0</span><span class="tally-label">Abstain</span></div>
+    <div class="tally tally-none"><span class="tally-num" id="nNone">0</span><span class="tally-label">Not voted</span></div>
+  </section>
+
+  <section class="board-grid" id="boardGrid" aria-label="Delegations"></section>
+  <p class="board-note" id="boardNote"></p>
+</main>
+
+<script src="allocation-data.js"></script>
+<script src="vote-data.js"></script>
+<script src="board.js"></script>
+</body>
+</html>

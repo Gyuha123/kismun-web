@@ -25,8 +25,13 @@
   var committeeFullEl = document.getElementById('allocCommitteeFull');
   var delegationEl = document.getElementById('allocDelegation');
   var flagEl = document.getElementById('allocFlag');
-  var flagLink = document.getElementById('allocFlagLink');
-  var placardHint = document.getElementById('allocPlacardHint');
+  var voteBtn = document.getElementById('allocVoteBtn');
+  var voteLine = document.getElementById('allocVoteLine');
+  var voteTopic = document.getElementById('allocVoteTopic');
+  var voteForm = document.getElementById('allocVoteCodeForm');
+  var voteCodeInput = document.getElementById('allocVoteCode');
+  var voteChoices = document.getElementById('allocVoteChoices');
+  var voteMsg = document.getElementById('allocVoteMsg');
   var committeeLink = document.getElementById('allocCommitteeLink');
   var committeeCtaName = document.getElementById('allocCommitteeCtaName');
   var roomWorkshopLine = document.getElementById('allocRoomWorkshopLine');
@@ -146,8 +151,8 @@
       roomKismunLine.hidden = true;
     }
 
-    // only delegates raise placards; the UN flag stays a plain image
-    setPlacardLink(d.d !== 'UN' && data.flags[d.d] ? d.d : null);
+    // only delegations vote; Secretariat and the UN flag have no button
+    setVoteCountry(d.d !== 'UN' && d.c !== 'Secretariat' && data.flags[d.d] ? { code: d.d, name: data.names[d.d] || d.d } : null);
 
     chipName.textContent = d.n;
     chipId.textContent = d.s;
@@ -165,20 +170,97 @@
     clearBtn.hidden = false;
   }
 
-  // the flag and the "Raise Placard" hint both lead to the placard page for
-  // this delegation; with no code there is nothing to link to
-  function setPlacardLink(code) {
-    if (code) {
-      var href = 'placard.html?d=' + encodeURIComponent(code);
-      flagLink.href = href;
-      placardHint.href = href;
-      placardHint.hidden = false;
-    } else {
-      flagLink.removeAttribute('href');
-      placardHint.removeAttribute('href');
-      placardHint.hidden = true;
-    }
+  // ---- voting ---------------------------------------------------------
+  // The code is only kept in memory for this page visit; every check and
+  // every vote is verified by the server, which also counts wrong codes.
+  var LABEL = { 'for': 'For', 'against': 'Against', 'abstain': 'Abstain' };
+  var vote = null;          // {code, name} while a delegation is selected
+  var pendingCode = '';     // checked code, used for the vote itself
+  var topicWatching = false;
+
+  function say(text) { voteMsg.textContent = text || ''; }
+  function showCodeStep() {
+    voteForm.hidden = false;
+    voteChoices.hidden = true;
+    voteCodeInput.value = '';
+    voteCodeInput.disabled = false;
+    voteCodeInput.focus();
   }
+  function showChoiceStep() {
+    voteForm.hidden = true;
+    voteChoices.hidden = false;
+  }
+  function hideVote() {
+    voteLine.hidden = true;
+    voteForm.hidden = true;
+    voteChoices.hidden = true;
+    say('');
+    pendingCode = '';
+  }
+  function networkProblem() { say('Could not reach the vote server. Please try again.'); }
+
+  function setVoteCountry(next) {
+    vote = next;
+    voteBtn.hidden = !next;
+    hideVote();
+  }
+
+  function watchTopic() {
+    if (topicWatching || !window.VoteData || !VoteData.configured()) return;
+    topicWatching = true;
+    VoteData.watch('session', function (s, err) {
+      if (err) { voteTopic.textContent = ''; return; }
+      voteTopic.textContent = s && s.topic ? 'Topic: ' + s.topic : 'The voting topic will appear here.';
+    });
+  }
+
+  voteBtn.addEventListener('click', function () {
+    if (!vote) return;
+    if (!window.VoteData || !VoteData.configured()) { voteLine.hidden = false; say('Voting is not connected yet.'); return; }
+    voteLine.hidden = false;
+    watchTopic();
+    showCodeStep();
+    say('');
+  });
+
+  voteForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!vote) return;
+    var code = voteCodeInput.value.trim();
+    if (!/^\d{4}$/.test(code)) { say('Enter the 4 digits.'); return; }
+    voteCodeInput.disabled = true;
+    say('Checking…');
+    VoteData.api('check', { country: vote.code, code: code }).then(function (r) {
+      voteCodeInput.disabled = false;
+      if (r.error === 'wrong') { say('Wrong code. Attempts are limited.'); voteCodeInput.select(); return; }
+      if (r.error === 'blocked') { say('This network has been blocked after too many wrong codes. Please ask the desk.'); return; }
+      if (r.error === 'format') { say('Enter the 4 digits.'); return; }
+      if (r.error === 'unknown-country') { say('This delegation does not vote.'); return; }
+      if (r.error) { say('Something went wrong. Please try again.'); return; }
+      if (r.voted) { say(vote.name + ' has already voted: ' + LABEL[r.voted] + '.'); voteForm.hidden = true; return; }
+      if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); pendingCode = code; return; }
+      pendingCode = code;
+      showChoiceStep();
+      say('Choose one. ' + vote.name + ' can vote once.');
+    }).catch(networkProblem);
+  });
+
+  voteChoices.addEventListener('click', function (e) {
+    var btn = e.target.closest('button[data-choice]');
+    if (!btn || !vote || !pendingCode) return;
+    var choice = btn.getAttribute('data-choice');
+    voteChoices.hidden = true;
+    say('Sending…');
+    VoteData.api('vote', { country: vote.code, code: pendingCode, choice: choice }).then(function (r) {
+      if (r.ok) { pendingCode = ''; say('Vote received: ' + LABEL[r.choice] + '. Thank you.'); return; }
+      if (r.error === 'already') { pendingCode = ''; say(vote.name + ' has already voted: ' + LABEL[r.choice] + '.'); return; }
+      if (r.error === 'closed') { pendingCode = ''; say('Voting has closed.'); return; }
+      if (r.error === 'blocked') { pendingCode = ''; say('This network has been blocked. Please ask the desk.'); return; }
+      if (r.error === 'wrong') { pendingCode = ''; showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
+      voteChoices.hidden = false;
+      say('Something went wrong. Please try again.');
+    }).catch(function () { voteChoices.hidden = false; networkProblem(); });
+  });
 
   function reset() {
     input.value = '';
@@ -196,7 +278,7 @@
     delegationEl.textContent = '';
     flagEl.removeAttribute('src');
     flagEl.hidden = true;
-    setPlacardLink(null);
+    setVoteCountry(null);
     roomWorkshopEl.textContent = '';
     roomKismunEl.textContent = '';
     roomWorkshopLine.hidden = true;
