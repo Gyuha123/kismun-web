@@ -7,7 +7,6 @@
 // Environment variables (Netlify → Site configuration → Environment variables):
 //   FIREBASE_SERVICE_ACCOUNT   service-account JSON (Firebase console)
 //   CODE_PEPPER                random secret (64 hex characters)
-//   PLACARD_CODE_HASHES        JSON {"SYRIA":"<hmac>", ...}, made by the pepper
 //   DESK_PASSWORD_SCRYPT       "saltHex:hashHex" of the desk password (scrypt)
 
 const crypto = require('crypto');
@@ -62,8 +61,13 @@ function codeHash(country, code) {
   return crypto.createHmac('sha256', pepper).update(country + '|' + code).digest('hex').slice(0, 32);
 }
 
+// Country -> keyed hash. Stored in code-hashes.json (safe to publish: each value is an
+// HMAC keyed with CODE_PEPPER, which is the secret). PLACARD_CODE_HASHES, if set, overrides it.
 function hashMap() {
-  try { return JSON.parse(process.env.PLACARD_CODE_HASHES || '{}'); } catch (e) { return {}; }
+  if (process.env.PLACARD_CODE_HASHES) {
+    try { return JSON.parse(process.env.PLACARD_CODE_HASHES); } catch (e) { return {}; }
+  }
+  try { return require('./code-hashes.json'); } catch (e) { return {}; }
 }
 
 // Always computes an HMAC, so unknown countries take the same time.
