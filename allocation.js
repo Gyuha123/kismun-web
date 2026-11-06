@@ -25,6 +25,8 @@
   var committeeFullEl = document.getElementById('allocCommitteeFull');
   var delegationEl = document.getElementById('allocDelegation');
   var flagEl = document.getElementById('allocFlag');
+  var flagLink = document.getElementById('allocFlagLink');
+  var placardHint = document.getElementById('allocPlacardHint');
   var committeeLink = document.getElementById('allocCommitteeLink');
   var committeeCtaName = document.getElementById('allocCommitteeCtaName');
   var roomWorkshopLine = document.getElementById('allocRoomWorkshopLine');
@@ -144,6 +146,9 @@
       roomKismunLine.hidden = true;
     }
 
+    // only delegates raise placards; the UN flag stays a plain image
+    setPlacardLink(d.d !== 'UN' && data.flags[d.d] ? d.d : null);
+
     chipName.textContent = d.n;
     chipId.textContent = d.s;
 
@@ -158,6 +163,21 @@
     activeIndex = -1;
     dropdown.hidden = true;
     clearBtn.hidden = false;
+  }
+
+  // the flag and the "Raise Placard" hint both lead to the placard page for
+  // this delegation; with no code there is nothing to link to
+  function setPlacardLink(code) {
+    if (code) {
+      var href = 'placard.html?d=' + encodeURIComponent(code);
+      flagLink.href = href;
+      placardHint.href = href;
+      placardHint.hidden = false;
+    } else {
+      flagLink.removeAttribute('href');
+      placardHint.removeAttribute('href');
+      placardHint.hidden = true;
+    }
   }
 
   function reset() {
@@ -176,6 +196,7 @@
     delegationEl.textContent = '';
     flagEl.removeAttribute('src');
     flagEl.hidden = true;
+    setPlacardLink(null);
     roomWorkshopEl.textContent = '';
     roomKismunEl.textContent = '';
     roomWorkshopLine.hidden = true;

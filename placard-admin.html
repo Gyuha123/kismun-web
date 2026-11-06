@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="noindex" />
+<title>KISMUN '26 | Placard Desk</title>
+<meta property="og:type" content="website" />
+
+<meta property="og:site_name" content="KISMUN '26" />
+<meta property="og:title" content="KISMUN '26 | Placard Desk" />
+<meta property="og:description" content="Value Your Voice, Voice Your Value — Korean International School Model United Nations 2026" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="KISMUN '26 | Placard Desk" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&amp;display=swap" />
+<link rel="stylesheet" href="styles.css" />
+<script type="speculationrules">
+{
+  "prerender": [{
+    "where": { "and": [
+      { "href_matches": "/*.html" },
+      { "not": { "href_matches": "/reports/*" } }
+    ]},
+    "eagerness": "moderate"
+  }]
+}
+</script>
+</head>
+<body data-accent="allocation">
+
+<nav class="sitenav solid" id="siteNav">
+  <div class="bar">
+    <a class="logo" href="index.html">
+      <img class="logo-icon" src="마크_icon.png" alt="" />
+      <img class="logo-text" src="마크_text.png" alt="KISMUN '26" />
+    </a>
+    <div class="links">
+      <a href="committee.html">committee</a>
+      <a href="staff.html">staff</a>
+      <a href="secretariat.html">secretariat</a>
+      <a href="director.html">director</a>
+    </div>
+    <a class="allocation" href="allocation.html"><span>my </span>allocation</a>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </div>
+</nav>
+
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <p class="pagehero-eyebrow">KISMUN 2026 &middot; Desk</p>
+    <h1 class="pagehero-title">Placard</h1>
+  </div>
+</header>
+
+<main class="pa-page">
+
+  <section class="pa-gate" id="paGate">
+    <form id="paForm" autocomplete="off">
+      <label class="pa-label" for="paPass">Password</label>
+      <div class="pa-row">
+        <input id="paPass" class="pa-input" type="password" required />
+        <button type="submit" class="pa-btn">Enter</button>
+      </div>
+      <p class="pa-error" id="paError" aria-live="polite"></p>
+    </form>
+  </section>
+
+  <section class="pa-panel" id="paPanel" hidden>
+    <div class="pa-bar">
+      <p class="pa-count" id="paCount">0 raised</p>
+      <button type="button" class="pa-btn pa-btn-ghost" id="paClear">All clear</button>
+    </div>
+    <p class="pa-empty" id="paEmpty" hidden>No placards raised yet.</p>
+    <div class="pa-grid" id="paGrid"></div>
+    <p class="pa-error" id="paNote" aria-live="polite"></p>
+  </section>
+
+</main>
+
+<footer class="sitefooter">
+  <div class="inner">
+    <div class="brand">
+      <img src="마크_cutout_crop.png" alt="KISMUN '26" />
+      <div class="brand-text">
+        <div class="rights">© 2013-2026 KISMUN. All rights reserved.</div>
+      </div>
+    </div>
+    <a class="insta" href="https://www.instagram.com/kishcmun/" target="_blank" rel="noopener">
+      <img src="인스타로고_cutout.png" alt="Instagram" />
+    </a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="allocation-data.js"></script>
+<script src="placard-data.js"></script>
+<script src="placard-admin.js"></script>
+</body>
+</html>

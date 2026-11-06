@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="dark" />
+<meta name="robots" content="noindex" />
+<title>KISMUN '26 | Raise Placard</title>
+<meta property="og:type" content="website" />
+
+<meta property="og:site_name" content="KISMUN '26" />
+<meta property="og:title" content="KISMUN '26 | Raise Placard" />
+<meta property="og:description" content="Value Your Voice, Voice Your Value — Korean International School Model United Nations 2026" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="KISMUN '26 | Raise Placard" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://api.fontshare.com" />
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-grotesk@200,300,400,500,600,700&amp;display=swap" />
+<link rel="stylesheet" href="styles.css" />
+<script type="speculationrules">
+{
+  "prerender": [{
+    "where": { "and": [
+      { "href_matches": "/*.html" },
+      { "not": { "href_matches": "/reports/*" } }
+    ]},
+    "eagerness": "moderate"
+  }]
+}
+</script>
+</head>
+<body data-accent="allocation">
+
+<nav class="sitenav solid" id="siteNav">
+  <div class="bar">
+    <a class="logo" href="index.html">
+      <img class="logo-icon" src="마크_icon.png" alt="" />
+      <img class="logo-text" src="마크_text.png" alt="KISMUN '26" />
+    </a>
+    <div class="links">
+      <a href="committee.html">committee</a>
+      <a href="staff.html">staff</a>
+      <a href="secretariat.html">secretariat</a>
+      <a href="director.html">director</a>
+    </div>
+    <a class="allocation" href="allocation.html"><span>my </span>allocation</a>
+    <div class="nav-toggle" id="navToggle">☰</div>
+  </div>
+</nav>
+
+<header class="pagehero">
+  <div class="pagehero-inner">
+    <a class="back-link" href="allocation.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg> back to my allocation</a>
+    <p class="pagehero-eyebrow">KISMUN 2026 &middot; Placard</p>
+    <h1 class="pagehero-title" id="placardCountry">Raise Placard</h1>
+  </div>
+</header>
+
+<main class="placard-page">
+  <div class="placard-flag" id="placardFlagWrap" hidden>
+    <img id="placardFlag" src="" alt="" />
+  </div>
+  <p class="placard-message" id="placardMessage" hidden></p>
+  <button type="button" class="placard-btn" id="placardBtn" hidden>Raise Placard</button>
+  <p class="placard-status" id="placardStatus" aria-live="polite"></p>
+</main>
+
+<footer class="sitefooter">
+  <div class="inner">
+    <div class="brand">
+      <img src="마크_cutout_crop.png" alt="KISMUN '26" />
+      <div class="brand-text">
+        <div class="rights">© 2013-2026 KISMUN. All rights reserved.</div>
+      </div>
+    </div>
+    <a class="insta" href="https://www.instagram.com/kishcmun/" target="_blank" rel="noopener">
+      <img src="인스타로고_cutout.png" alt="Instagram" />
+    </a>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+<script src="allocation-data.js"></script>
+<script src="placard-data.js"></script>
+<script src="placard.js"></script>
+</body>
+</html>

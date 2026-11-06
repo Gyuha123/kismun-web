@@ -1858,24 +1858,193 @@ body {
   box-shadow: none;
 }
 
-.sitenav:not(.overlay) .allocation,
-.sitenav.solid .allocation {
-  background: transparent;
-  border: 1px solid #ffffff;
-  color: #ffffff;
-}
-
-.sitenav:not(.overlay) .allocation:hover,
-.sitenav.solid .allocation:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #ffffff;
-  box-shadow: none;
-}
-
 @media (max-width: 860px) {
   .sitenav .allocation {
     padding: 8px 13px;
     font-size: 14px;
     line-height: 1.2;
   }
+}
+
+/* -- allocation button off the home page: at rest the text matches the centre
+   bar links; on hover it switches straight to white. No transition at all —
+   the outline and the text change instantly. Home page keeps its glass style. -- */
+.sitenav:not(.overlay) .allocation,
+.sitenav.solid .allocation {
+  background: transparent;
+  border: 1px solid #ffffff;
+  color: rgba(231, 232, 238, 0.62);
+  box-shadow: none;
+  transition: none;
+}
+
+.sitenav:not(.overlay) .allocation:hover,
+.sitenav.solid .allocation:hover {
+  background: transparent;
+  border-color: #ffffff;
+  color: #ffffff;
+  box-shadow: none;
+  transition: none;
+}
+
+/* -- flag and "Raise Placard" hint on the allocation result -- */
+.alloc-flag-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.alloc-flag-link { display: inline-block; line-height: 0; border-radius: 3px; }
+.alloc-flag-link[href] { cursor: pointer; }
+.alloc-flag-link[href]:hover .alloc-flag,
+.alloc-flag-link[href]:focus-visible .alloc-flag { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5); }
+.alloc-flag-link:focus-visible { outline: 1px solid #fff; outline-offset: 3px; }
+
+.alloc-placard-hint {
+  font-size: 14px;
+  color: var(--text-dim);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1px;
+  transition: color 0.18s ease;
+}
+.alloc-placard-hint:hover { color: #ffffff; }
+.alloc-placard-hint[hidden] { display: none; }
+
+/* -- placard page (delegate) -- */
+.placard-page { max-width: 900px; margin: 0 auto; padding: 0 40px 100px; }
+
+.placard-flag { max-width: 360px; margin: 4px 0 32px; }
+.placard-flag[hidden] { display: none; }
+.placard-flag img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+}
+
+.placard-message { font-size: 17px; color: var(--text-dim); margin-bottom: 24px; }
+.placard-message[hidden] { display: none; }
+
+.placard-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 240px;
+  padding: 16px 34px;
+  border-radius: var(--radius-full);
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: #0b0d18;
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+.placard-btn:hover:not(:disabled) { background: transparent; color: #ffffff; }
+.placard-btn:disabled { opacity: 0.45; cursor: default; }
+.placard-btn[hidden] { display: none; }
+
+.placard-status { margin-top: 18px; font-size: 16px; color: var(--text-dim); min-height: 1.5em; }
+
+/* -- placard desk (admin) -- */
+.pa-page { max-width: 900px; margin: 0 auto; padding: 40px 40px 100px; }
+
+.pa-label {
+  display: block;
+  font-size: 13px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 10px;
+}
+
+.pa-row { display: flex; gap: 10px; max-width: 460px; }
+
+.pa-input {
+  flex: 1;
+  min-width: 0;
+  padding: 13px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--pill-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+}
+.pa-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.5); }
+
+.pa-btn {
+  padding: 13px 22px;
+  border-radius: var(--radius-full);
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: #0b0d18;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.pa-btn:disabled { opacity: 0.45; cursor: default; }
+.pa-btn-ghost { background: transparent; color: #ffffff; }
+.pa-btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+
+.pa-error { margin-top: 12px; font-size: 14px; color: #f0a08c; min-height: 1.2em; }
+
+.pa-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.pa-count {
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.pa-empty { margin-top: 26px; color: var(--text-faint); }
+.pa-empty[hidden] { display: none; }
+
+.pa-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 18px;
+  margin-top: 26px;
+}
+
+.pa-tile { display: flex; flex-direction: column; gap: 10px; }
+
+.pa-tile img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+  display: block;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.3);
+}
+
+.pa-tile span { font-size: 15px; color: var(--text-dim); }
+
+.pa-tile.is-new { animation: pa-in 0.5s cubic-bezier(0.2, 0.7, 0.3, 1); }
+
+@keyframes pa-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pa-tile.is-new { animation: none; }
+}
+
+@media (max-width: 700px) {
+  .placard-page, .pa-page { padding-left: 24px; padding-right: 24px; }
+  .placard-btn { width: 100%; min-width: 0; }
+  .pa-row { flex-direction: column; }
+  .pa-bar { flex-wrap: wrap; }
 }
