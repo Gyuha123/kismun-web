@@ -4,11 +4,11 @@
 // (Project settings → Your apps → Web app → SDK setup and configuration).
 // Only the list of raised placards lives here; nothing is kept after All clear.
 var PLACARD_CONFIG = {
-  apiKey: "",
-  authDomain: "",
-  databaseURL: "",
-  projectId: "",
-  appId: ""
+  apiKey: "AIzaSyAdDxZ4XEO707F9z1nxYUL7SLbOOA85Dfs",
+  authDomain: "kismun-placard.firebaseapp.com",
+  databaseURL: "https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "kismun-placard",
+  appId: "1:207700636090:web:7e9f6a1b4a38418f54ed83"
 };
 
 (function () {
