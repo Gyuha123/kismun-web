@@ -240,7 +240,6 @@
       if (r.error === 'blocked') { say('This network has been blocked after too many wrong codes. Please ask the desk.'); return; }
       if (r.error === 'format') { say('Enter the 4 digits.'); return; }
       if (r.error === 'unknown-country') { say('This delegation does not vote.'); return; }
-      if (r.error === 'country-locked') { say('This delegation is temporarily locked after too many wrong codes. Please ask the desk.'); return; }
       if (r.error) { say('Something went wrong. Please try again.'); return; }
       if (r.voted) { say(vote.name + ' has already voted: ' + LABEL[r.voted] + '.'); voteForm.hidden = true; return; }
       if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); pendingCode = code; return; }
@@ -261,7 +260,6 @@
       if (r.error === 'already') { pendingCode = ''; say(vote.name + ' has already voted: ' + LABEL[r.choice] + '.'); return; }
       if (r.error === 'closed') { pendingCode = ''; say('Voting has closed.'); return; }
       if (r.error === 'blocked') { pendingCode = ''; say('This network has been blocked. Please ask the desk.'); return; }
-      if (r.error === 'country-locked') { pendingCode = ''; showCodeStep(); say('This delegation is temporarily locked. Please ask the desk.'); return; }
       if (r.error === 'wrong') { pendingCode = ''; showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
       voteChoices.hidden = false;
       say('Something went wrong. Please try again.');

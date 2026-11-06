@@ -15,13 +15,11 @@ const crypto = require('crypto');
 const DB = 'https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app';
 const SITE_HOST_ANY = true;        // origin must match the host this function was called on
 const CHOICES = ['for', 'against', 'abstain'];
-const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all', 'unlock_countries'];
+const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all'];
 
 // limits
 const MAX_BODY_BYTES = 2048;
 const IP_MAX_FAILS = 5;                 // per network: blocks after 5 wrong codes (kept as requested)
-const COUNTRY_MAX_FAILS = 10;           // per country, across all networks
-const COUNTRY_LOCK_MS = 15 * 60 * 1000;
 const DESK_MAX_FAILS = 5;               // per network, wrong desk passwords
 const DESK_LOCK_MS = 15 * 60 * 1000;
 const TOPIC_MAX = 120;
@@ -67,7 +65,7 @@ function hashMap() {
   try { return JSON.parse(process.env.PLACARD_CODE_HASHES || '{}'); } catch (e) { return {}; }
 }
 
-// Constant-shape check: always computes an HMAC, so unknown countries take the same time.
+// Always computes an HMAC, so unknown countries take the same time.
 function codeMatches(country, code) {
   const map = hashMap();
   const known = Object.prototype.hasOwnProperty.call(map, country);
@@ -175,21 +173,6 @@ async function recordIpFailure(ipHash) {
   });
 }
 
-async function countryLocked(key) {
-  const rec = await read('security/country/' + key);
-  return !!(rec && rec.lockedUntil && rec.lockedUntil > Date.now());
-}
-
-async function recordCountryFailure(key) {
-  return update('security/country/' + key, function (cur) {
-    if (cur && cur.lockedUntil && cur.lockedUntil > Date.now()) return { write: false, result: cur };
-    const fails = ((cur && cur.fails) || 0) + 1;
-    const lock = fails >= COUNTRY_MAX_FAILS;
-    const value = lock ? { fails: 0, lockedUntil: Date.now() + COUNTRY_LOCK_MS } : { fails: fails, lockedUntil: 0 };
-    return { write: true, value: value, result: value };
-  });
-}
-
 async function deskLocked(ipHash) {
   const rec = await read('security/desk/' + ipHash);
   return !!(rec && rec.lockedUntil && rec.lockedUntil > Date.now());
@@ -244,13 +227,11 @@ exports.handler = async function (event) {
       if (!/^\d{4}$/.test(code)) return json(200, { error: 'format' });
 
       const key = sanitizeKey(country);
-      if (await countryLocked(key)) return json(200, { error: 'country-locked' });
 
       const valid = knownCountry(country) && codeMatches(country, code);
       if (!valid) {
         // unknown countries are counted exactly like wrong codes, so they cannot be probed
         const ip = await recordIpFailure(ipHash);
-        await recordCountryFailure(key);
         return json(200, { error: ip.fails >= IP_MAX_FAILS ? 'blocked' : 'wrong' });
       }
 
@@ -278,7 +259,7 @@ exports.handler = async function (event) {
     }
 
     // ---- desk actions: password, with its own lock per network -----------
-    if (DESK_ACTIONS.indexOf(action) !== -1 || action === 'desk_status') {
+    if (DESK_ACTIONS.indexOf(action) !== -1) {
       if (await deskLocked(ipHash)) return json(200, { error: 'locked' });
       if (!deskPasswordOk(body.password)) {
         await recordDeskFailure(ipHash);
@@ -286,16 +267,6 @@ exports.handler = async function (event) {
       }
       if (action === 'auth') return json(200, { ok: true });
 
-      if (action === 'desk_status') {
-        const now = Date.now();
-        const countries = (await read('security/country')) || {};
-        const networks = (await read('security/ip')) || {};
-        const locked = Object.keys(countries)
-          .filter((k) => countries[k] && countries[k].lockedUntil > now)
-          .map((k) => ({ key: k, until: countries[k].lockedUntil }));
-        const blockedNetworks = Object.keys(networks).filter((k) => networks[k] && networks[k].blocked).length;
-        return json(200, { ok: true, lockedCountries: locked, blockedNetworks: blockedNetworks });
-      }
 
       if (action === 'set_topic') {
         await rtdb('PATCH', 'session', { topic: cleanTopic(body.topic) });
@@ -305,8 +276,6 @@ exports.handler = async function (event) {
         await rtdb('DELETE', 'votes');
       } else if (action === 'unblock_all') {
         await rtdb('DELETE', 'security/ip');
-      } else if (action === 'unlock_countries') {
-        await rtdb('DELETE', 'security/country');
       }
       await audit(action, ipHash);
       return json(200, { ok: true });
