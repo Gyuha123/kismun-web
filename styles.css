@@ -2048,3 +2048,15 @@ body {
   .pa-row { flex-direction: column; }
   .pa-bar { flex-wrap: wrap; }
 }
+
+/* -- home page allocation text: same dim colour as the centre bar links at
+   rest, white only on hover, no transition. Glass background unchanged. -- */
+.sitenav.overlay .allocation {
+  color: rgba(231, 232, 238, 0.62);
+  transition: none;
+}
+
+.sitenav.overlay .allocation:hover {
+  color: #ffffff;
+  transition: none;
+}
