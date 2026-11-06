@@ -2060,3 +2060,33 @@ body {
   color: #ffffff;
   transition: none;
 }
+
+/* -- allocation result: "Raise Placard" reads as a button, not a link -- */
+.alloc-placard-hint {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 16px;
+  border: 1px solid var(--pill-border);
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--text);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.alloc-placard-hint:hover {
+  background: var(--text);
+  border-color: var(--text);
+  color: #0b0d18;
+}
+
+.alloc-placard-hint[hidden] { display: none; }
+
+/* -- placard page: keep the flag clear of the hero's lower edge -- */
+.pagehero + .placard-page { padding-top: 64px; }
+
+@media (max-width: 700px) {
+  .pagehero + .placard-page { padding-top: 48px; }
+}
