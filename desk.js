@@ -11,16 +11,7 @@
   var note = $('paNote');
   var list = $('paList');
 
-  var countries = [];
-  var seen = {};
-  if (data) {
-    data.delegates.forEach(function (d) {
-      if (d.c === 'Secretariat' || d.d === 'UN' || !data.flags[d.d] || seen[d.d]) return;
-      seen[d.d] = true;
-      countries.push({ code: d.d, name: data.names[d.d] || d.d, flag: data.flags[d.d] });
-    });
-    countries.sort(function (a, b) { return a.name.localeCompare(b.name); });
-  }
+  var countries = VoteData.voters(data);
   var LABEL = { 'for': 'For', 'against': 'Against', 'abstain': 'Abstain' };
   var votes = {}, session = {};
 
@@ -40,7 +31,7 @@
   function renderSummary() {
     var c = { 'for': 0, against: 0, abstain: 0, none: 0 };
     countries.forEach(function (x) {
-      var v = votes[VoteData.key(x.code)];
+      var v = votes[VoteData.key(x.id)];
       if (v && c.hasOwnProperty(v.choice)) c[v.choice]++; else c.none++;
     });
     $('sFor').textContent = c['for'];
@@ -50,15 +41,15 @@
 
     list.textContent = '';
     countries.forEach(function (x) {
-      var v = votes[VoteData.key(x.code)];
+      var v = votes[VoteData.key(x.id)];
       var li = document.createElement('li');
       li.className = 'pa-item' + (v ? ' is-' + v.choice : '');
       var flag = document.createElement('img');
       flag.className = 'pa-flag';
-      flag.src = 'flags/4x3/' + x.flag + '.svg';
+      flag.src = x.kind === 'un' ? 'unflag.png' : 'flags/4x3/' + x.flag + '.svg';
       flag.alt = '';
       var name = document.createElement('span');
-      name.textContent = x.name;
+      name.textContent = x.label;
       li.appendChild(flag);
       var state = document.createElement('span');
       state.textContent = v ? LABEL[v.choice] : 'Not voted';

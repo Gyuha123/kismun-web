@@ -154,7 +154,7 @@
     }
 
     // only delegations vote; Secretariat and the UN flag have no button
-    setVoteCountry(d.d !== 'UN' && d.c !== 'Secretariat' && data.flags[d.d] ? { code: d.d, name: data.names[d.d] || d.d } : null);
+    setVoteCountry(voteTargetFor(d));
 
     chipName.textContent = d.n;
     chipId.textContent = d.s;
@@ -201,6 +201,15 @@
   }
   function networkProblem() { say('Could not reach the vote server. Please try again.'); }
 
+  // the voting unit a delegate belongs to: their country, or the UN group for chairs.
+  // The Secretariat (and anyone without a flag) has no vote.
+  function voteTargetFor(d) {
+    if (d.c === 'Secretariat') return null;
+    if (d.d === 'UN') return { code: 'UN', name: 'UN (Chairs)', flag: 'unflag.png' };
+    if (!data.flags[d.d]) return null;
+    return { code: d.d, name: data.names[d.d] || d.d, flag: 'flags/4x3/' + data.flags[d.d] + '.svg' };
+  }
+
   function setVoteCountry(next) {
     vote = next;
     voteBtn.hidden = !next;
@@ -220,7 +229,7 @@
     if (!vote) return;
     if (!window.VoteData || !VoteData.configured()) { voteLine.hidden = false; say('Voting is not connected yet.'); return; }
     voteLine.hidden = false;
-    voteFlag.src = 'flags/4x3/' + data.flags[vote.code] + '.svg';
+    voteFlag.src = vote.flag;
     voteName.textContent = vote.name;
     watchTopic();
     showCodeStep();

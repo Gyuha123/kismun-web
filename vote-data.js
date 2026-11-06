@@ -58,6 +58,27 @@ var PLACARD_CONFIG = {
     },
 
     // Firebase keys cannot contain . # $ [ ] /
+    key: function (name) { return String(name).replace(/[.#$\[\]\/]/g, '_'); },
+
+    // Everyone who can vote, one entry per voting unit. Each delegation is its own
+    // country. The 18 committee chairs form ONE unit, "UN", that votes with the UN
+    // flag, exactly like a country. The Secretariat does not vote.
+    voters: function (data) {
+      var out = [], seen = {}, chairs = 0;
+      if (!data) return out;
+      data.delegates.forEach(function (d) {
+        if (d.c === 'Secretariat') return;
+        if (d.d === 'UN') { chairs++; return; }
+        if (!data.flags[d.d] || seen[d.d]) return;
+        seen[d.d] = true;
+        out.push({ id: d.d, kind: 'country', name: data.names[d.d] || d.d, label: data.names[d.d] || d.d, flag: data.flags[d.d] });
+      });
+      if (chairs) out.push({ id: 'UN', kind: 'un', name: 'UN', label: 'UN (Chairs)', flag: 'unflag' });
+      out.sort(function (a, b) { return a.label.localeCompare(b.label); });
+      return out;
+    },
+
+    // Firebase keys cannot contain . # $ [ ] /
     key: function (name) { return String(name).replace(/[.#$\[\]\/]/g, '_'); }
   };
 })();

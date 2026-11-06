@@ -9,15 +9,8 @@
 
   if (!data) { note.textContent = 'Country data is missing.'; return; }
 
-  // delegations only: Secretariat and the UN have no vote
-  var seen = {};
-  var countries = [];
-  data.delegates.forEach(function (d) {
-    if (d.c === 'Secretariat' || d.d === 'UN' || !data.flags[d.d] || seen[d.d]) return;
-    seen[d.d] = true;
-    countries.push({ code: d.d, name: data.names[d.d] || d.d, flag: data.flags[d.d] });
-  });
-  countries.sort(function (a, b) { return a.name.localeCompare(b.name); });
+  // every voting unit: each country, plus the UN group of chairs
+  var countries = VoteData.voters(data);
 
   var LABEL = { 'for': 'For', 'against': 'Against', 'abstain': 'Abstain' };
   var tiles = {};
@@ -25,20 +18,20 @@
     var el = document.createElement('div');
     el.className = 'bd-tile is-none';
     var img = document.createElement('img');
-    img.src = 'flags/4x3/' + c.flag + '.svg';
+    img.src = c.kind === 'un' ? 'unflag.png' : 'flags/4x3/' + c.flag + '.svg';
     img.alt = '';
     var label = document.createElement('span');
-    label.textContent = c.name;
+    label.textContent = c.label;
     el.appendChild(img);
     el.appendChild(label);
     grid.appendChild(el);
-    tiles[VoteData.key(c.code)] = el;
+    tiles[VoteData.key(c.id)] = el;
   });
 
   function render(votes) {
     var counts = { 'for': 0, 'against': 0, 'abstain': 0, none: 0 };
     countries.forEach(function (c) {
-      var k = VoteData.key(c.code);
+      var k = VoteData.key(c.id);
       var v = votes && votes[k];
       var el = tiles[k];
       el.className = 'bd-tile ' + (v ? 'is-' + v.choice : 'is-none');
