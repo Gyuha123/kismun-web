@@ -58,7 +58,8 @@ function safeEqualHex(a, b) {
 
 function codeHash(country, code) {
   const pepper = process.env.CODE_PEPPER || '';
-  return crypto.createHmac('sha256', pepper).update(country + '|' + code).digest('hex');
+  // 128-bit truncation keeps the environment value under Netlify's 5000-character limit
+  return crypto.createHmac('sha256', pepper).update(country + '|' + code).digest('hex').slice(0, 32);
 }
 
 function hashMap() {
