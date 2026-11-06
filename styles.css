@@ -2224,3 +2224,5 @@ body {
 .alloc-vote-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
 .alloc-vote-flag { width: 44px; height: auto; border-radius: 3px; }
 .alloc-vote-name { font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif; font-size: 22px; font-weight: 500; color: var(--text); }
+
+.pa-help { font-size: 15px; line-height: 1.6; color: var(--text-dim); margin-bottom: 14px; max-width: 70ch; }

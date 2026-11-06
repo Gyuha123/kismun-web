@@ -101,6 +101,7 @@
         gate.hidden = true;
         panel.hidden = false;
         start();
+        refreshLocks();
       } else {
         say(err, errorText(r.error));
         pass.select();
@@ -133,6 +134,43 @@
       say(note, r.ok ? 'All votes cleared.' : errorText(r.error));
     }).catch(function () { say(note, 'Could not reach the server.'); });
   });
+
+  // ---- locks: which delegations are locked, how many networks are blocked
+  var keyToName = {};
+  countries.forEach(function (x) { keyToName[VoteData.key(x.code)] = x.name; });
+
+  function refreshLocks() {
+    if (!pw) return;
+    deskCall('desk_status').then(function (r) {
+      if (!r.ok) { say($('lockNote'), errorText(r.error)); return; }
+      say($('lockNote'), '');
+      var lockedList = $('lockList');
+      lockedList.textContent = '';
+      var locked = r.lockedCountries || [];
+      say($('lockSummary'), locked.length + ' countries locked · ' + (r.blockedNetworks || 0) + ' networks blocked');
+      locked.forEach(function (c) {
+        var li = document.createElement('li');
+        li.className = 'pa-item is-against';
+        var name = document.createElement('span');
+        name.textContent = keyToName[c.key] || c.key;
+        var until = document.createElement('span');
+        until.textContent = 'until ' + new Date(c.until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        li.appendChild(name);
+        li.appendChild(until);
+        lockedList.appendChild(li);
+      });
+    }).catch(function () { say($('lockNote'), 'Could not reach the server.'); });
+  }
+
+  $('refreshLocksBtn').addEventListener('click', refreshLocks);
+  $('unlockCountriesBtn').addEventListener('click', function () {
+    if (!confirm('Unlock every delegation whose code is locked?')) return;
+    deskCall('unlock_countries').then(function (r) {
+      say($('lockNote'), r.ok ? 'All countries unlocked.' : errorText(r.error));
+      refreshLocks();
+    }).catch(function () { say($('lockNote'), 'Could not reach the server.'); });
+  });
+  setInterval(refreshLocks, 10000);
 
   $('unblockBtn').addEventListener('click', function () {
     if (!confirm('Unblock every network that was locked by wrong codes?')) return;

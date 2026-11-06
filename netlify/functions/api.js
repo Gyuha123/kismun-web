@@ -8,7 +8,7 @@
 //   FIREBASE_SERVICE_ACCOUNT   service-account JSON (Firebase console)
 //   CODE_PEPPER                random secret (64 hex characters)
 //   PLACARD_CODE_HASHES        JSON {"SYRIA":"<hmac>", ...}, made by the pepper
-//   DESK_PASSWORD_SHA256       SHA-256 of the desk password (hex)
+//   DESK_PASSWORD_SCRYPT       "saltHex:hashHex" of the desk password (scrypt)
 
 const crypto = require('crypto');
 
@@ -207,8 +207,13 @@ function cleanTopic(raw) {
   return String(raw || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, TOPIC_MAX);
 }
 
+// scrypt is deliberately slow and memory-hungry, so guessing offline is costly.
 function deskPasswordOk(password) {
-  return safeEqualHex(sha256Hex(String(password || '')), process.env.DESK_PASSWORD_SHA256 || '0');
+  const [saltHex, hashHex] = String(process.env.DESK_PASSWORD_SCRYPT || '').split(':');
+  if (!saltHex || !hashHex) return false;
+  const computed = crypto.scryptSync(String(password || ''), Buffer.from(saltHex, 'hex'), 64);
+  const want = Buffer.from(hashHex, 'hex');
+  return want.length === computed.length && crypto.timingSafeEqual(computed, want);
 }
 
 exports.handler = async function (event) {
@@ -273,13 +278,24 @@ exports.handler = async function (event) {
     }
 
     // ---- desk actions: password, with its own lock per network -----------
-    if (DESK_ACTIONS.indexOf(action) !== -1) {
+    if (DESK_ACTIONS.indexOf(action) !== -1 || action === 'desk_status') {
       if (await deskLocked(ipHash)) return json(200, { error: 'locked' });
       if (!deskPasswordOk(body.password)) {
         await recordDeskFailure(ipHash);
         return json(200, { error: 'password' });
       }
       if (action === 'auth') return json(200, { ok: true });
+
+      if (action === 'desk_status') {
+        const now = Date.now();
+        const countries = (await read('security/country')) || {};
+        const networks = (await read('security/ip')) || {};
+        const locked = Object.keys(countries)
+          .filter((k) => countries[k] && countries[k].lockedUntil > now)
+          .map((k) => ({ key: k, until: countries[k].lockedUntil }));
+        const blockedNetworks = Object.keys(networks).filter((k) => networks[k] && networks[k].blocked).length;
+        return json(200, { ok: true, lockedCountries: locked, blockedNetworks: blockedNetworks });
+      }
 
       if (action === 'set_topic') {
         await rtdb('PATCH', 'session', { topic: cleanTopic(body.topic) });
