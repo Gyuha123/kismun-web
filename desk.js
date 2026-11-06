@@ -17,7 +17,7 @@
     data.delegates.forEach(function (d) {
       if (d.c === 'Secretariat' || d.d === 'UN' || !data.flags[d.d] || seen[d.d]) return;
       seen[d.d] = true;
-      countries.push({ code: d.d, name: data.names[d.d] || d.d });
+      countries.push({ code: d.d, name: data.names[d.d] || d.d, flag: data.flags[d.d] });
     });
     countries.sort(function (a, b) { return a.name.localeCompare(b.name); });
   }
@@ -28,6 +28,8 @@
 
   function errorText(code) {
     if (code === 'password') return 'Wrong password.';
+    if (code === 'locked') return 'Too many wrong passwords from this network. Try again in 15 minutes.';
+    if (code === 'origin') return 'This request was refused.';
     return 'Something went wrong. Please try again.';
   }
 
@@ -51,8 +53,13 @@
       var v = votes[VoteData.key(x.code)];
       var li = document.createElement('li');
       li.className = 'pa-item' + (v ? ' is-' + v.choice : '');
+      var flag = document.createElement('img');
+      flag.className = 'pa-flag';
+      flag.src = 'flags/4x3/' + x.flag + '.svg';
+      flag.alt = '';
       var name = document.createElement('span');
       name.textContent = x.name;
+      li.appendChild(flag);
       var state = document.createElement('span');
       state.textContent = v ? LABEL[v.choice] : 'Not voted';
       li.appendChild(name);

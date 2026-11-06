@@ -2171,7 +2171,7 @@ body {
 .bd-tile span { font-size: 14px; line-height: 1.3; color: var(--text-dim); }
 
 .bd-tile.is-none img { filter: grayscale(1); opacity: 0.32; }
-.bd-tile.is-none span { color: var(--text-faint); }
+.bd-tile.is-none span { color: #c3c7d6; }
 
 .bd-tile.is-for img { box-shadow: 0 0 0 3px #4fb38a, 0 0 26px rgba(79, 179, 138, 0.45); }
 .bd-tile.is-against img { box-shadow: 0 0 0 3px #e0707a, 0 0 26px rgba(224, 112, 122, 0.45); }
@@ -2217,3 +2217,10 @@ body {
 .pa-item.is-abstain { color: #ecc87f; border-color: rgba(217, 164, 65, 0.5); }
 
 .pa-danger .pa-label { color: #e0a090; }
+
+.pa-flag { width: 44px; height: auto; border-radius: 3px; flex-shrink: 0; }
+.pa-item { align-items: center; }
+.pa-item > span:last-child { margin-left: auto; }
+.alloc-vote-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.alloc-vote-flag { width: 44px; height: auto; border-radius: 3px; }
+.alloc-vote-name { font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif; font-size: 22px; font-weight: 500; color: var(--text); }

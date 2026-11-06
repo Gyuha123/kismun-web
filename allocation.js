@@ -28,6 +28,8 @@
   var voteBtn = document.getElementById('allocVoteBtn');
   var voteLine = document.getElementById('allocVoteLine');
   var voteTopic = document.getElementById('allocVoteTopic');
+  var voteFlag = document.getElementById('allocVoteFlag');
+  var voteName = document.getElementById('allocVoteName');
   var voteForm = document.getElementById('allocVoteCodeForm');
   var voteCodeInput = document.getElementById('allocVoteCode');
   var voteChoices = document.getElementById('allocVoteChoices');
@@ -218,6 +220,8 @@
     if (!vote) return;
     if (!window.VoteData || !VoteData.configured()) { voteLine.hidden = false; say('Voting is not connected yet.'); return; }
     voteLine.hidden = false;
+    voteFlag.src = 'flags/4x3/' + data.flags[vote.code] + '.svg';
+    voteName.textContent = vote.name;
     watchTopic();
     showCodeStep();
     say('');
@@ -236,6 +240,7 @@
       if (r.error === 'blocked') { say('This network has been blocked after too many wrong codes. Please ask the desk.'); return; }
       if (r.error === 'format') { say('Enter the 4 digits.'); return; }
       if (r.error === 'unknown-country') { say('This delegation does not vote.'); return; }
+      if (r.error === 'country-locked') { say('This delegation is temporarily locked after too many wrong codes. Please ask the desk.'); return; }
       if (r.error) { say('Something went wrong. Please try again.'); return; }
       if (r.voted) { say(vote.name + ' has already voted: ' + LABEL[r.voted] + '.'); voteForm.hidden = true; return; }
       if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); pendingCode = code; return; }
@@ -256,6 +261,7 @@
       if (r.error === 'already') { pendingCode = ''; say(vote.name + ' has already voted: ' + LABEL[r.choice] + '.'); return; }
       if (r.error === 'closed') { pendingCode = ''; say('Voting has closed.'); return; }
       if (r.error === 'blocked') { pendingCode = ''; say('This network has been blocked. Please ask the desk.'); return; }
+      if (r.error === 'country-locked') { pendingCode = ''; showCodeStep(); say('This delegation is temporarily locked. Please ask the desk.'); return; }
       if (r.error === 'wrong') { pendingCode = ''; showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
       voteChoices.hidden = false;
       say('Something went wrong. Please try again.');

@@ -1,26 +1,41 @@
 // Vote server. The only thing that writes votes or changes the session.
-// Browsers talk to it with POST {action, ...}. It checks the 4-digit country
-// code, counts failed attempts per network (blocking after 5), and writes to
-// the Firebase Realtime Database as a service account.
+//
+// Browsers send POST application/json {action, ...} from this site only.
+// Codes are never stored in clear: each country's code is kept as an HMAC
+// keyed with a secret pepper, so the environment alone cannot reveal them.
 //
 // Environment variables (Netlify → Site configuration → Environment variables):
-//   PLACARD_CODES             JSON object {"SYRIA":"1234", ...}
-//   FIREBASE_SERVICE_ACCOUNT  the service-account JSON from Firebase
+//   FIREBASE_SERVICE_ACCOUNT   service-account JSON (Firebase console)
+//   CODE_PEPPER                random secret (64 hex characters)
+//   PLACARD_CODE_HASHES        JSON {"SYRIA":"<hmac>", ...}, made by the pepper
+//   DESK_PASSWORD_SHA256       SHA-256 of the desk password (hex)
 
 const crypto = require('crypto');
 
 const DB = 'https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app';
-const ADMIN_SHA256 = '31ffc5f32537c7f67c787bf32e27a2d8aeac8efd2ad86f1ae4fd586369cab37e';
-const IP_SALT = 'kismun-2026-ip';
-const MAX_FAILS = 5;
+const SITE_HOST_ANY = true;        // origin must match the host this function was called on
 const CHOICES = ['for', 'against', 'abstain'];
+const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all', 'unlock_countries'];
+
+// limits
+const MAX_BODY_BYTES = 2048;
+const IP_MAX_FAILS = 5;                 // per network: blocks after 5 wrong codes (kept as requested)
+const COUNTRY_MAX_FAILS = 10;           // per country, across all networks
+const COUNTRY_LOCK_MS = 15 * 60 * 1000;
+const DESK_MAX_FAILS = 5;               // per network, wrong desk passwords
+const DESK_LOCK_MS = 15 * 60 * 1000;
+const TOPIC_MAX = 120;
 
 let tokenCache = { token: null, exp: 0 };
 
 function json(status, obj) {
   return {
     statusCode: status,
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff'
+    },
     body: JSON.stringify(obj)
   };
 }
@@ -37,9 +52,34 @@ function sanitizeKey(name) {
   return String(name).replace(/[.#$\[\]\/]/g, '_');
 }
 
-function codeMap() {
-  return JSON.parse(process.env.PLACARD_CODES || '{}');
+function safeEqualHex(a, b) {
+  const x = Buffer.from(String(a), 'hex');
+  const y = Buffer.from(String(b), 'hex');
+  return x.length > 0 && x.length === y.length && crypto.timingSafeEqual(x, y);
 }
+
+function codeHash(country, code) {
+  const pepper = process.env.CODE_PEPPER || '';
+  return crypto.createHmac('sha256', pepper).update(country + '|' + code).digest('hex');
+}
+
+function hashMap() {
+  try { return JSON.parse(process.env.PLACARD_CODE_HASHES || '{}'); } catch (e) { return {}; }
+}
+
+// Constant-shape check: always computes an HMAC, so unknown countries take the same time.
+function codeMatches(country, code) {
+  const map = hashMap();
+  const known = Object.prototype.hasOwnProperty.call(map, country);
+  const computed = codeHash(country, code);
+  return known && safeEqualHex(computed, map[country]);
+}
+
+function knownCountry(country) {
+  return Object.prototype.hasOwnProperty.call(hashMap(), country);
+}
+
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
 async function accessToken() {
   if (tokenCache.token && Date.now() < tokenCache.exp - 60000) return tokenCache.token;
@@ -87,7 +127,7 @@ async function read(path) {
 
 // Compare-and-set on one path. mutate(current) returns {write, value, result}.
 // The write only lands if nothing changed the path since it was read, so two
-// simultaneous votes for the same country cannot both be stored.
+// simultaneous votes for one country cannot both be stored.
 async function update(path, mutate) {
   for (let attempt = 0; attempt < 8; attempt++) {
     const got = await rtdb('GET', path, undefined, { 'X-Firebase-ETag': 'true' });
@@ -109,62 +149,117 @@ function clientIp(event) {
   return String(raw).split(',')[0].trim();
 }
 
-async function isBlocked(ipHash) {
+// Only requests from this site's own pages are accepted.
+function fromThisSite(event) {
+  const origin = event.headers.origin;
+  if (!origin) return SITE_HOST_ANY; // non-browser tools send no Origin; they still need the codes
+  try { return new URL(origin).host === event.headers.host; } catch (e) { return false; }
+}
+
+// The audit trail must never block or undo a desk action, so failures are ignored.
+async function audit(action, ipHash) {
+  try {
+    await rtdb('POST', 'security/log', { a: action, ip: ipHash.slice(0, 12), t: { '.sv': 'timestamp' } });
+  } catch (e) { /* ignored on purpose */ }
+}
+
+async function ipBlocked(ipHash) {
   const rec = await read('security/ip/' + ipHash);
   return !!(rec && rec.blocked);
 }
 
-async function recordFailure(ipHash) {
+async function recordIpFailure(ipHash) {
   return update('security/ip/' + ipHash, function (cur) {
     const fails = ((cur && cur.fails) || 0) + 1;
-    return { write: true, value: { fails: fails, blocked: fails >= MAX_FAILS }, result: { fails: fails } };
+    return { write: true, value: { fails: fails, blocked: fails >= IP_MAX_FAILS }, result: { fails: fails } };
   });
 }
 
-async function sessionState() {
-  const s = (await read('session')) || {};
-  return { open: !!s.open, topic: s.topic || '' };
+async function countryLocked(key) {
+  const rec = await read('security/country/' + key);
+  return !!(rec && rec.lockedUntil && rec.lockedUntil > Date.now());
+}
+
+async function recordCountryFailure(key) {
+  return update('security/country/' + key, function (cur) {
+    if (cur && cur.lockedUntil && cur.lockedUntil > Date.now()) return { write: false, result: cur };
+    const fails = ((cur && cur.fails) || 0) + 1;
+    const lock = fails >= COUNTRY_MAX_FAILS;
+    const value = lock ? { fails: 0, lockedUntil: Date.now() + COUNTRY_LOCK_MS } : { fails: fails, lockedUntil: 0 };
+    return { write: true, value: value, result: value };
+  });
+}
+
+async function deskLocked(ipHash) {
+  const rec = await read('security/desk/' + ipHash);
+  return !!(rec && rec.lockedUntil && rec.lockedUntil > Date.now());
+}
+
+async function recordDeskFailure(ipHash) {
+  return update('security/desk/' + ipHash, function (cur) {
+    const fails = ((cur && cur.fails) || 0) + 1;
+    const lock = fails >= DESK_MAX_FAILS;
+    return { write: true, value: { fails: lock ? 0 : fails, lockedUntil: lock ? Date.now() + DESK_LOCK_MS : 0 }, result: {} };
+  });
+}
+
+function cleanTopic(raw) {
+  return String(raw || '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, TOPIC_MAX);
+}
+
+function deskPasswordOk(password) {
+  return safeEqualHex(sha256Hex(String(password || '')), process.env.DESK_PASSWORD_SHA256 || '0');
 }
 
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') return json(405, { error: 'method' });
+  if (!fromThisSite(event)) return json(403, { error: 'origin' });
+
+  const type = String((event.headers['content-type'] || '')).toLowerCase();
+  if (type.indexOf('application/json') !== 0) return json(415, { error: 'content-type' });
+  if (String(event.body || '').length > MAX_BODY_BYTES) return json(413, { error: 'too-large' });
 
   let body;
   try { body = JSON.parse(event.body || '{}'); } catch (e) { return json(400, { error: 'bad-json' }); }
+  if (!body || typeof body !== 'object') return json(400, { error: 'bad-json' });
 
-  const ipHash = sha256Hex(IP_SALT + clientIp(event));
   const action = String(body.action || '');
+  const ipHash = sha256Hex((process.env.IP_SALT || 'kismun-ip') + clientIp(event));
+
+  // a small, fixed-ish delay on every request slows down scripted guessing
+  await sleep(80 + Math.floor(Math.random() * 120));
 
   try {
-    // ---- voter actions: check the country code, then show the choices / vote
+    // ---- voter actions --------------------------------------------------
     if (action === 'check' || action === 'vote') {
-      if (await isBlocked(ipHash)) return json(200, { error: 'blocked' });
+      if (await ipBlocked(ipHash)) return json(200, { error: 'blocked' });
 
       const country = String(body.country || '');
-      const expected = codeMap()[country];
-      if (!expected) return json(200, { error: 'unknown-country' });
-      if (!/^\d{4}$/.test(String(body.code || ''))) return json(200, { error: 'format' });
-
-      if (String(body.code) !== String(expected)) {
-        const failed = await recordFailure(ipHash);
-        return json(200, { error: failed.fails >= MAX_FAILS ? 'blocked' : 'wrong' });
-      }
+      const code = String(body.code || '');
+      if (!/^\d{4}$/.test(code)) return json(200, { error: 'format' });
 
       const key = sanitizeKey(country);
-      const state = await sessionState();
+      if (await countryLocked(key)) return json(200, { error: 'country-locked' });
+
+      const valid = knownCountry(country) && codeMatches(country, code);
+      if (!valid) {
+        // unknown countries are counted exactly like wrong codes, so they cannot be probed
+        const ip = await recordIpFailure(ipHash);
+        await recordCountryFailure(key);
+        return json(200, { error: ip.fails >= IP_MAX_FAILS ? 'blocked' : 'wrong' });
+      }
+
+      const session = (await read('session')) || {};
+      const open = !!session.open;
+      const topic = session.topic || '';
 
       if (action === 'check') {
         const existing = await read('votes/' + key);
-        return json(200, {
-          ok: true,
-          topic: state.topic,
-          open: state.open,
-          voted: existing ? existing.choice : null
-        });
+        return json(200, { ok: true, topic: topic, open: open, voted: existing ? existing.choice : null });
       }
 
-      if (!CHOICES.includes(body.choice)) return json(200, { error: 'choice' });
-      if (!state.open) return json(200, { error: 'closed' });
+      if (CHOICES.indexOf(body.choice) === -1) return json(200, { error: 'choice' });
+      if (!open) return json(200, { error: 'closed' });
 
       const result = await update('votes/' + key, function (cur) {
         if (cur) return { write: false, result: { error: 'already', choice: cur.choice } };
@@ -177,20 +272,27 @@ exports.handler = async function (event) {
       return json(200, result);
     }
 
-    // ---- desk actions: every one needs the desk password
-    const deskActions = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all'];
-    if (deskActions.indexOf(action) !== -1) {
-      if (sha256Hex(String(body.password || '')) !== ADMIN_SHA256) return json(200, { error: 'password' });
+    // ---- desk actions: password, with its own lock per network -----------
+    if (DESK_ACTIONS.indexOf(action) !== -1) {
+      if (await deskLocked(ipHash)) return json(200, { error: 'locked' });
+      if (!deskPasswordOk(body.password)) {
+        await recordDeskFailure(ipHash);
+        return json(200, { error: 'password' });
+      }
       if (action === 'auth') return json(200, { ok: true });
+
       if (action === 'set_topic') {
-        await rtdb('PATCH', 'session', { topic: String(body.topic || '').slice(0, 200) });
+        await rtdb('PATCH', 'session', { topic: cleanTopic(body.topic) });
       } else if (action === 'open' || action === 'close') {
         await rtdb('PATCH', 'session', { open: action === 'open' });
       } else if (action === 'reset_votes') {
         await rtdb('DELETE', 'votes');
       } else if (action === 'unblock_all') {
         await rtdb('DELETE', 'security/ip');
+      } else if (action === 'unlock_countries') {
+        await rtdb('DELETE', 'security/country');
       }
+      await audit(action, ipHash);
       return json(200, { ok: true });
     }
 
@@ -201,4 +303,4 @@ exports.handler = async function (event) {
 };
 
 // used by the local tests only
-exports._internal = { sha256Hex: sha256Hex, sanitizeKey: sanitizeKey, MAX_FAILS: MAX_FAILS };
+exports._internal = { sha256Hex: sha256Hex, sanitizeKey: sanitizeKey, codeHash: codeHash, cleanTopic: cleanTopic };
