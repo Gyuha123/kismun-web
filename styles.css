@@ -1866,14 +1866,14 @@ body {
   }
 }
 
-/* -- allocation button off the home page: at rest the text matches the centre
-   bar links; on hover it switches straight to white. No transition at all —
+/* -- allocation button off the home page: white text and white outline at rest
+   and on hover; no transition. No transition at all —
    the outline and the text change instantly. Home page keeps its glass style. -- */
 .sitenav:not(.overlay) .allocation,
 .sitenav.solid .allocation {
   background: transparent;
   border: 1px solid #ffffff;
-  color: rgba(231, 232, 238, 0.62);
+  color: #ffffff;
   box-shadow: none;
   transition: none;
 }
