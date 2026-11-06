@@ -1,6 +1,7 @@
 // Raise Placard — one button per delegation. The first request for a country
 // is kept on the shared list; anything that arrives after it is dropped, and
-// the delegate sees that straight away.
+// the delegate sees that straight away. The page follows the shared entry live,
+// so when the desk clears the list the button comes back without a reload.
 (function () {
   var data = window.KISMUN_ALLOCATION;
   var $ = function (id) { return document.getElementById(id); };
@@ -39,46 +40,66 @@
     return;
   }
 
+  var busy = false;   // a press is in flight; ignore the live feed until it settles
+
   function mine() {
     try { return localStorage.getItem(MINE); } catch (e) { return null; }
   }
   function remember(id) {
-    try { localStorage.setItem(MINE, id); } catch (e) { /* private mode: state just won't survive a reload */ }
+    try { localStorage.setItem(MINE, id); } catch (e) { /* private mode */ }
+  }
+  function forget() {
+    try { localStorage.removeItem(MINE); } catch (e) { /* ignore */ }
+  }
+  function showIdle() {
+    btn.textContent = 'Raise Placard';
+    btn.disabled = false;
+    setStatus('');
   }
   function showRaised() {
-    btn.disabled = true;
     btn.textContent = 'Placard raised';
+    btn.disabled = true;
     setStatus('Your placard is raised.');
   }
   function showTaken() {
+    btn.textContent = 'Raise Placard';
     btn.disabled = true;
     setStatus('Another delegate of ' + name + ' raised the placard first.');
   }
 
-  // while we look at the shared list, don't allow a press
-  btn.disabled = true;
-  PlacardData.get(key).then(function (existing) {
-    if (!existing) { btn.disabled = false; return; }
+  // every live update of this country's entry goes through here
+  function apply(existing) {
+    if (busy) return;
+    if (!existing) { forget(); showIdle(); return; }
     if (mine() && existing.id === mine()) showRaised();
     else showTaken();
-  }).catch(function () {
-    setStatus('Could not reach the placard service. Please try again.');
+  }
+
+  btn.disabled = true;   // until the first live value arrives
+  PlacardData.watch(key, function (value, error) {
+    if (error) { setStatus('Could not reach the placard service. Please try again.'); return; }
+    apply(value);
   });
 
   btn.addEventListener('click', function () {
-    if (btn.disabled) return;
+    if (btn.disabled || busy) return;
+    busy = true;
     btn.disabled = true;
     setStatus('Raising…');
     var id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    remember(id);   // so the live feed recognises our own entry as ours
     PlacardData.claim(key, {
       id: id,
       name: name,
       flag: flag,
       t: PlacardData.SERVER_TIME
     }).then(function (won) {
-      if (won) { remember(id); showRaised(); }
-      else { showTaken(); }
+      busy = false;
+      if (won) showRaised();
+      else { forget(); showTaken(); }
     }).catch(function () {
+      busy = false;
+      forget();
       btn.disabled = false;
       setStatus('Could not raise the placard. Please try again.');
     });

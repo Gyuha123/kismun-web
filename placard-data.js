@@ -54,6 +54,17 @@ var PLACARD_CONFIG = {
       });
     },
 
+    // One country's entry, live: called with its value now and on every change
+    // (null once All clear removes it). Returns an unsubscribe function.
+    watch: function (key, cb) {
+      var unsubscribe = null, stopped = false;
+      load().then(function (x) {
+        if (stopped) return;
+        unsubscribe = x.sdk.onValue(x.sdk.ref(x.db, 'placard/' + key), function (s) { cb(s.val()); });
+      }).catch(function (err) { cb(undefined, err); });
+      return function () { stopped = true; if (unsubscribe) unsubscribe(); };
+    },
+
     // Calls back immediately and again on every change, with no refresh needed.
     watchAll: function (cb) {
       var unsubscribe = null, stopped = false;
