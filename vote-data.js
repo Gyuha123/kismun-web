@@ -144,8 +144,12 @@ var PLACARD_CONFIG = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       }).then(function (res) {
-        if (!res.ok) throw new Error('http-' + res.status);
-        return res.json();
+        if (res.ok) return res.json();
+        return res.json().catch(function () { return {}; }).then(function (b) {
+          var err = new Error('http-' + res.status);
+          err.detail = b.detail || 'http ' + res.status;
+          throw err;
+        });
       });
     },
 

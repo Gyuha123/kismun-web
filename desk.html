@@ -77,6 +77,12 @@
 
   <section class="pa-panel" id="paPanel" hidden>
 
+    <div class="seg desk-tabs" id="deskTabs" role="tablist" aria-label="Desk view" data-active="vote">
+      <button type="button" class="desk-tab is-active" role="tab" data-tab="vote" aria-selected="true">Vote</button>
+      <button type="button" class="desk-tab" role="tab" data-tab="placard" aria-selected="false">Placard</button>
+    </div>
+
+    <div id="deskVote">
     <div class="pa-block">
       <p class="pa-label">Topic</p>
       <form id="topicForm" class="pa-row">
@@ -110,6 +116,33 @@
     <div class="pa-block">
       <p class="pa-label">Delegations</p>
       <ul class="pa-list" id="paList"></ul>
+    </div>
+    </div>
+
+    <div id="deskPlacard" hidden>
+      <div class="pa-block pa-status">
+        <div>
+          <p class="pa-label">Random pick</p>
+          <p class="pa-pick" id="pickResult"><span id="pickEmpty">No delegation picked</span></p>
+        </div>
+        <div class="pa-actions">
+          <button type="button" class="pa-btn" id="pickBtn">Pick a random delegation</button>
+        </div>
+      </div>
+      <p class="pa-error" id="pickNote" aria-live="polite"></p>
+
+      <div class="pa-block">
+        <p class="pa-label">Live summary</p>
+        <div class="pa-summary">
+          <span>Raised <strong id="sRaised">0</strong></span>
+          <span>Not raised <strong id="sLowered">0</strong></span>
+        </div>
+      </div>
+
+      <div class="pa-block">
+        <p class="pa-label">Delegations</p>
+        <ul class="pa-list" id="placardList"></ul>
+      </div>
     </div>
 
     <div class="pa-block pa-danger">

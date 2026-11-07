@@ -14,7 +14,7 @@ const crypto = require('crypto');
 const DB = 'https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app';
 const SITE_HOST_ANY = true;        // origin must match the host this function was called on
 const CHOICES = ['for', 'against', 'abstain'];
-const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all'];
+const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all', 'pick_random'];
 
 // limits
 const MAX_BODY_BYTES = 2048;
@@ -125,7 +125,17 @@ async function rtdb(method, path, body, headers) {
 // A desk action must never report success when the database refused the write.
 async function write(method, path, body) {
   const res = await rtdb(method, path, body);
-  if (!res.ok) throw new Error('write');
+  if (!res.ok) {
+    const err = new Error('write');
+    err.status = res.status;
+    throw err;
+  }
+}
+
+// Ends a round in ONE request, so it either happens completely or not at all.
+// A null value in a multi-path update removes that path. The topic stays.
+function clearRound(extra) {
+  return write('PATCH', '', Object.assign({ votes: null, 'session/placard': null, 'session/pick': null }, extra || {}));
 }
 
 // The public state: the same data the database shows to anyone (never security/*).
@@ -319,18 +329,25 @@ exports.handler = async function (event) {
 
       if (action === 'set_topic') {
         await write('PATCH', 'session', { topic: cleanTopic(body.topic) });
-      } else if (action === 'open' || action === 'close') {
-        await write('PATCH', 'session', { open: action === 'open' });
-        // closing ends the round: every vote and placard is removed, the topic stays
-        if (action === 'close') {
-          await write('DELETE', 'votes');
-          await write('DELETE', 'session/placard');
-        }
+      } else if (action === 'open') {
+        await write('PATCH', 'session', { open: true });
+      } else if (action === 'close') {
+        await clearRound({ 'session/open': false });
       } else if (action === 'reset_votes') {
-        await write('DELETE', 'votes');
-        await write('DELETE', 'session/placard');
+        await clearRound();
       } else if (action === 'unblock_all') {
-        await write('DELETE', 'security/ip');
+        await write('PATCH', '', { 'security/ip': null });
+      } else if (action === 'pick_random') {
+        // one delegation among the raised placards; a new one each time when possible
+        const raised = Object.keys((await read('session/placard')) || {});
+        if (!raised.length) return json(200, { error: 'no-placards' });
+        const current = await read('session/pick');
+        const others = raised.filter(function (k) { return !current || k !== current.id; });
+        const pool = others.length ? others : raised;
+        const id = pool[crypto.randomInt(pool.length)];
+        await write('PATCH', 'session', { pick: { id: id, t: { '.sv': 'timestamp' } } });
+        await audit(action, ipHash);
+        return json(200, { ok: true, id: id });
       }
       await audit(action, ipHash);
       return json(200, { ok: true });
@@ -338,7 +355,7 @@ exports.handler = async function (event) {
 
     return json(400, { error: 'unknown-action' });
   } catch (err) {
-    return json(500, { error: 'server' });
+    return json(500, { error: 'server', detail: err.status ? 'database ' + err.status : err.message });
   }
 };
 

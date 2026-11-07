@@ -30,7 +30,7 @@
     tiles[VoteData.key(c.id)] = el;
   });
 
-  var votes = {}, raised = {}, view = 'vote';
+  var votes = {}, raised = {}, pick = '', view = 'vote';
 
   function paint() {
     var counts = { 'for': 0, 'against': 0, 'abstain': 0, none: 0 };
@@ -40,7 +40,7 @@
       if (v && counts.hasOwnProperty(v.choice)) counts[v.choice]++; else counts.none++;
       var el = tiles[k];
       if (view === 'placard') {
-        el.className = 'bd-tile ' + (raised[k] ? 'is-raised' : 'is-none');
+        el.className = 'bd-tile ' + (k === pick ? 'is-picked' : raised[k] ? 'is-raised' : 'is-none');
       } else {
         el.className = 'bd-tile ' + (v ? 'is-' + v.choice : 'is-none');
       }
@@ -88,6 +88,8 @@
 
   VoteData.watch('session', function (s, err) {
     if (err) return;
+    pick = s && s.pick ? s.pick.id : '';
+    paint();
     $('boardTopic').textContent = s && s.topic ? s.topic : 'Waiting for the topic';
     $('boardOpen').textContent = s && s.open ? 'Voting is open' : 'Voting is closed';
     $('boardOpen').classList.toggle('is-open', !!(s && s.open));

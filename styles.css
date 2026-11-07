@@ -2388,6 +2388,19 @@ body {
 .placard-round.is-raised::after { animation: placard-ripple 0.9s ease-out 1; }
 .alloc-placard .alloc-vote-msg { min-height: 1.4em; margin: 0; text-align: center; }
 
+/* desk: Vote | Placard views and the random pick */
+.desk-tabs { max-width: 420px; margin-bottom: 26px; }
+.desk-tab { padding: 10px 0; font-size: 15px; }
+.pa-item.is-raised { border-left-color: #ffffff; background: rgba(255, 255, 255, 0.09); color: #ffffff; }
+.pa-item.is-picked { border-left-color: #d9a441; border-color: rgba(217, 164, 65, 0.6); background: rgba(217, 164, 65, 0.14); color: #f4d48f; }
+.pa-pick { display: flex; align-items: center; gap: 14px; min-height: 48px; margin-top: 6px; font-size: 30px; font-weight: 500; color: var(--text); }
+.pa-pick img { width: 60px; height: auto; border-radius: 4px; animation: bd-lit 0.5s cubic-bezier(0.2, 0.8, 0.3, 1); }
+.pa-pick-empty { font-size: 16px; font-weight: 400; color: var(--text-faint); }
+#pickNote { margin-top: 0; min-height: 0; }
+.bd-tile.is-picked { border-color: #d9a441; background: rgba(217, 164, 65, 0.18); box-shadow: 0 0 26px rgba(217, 164, 65, 0.5); animation: bd-lit 0.5s cubic-bezier(0.2, 0.8, 0.3, 1); }
+.bd-tile.is-picked span { color: #f4d48f; }
+.bd-tile.is-picked img { opacity: 1; filter: none; }
+
 @keyframes placard-breathe {
   0% { transform: scale(0.97); opacity: 0; }
   30% { opacity: 0.8; }

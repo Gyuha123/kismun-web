@@ -10,6 +10,7 @@
   var topicForm = $('topicForm'), topicInput = $('topicInput'), topicNote = $('topicNote');
   var note = $('paNote');
   var list = $('paList');
+  var placardList = $('placardList');
 
   VoteData.useFreshReads();
   var countries = VoteData.voters(data);
@@ -29,6 +30,83 @@
     return VoteData.api(action, Object.assign({ password: pw }, extra || {}));
   }
 
+  function failure(e) {
+    return 'The server could not save this' + (e && e.detail ? ' (' + e.detail + ')' : '') + '. Please try again.';
+  }
+
+  function flagSrc(x) { return x.kind === 'un' ? 'unflag.png' : 'flags/4x3/' + x.flag + '.svg'; }
+
+  function item(x, className, title) {
+    var li = document.createElement('li');
+    li.className = className;
+    li.title = title;
+    var flag = document.createElement('img');
+    flag.className = 'pa-flag';
+    flag.src = flagSrc(x);
+    flag.alt = '';
+    var name = document.createElement('span');
+    name.textContent = x.label;
+    li.appendChild(flag);
+    li.appendChild(name);
+    return li;
+  }
+
+  function renderPlacards() {
+    var raised = session.placard || {};
+    var pick = session.pick ? session.pick.id : '';
+    var count = 0, picked = null;
+    placardList.textContent = '';
+    countries.forEach(function (x) {
+      var k = VoteData.key(x.id);
+      var up = !!raised[k];
+      if (up) count++;
+      if (k === pick) picked = x;
+      placardList.appendChild(item(x, 'pa-item' + (k === pick ? ' is-picked' : up ? ' is-raised' : ''), x.label + (up ? ' — raised' : ' — not raised')));
+    });
+    $('sRaised').textContent = count;
+    $('sLowered').textContent = countries.length - count;
+
+    var box = $('pickResult');
+    box.textContent = '';
+    if (picked) {
+      var img = document.createElement('img');
+      img.src = flagSrc(picked);
+      img.alt = '';
+      var label = document.createElement('span');
+      label.textContent = picked.label;
+      box.appendChild(img);
+      box.appendChild(label);
+    } else {
+      var empty = document.createElement('span');
+      empty.className = 'pa-pick-empty';
+      empty.textContent = 'No delegation picked';
+      box.appendChild(empty);
+    }
+  }
+
+  function showTab(name) {
+    $('deskTabs').setAttribute('data-active', name);
+    Array.prototype.forEach.call($('deskTabs').querySelectorAll('.desk-tab'), function (t) {
+      var on = t.getAttribute('data-tab') === name;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    $('deskVote').hidden = name !== 'vote';
+    $('deskPlacard').hidden = name !== 'placard';
+  }
+  $('deskTabs').addEventListener('click', function (e) {
+    var t = e.target.closest('.desk-tab');
+    if (t) showTab(t.getAttribute('data-tab'));
+  });
+
+  function clearLocally() {
+    votes = {};
+    delete session.placard;
+    delete session.pick;
+    renderSummary();
+    renderPlacards();
+  }
+
   function renderSummary() {
     var c = { 'for': 0, against: 0, abstain: 0, none: 0 };
     countries.forEach(function (x) {
@@ -43,18 +121,7 @@
     list.textContent = '';
     countries.forEach(function (x) {
       var v = votes[VoteData.key(x.id)];
-      var li = document.createElement('li');
-      li.className = 'pa-item' + (v ? ' is-' + v.choice : '');
-      li.title = x.label + (v ? ' — ' + LABEL[v.choice] : ' — not voted');
-      var flag = document.createElement('img');
-      flag.className = 'pa-flag';
-      flag.src = x.kind === 'un' ? 'unflag.png' : 'flags/4x3/' + x.flag + '.svg';
-      flag.alt = '';
-      var name = document.createElement('span');
-      name.textContent = x.label;
-      li.appendChild(flag);
-      li.appendChild(name);
-      list.appendChild(li);
+      list.appendChild(item(x, 'pa-item' + (v ? ' is-' + v.choice : ''), x.label + (v ? ' — ' + LABEL[v.choice] : ' — not voted')));
     });
   }
 
@@ -65,6 +132,7 @@
     $('openBtn').disabled = open;
     $('closeBtn').disabled = !open;
     if (document.activeElement !== topicInput) topicInput.value = session.topic || '';
+    renderPlacards();
   }
 
   function start() {
@@ -120,13 +188,13 @@
       if (r.ok) {
         session.open = action === 'open';
         say(note, session.open ? 'Voting is open.' : 'Voting is closed. All votes and placards deleted.');
-        if (!session.open) { votes = {}; renderSummary(); }
+        if (!session.open) clearLocally();
         VoteData.refresh();
       } else {
         say(note, errorText(r.error));
       }
       renderSession();
-    }).catch(function () { renderSession(); say(note, 'The server could not save this. Please try again.'); });
+    }).catch(function (e) { renderSession(); say(note, failure(e)); });
   }
   $('openBtn').addEventListener('click', function () { toggle('open'); });
   $('closeBtn').addEventListener('click', function () { toggle('close'); });
@@ -136,8 +204,18 @@
     say(note, '');
     deskCall('reset_votes').then(function (r) {
       say(note, r.ok ? 'All votes and placards cleared.' : errorText(r.error));
-      if (r.ok) VoteData.refresh();
-    }).catch(function () { say(note, 'Could not reach the server.'); });
+      if (r.ok) { clearLocally(); VoteData.refresh(); }
+    }).catch(function (e) { say(note, failure(e)); });
+  });
+
+  $('pickBtn').addEventListener('click', function () {
+    say($('pickNote'), '');
+    $('pickBtn').disabled = true;
+    deskCall('pick_random').then(function (r) {
+      $('pickBtn').disabled = false;
+      if (r.ok) { session.pick = { id: r.id }; renderPlacards(); VoteData.refresh(); return; }
+      say($('pickNote'), r.error === 'no-placards' ? 'No placards are raised yet.' : errorText(r.error));
+    }).catch(function (e) { $('pickBtn').disabled = false; say($('pickNote'), failure(e)); });
   });
 
   $('unblockBtn').addEventListener('click', function () {
@@ -145,6 +223,6 @@
     say(note, '');
     deskCall('unblock_all').then(function (r) {
       say(note, r.ok ? 'All networks unblocked.' : errorText(r.error));
-    }).catch(function () { say(note, 'Could not reach the server.'); });
+    }).catch(function (e) { say(note, failure(e)); });
   });
 })();
