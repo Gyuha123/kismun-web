@@ -71,7 +71,10 @@ var PLACARD_CONFIG = {
         if (d.d === 'UN') { chairs++; return; }
         if (!data.flags[d.d] || seen[d.d]) return;
         seen[d.d] = true;
-        out.push({ id: d.d, kind: 'country', name: data.names[d.d] || d.d, label: data.names[d.d] || d.d, flag: data.flags[d.d] });
+        // short labels for the two longest names, shown on the board and desk
+        var short = { 'DPRK': 'DPRK', 'DR CONGO': 'DRC' };
+        var label = short[d.d] || data.names[d.d] || d.d;
+        out.push({ id: d.d, kind: 'country', name: data.names[d.d] || d.d, label: label, flag: data.flags[d.d] });
       });
       if (chairs) out.push({ id: 'UN', kind: 'un', name: 'UN', label: 'UN (Chairs)', flag: 'unflag' });
       out.sort(function (a, b) { return a.label.localeCompare(b.label); });
