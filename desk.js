@@ -216,7 +216,15 @@
     $('pickBtn').disabled = true;
     deskCall('pick_random').then(function (r) {
       $('pickBtn').disabled = false;
-      if (r.ok) { session.pick = { id: r.id }; renderPlacards(); VoteData.refresh(); return; }
+      if (r.ok) {
+        // the pick raises that delegation's placard, so the counts change right now
+        session.pick = { id: r.id };
+        session.placard = session.placard || {};
+        session.placard[r.id] = { t: Date.now() };
+        renderPlacards();
+        VoteData.refresh();
+        return;
+      }
       say($('pickNote'), r.error === 'no-candidates' ? 'Every delegation has raised its placard.' : errorText(r.error));
     }).catch(function (e) { $('pickBtn').disabled = false; say($('pickNote'), failure(e)); });
   });

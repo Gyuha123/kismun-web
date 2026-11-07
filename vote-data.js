@@ -20,6 +20,7 @@ var PLACARD_CONFIG = {
   var API = '/.netlify/functions/api';
   var POLL_MS = 2000;       // delegates (cached state)
   var POLL_FRESH_MS = 1200; // desk and board (uncached state)
+  var POLL_TIMEOUT_MS = 8000; // a hung request must not stop the page updating
   var loaded = null;
 
   // Two ways to follow the data. Firebase pushes changes instantly, but its host is
@@ -67,7 +68,9 @@ var PLACARD_CONFIG = {
     pollTimer = null;
     if (polling || firebaseLive || !watchers.length) return;
     polling = true;
-    fetchState().then(function (state) {
+    Promise.race([fetchState(), new Promise(function (resolve, reject) {
+      setTimeout(function () { reject(new Error('timeout')); }, POLL_TIMEOUT_MS);
+    })]).then(function (state) {
       pollFails = 0;
       if (firebaseLive) return;
       watchers.slice().forEach(function (w) { deliver(w, pick(state, w.path)); });

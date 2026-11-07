@@ -339,16 +339,14 @@ exports.handler = async function (event) {
       } else if (action === 'unblock_all') {
         await write('PATCH', '', { 'security/ip': null });
       } else if (action === 'pick_random') {
-        // one delegation among those that have NOT raised a placard;
-        // a new one each time when possible
+        // one delegation among those that have NOT raised a placard. Being picked
+        // raises its placard, in the same request, so it cannot be picked again.
         const raised = (await read('session/placard')) || {};
         const waiting = Object.keys(hashMap()).map(sanitizeKey).filter(function (k) { return !raised[k]; });
         if (!waiting.length) return json(200, { error: 'no-candidates' });
-        const current = await read('session/pick');
-        const others = waiting.filter(function (k) { return !current || k !== current.id; });
-        const pool = others.length ? others : waiting;
-        const id = pool[crypto.randomInt(pool.length)];
-        await write('PATCH', 'session', { pick: { id: id, t: { '.sv': 'timestamp' } } });
+        const id = waiting[crypto.randomInt(waiting.length)];
+        const stamp = { '.sv': 'timestamp' };
+        await write('PATCH', '', { ['session/placard/' + id]: { t: stamp }, 'session/pick': { id: id, t: stamp } });
         await audit(action, ipHash);
         return json(200, { ok: true, id: id });
       }

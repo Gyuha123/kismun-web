@@ -240,7 +240,8 @@
     }
     function applyPlacard() {
       var raised = placardBtn.classList.contains('is-raised');
-      if (seenPlacard && !raised) setPlacardRaised(true);
+      // also when the desk's random pick raised it
+      if (seenPlacard && !raised) { setPlacardRaised(true); say2('Your placard is raised.'); }
       if (!seenPlacard && raised) { setPlacardRaised(false); say2('Placard cleared. You can raise it again.'); }
     }
     // Cast and deleted between two reads, a vote never shows up as a change.
