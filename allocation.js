@@ -28,14 +28,11 @@
   var voteBtn = document.getElementById('allocVoteBtn');
   var voteLine = document.getElementById('allocVoteLine');
   var voteTopic = document.getElementById('allocVoteTopic');
-  var voteFlag = document.getElementById('allocVoteFlag');
-  var voteName = document.getElementById('allocVoteName');
   var voteForm = document.getElementById('allocVoteCodeForm');
   var voteCodeInput = document.getElementById('allocVoteCode');
   var voteChoices = document.getElementById('allocVoteChoices');
   var voteMsg = document.getElementById('allocVoteMsg');
   var committeeLink = document.getElementById('allocCommitteeLink');
-  var committeeCtaName = document.getElementById('allocCommitteeCtaName');
   var roomWorkshopLine = document.getElementById('allocRoomWorkshopLine');
   var roomKismunLine = document.getElementById('allocRoomKismunLine');
   var roomWorkshopEl = document.getElementById('allocRoomWorkshop');
@@ -115,11 +112,10 @@
     var page = COMMITTEE_PAGE[d.c];
     if (page) {
       committeeLink.href = page;
-      committeeCtaName.textContent = d.c;
-      committeeLink.hidden = false;
+      committeeLink.classList.add('is-link');
     } else {
       committeeLink.removeAttribute('href');
-      committeeLink.hidden = true;
+      committeeLink.classList.remove('is-link');
     }
 
     // chairs and the secretariat get their role under the UN flag instead of a country
@@ -229,8 +225,6 @@
     if (!vote) return;
     if (!window.VoteData || !VoteData.configured()) { voteLine.hidden = false; say('Voting is not connected yet.'); return; }
     voteLine.hidden = false;
-    voteFlag.src = vote.flag;
-    voteName.textContent = vote.name;
     watchTopic();
     showCodeStep();
     say('');
@@ -286,7 +280,7 @@
     result.classList.remove('revealed');
     committeeEl.textContent = '';
     committeeFullEl.textContent = '';
-    committeeLink.hidden = true;
+    committeeLink.classList.remove('is-link');
     committeeLink.removeAttribute('href');
     delegationEl.textContent = '';
     flagEl.removeAttribute('src');

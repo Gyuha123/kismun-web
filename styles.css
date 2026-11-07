@@ -1744,31 +1744,33 @@ body {
 
 .alloc-line dt { padding-top: 7px; }
 
-/* committee page link: a filled button that names its destination. No arrow —
-   the arrow next to a name read as decoration, not as something to press. */
-.alloc-committee-cta {
-  display: inline-block;
-  margin-top: 16px;
-  padding: 10px 20px;
-  border: 1px solid #ffffff;
-  border-radius: var(--radius-full);
-  background: #ffffff;
-  color: #0b0d18;
-  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.2;
+/* committee name with an "open page" icon. The icon only appears when the
+   committee has its own page; it is quiet at rest and brightens on hover. */
+.alloc-committee-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  color: inherit;
   text-decoration: none;
-  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.alloc-committee-cta[hidden] { display: none; }
-
-.alloc-committee-cta:hover,
-.alloc-committee-cta:focus-visible {
-  background: transparent;
-  color: #ffffff;
+.alloc-open-icon {
+  display: none;
+  width: 0.6em;
+  height: 0.6em;
+  flex: none;
+  color: var(--text-faint);
+  transition: color 0.2s ease, transform 0.25s cubic-bezier(.2,.7,.3,1);
 }
+
+.alloc-committee-link.is-link { cursor: pointer; }
+.alloc-committee-link.is-link .alloc-open-icon { display: inline-block; }
+.alloc-committee-link.is-link:hover .alloc-open-icon,
+.alloc-committee-link.is-link:focus-visible .alloc-open-icon {
+  color: var(--text);
+  transform: translate(2px, -2px);
+}
+.alloc-committee-link.is-link:focus-visible { outline: 1px solid #fff; outline-offset: 4px; border-radius: 4px; }
 
 /* -- 5. 리스트 hover: 글자가 살짝 밝아지고 화살표가 움직인다 -- */
 
@@ -2106,7 +2108,9 @@ body {
 .alloc-vote-msg { margin-top: 14px; min-height: 1.4em; color: var(--text); }
 
 /* =========================================================
-   VOTE BOARD (full screen, projected) — the whole board fits one screen
+   VOTE BOARD (full screen, projected)
+   Wide, short cells (flag beside the name) in a fixed grid. Every size is
+   tied to the viewport height, so the whole board always fits one screen.
    ========================================================= */
 .board-body { height: 100vh; height: 100dvh; overflow: hidden; }
 
@@ -2116,82 +2120,86 @@ body {
   height: 100dvh;
   max-width: none;
   margin: 0;
-  padding: 22px 32px 16px;
+  padding: 2.2vh 2.4vw 1.6vh;
   display: flex;
   flex-direction: column;
 }
 
-.board-head { flex: none; margin-bottom: 14px; }
-.board-eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--text-faint); }
+.board-head { flex: none; margin-bottom: 1.6vh; }
+.board-eyebrow { font-size: clamp(10px, 1.5vh, 14px); letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint); }
 .board-topic {
-  margin-top: 4px;
+  margin-top: 0.4vh;
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-weight: 500;
-  font-size: clamp(20px, 2.6vw, 38px);
+  font-size: clamp(18px, 4.2vh, 40px);
   line-height: 1.15;
   color: var(--text);
 }
-.board-open { margin-top: 4px; font-size: 15px; color: var(--text-faint); }
+.board-open { margin-top: 0.4vh; font-size: clamp(11px, 1.8vh, 16px); color: var(--text-faint); }
 .board-open.is-open { color: #4fb38a; }
 
 .board-tally {
   flex: none;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 14px;
+  gap: 0.8vw;
+  margin-bottom: 1.6vh;
 }
 .tally {
   display: flex;
   align-items: baseline;
-  gap: 10px;
-  padding: 10px 16px;
-  border-radius: 12px;
+  gap: 0.6vw;
+  padding: 0.9vh 1.2vw;
+  border-radius: 10px;
   border: 1px solid var(--border-soft);
   background: rgba(255, 255, 255, 0.025);
 }
 .tally-num {
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-weight: 500;
-  font-size: clamp(22px, 2.4vw, 34px);
+  font-size: clamp(18px, 3.6vh, 34px);
   line-height: 1;
 }
-.tally-label { font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-faint); }
+.tally-label { font-size: clamp(9px, 1.4vh, 12px); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-faint); }
 .tally-for .tally-num { color: #4fb38a; }
 .tally-against .tally-num { color: #e0707a; }
 .tally-abstain .tally-num { color: #d9a441; }
 .tally-none .tally-num { color: var(--text-dim); }
 
-/* 72 voting units fill a 12 x 6 grid on a wide screen; the rows share the
-   remaining height, so nothing has to scroll */
+/* 72 units, 6 columns x 12 rows on a wide screen: each row is 1/12 of the
+   height left under the header, so the grid cannot run past the screen */
 .board-grid {
   flex: 1 1 0;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: repeat(6, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(12, minmax(0, 1fr));
+  gap: 0.6vh 0.8vw;
 }
 .bd-tile {
   min-width: 0;
   min-height: 0;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
-  transition: opacity 0.4s ease, filter 0.4s ease;
+  align-items: center;
+  gap: 0.8vw;
+  padding: 0 0.9vw;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  background: rgba(255, 255, 255, 0.02);
+  transition: opacity 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
 }
 .bd-tile img {
-  flex: 1 1 0;
-  height: 0;
-  min-height: 0;
-  width: 100%;
+  flex: none;
+  height: 62%;
+  width: auto;
+  aspect-ratio: 4 / 3;
   object-fit: contain;
-  border-radius: 4px;
-  transition: box-shadow 0.4s ease;
+  border-radius: 3px;
 }
 .bd-tile span {
-  flex: none;
-  font-size: clamp(10px, 0.95vw, 13px);
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(10px, 1.9vh, 17px);
   line-height: 1.2;
   color: var(--text-dim);
   white-space: nowrap;
@@ -2201,31 +2209,25 @@ body {
 
 .bd-tile.is-none img { filter: grayscale(1); opacity: 0.32; }
 .bd-tile.is-none span { color: #c3c7d6; }
-.bd-tile.is-for img { box-shadow: 0 0 0 3px #4fb38a, 0 0 26px rgba(79, 179, 138, 0.45); }
-.bd-tile.is-against img { box-shadow: 0 0 0 3px #e0707a, 0 0 26px rgba(224, 112, 122, 0.45); }
-.bd-tile.is-abstain img { box-shadow: 0 0 0 3px #d9a441, 0 0 26px rgba(217, 164, 65, 0.45); }
+.bd-tile.is-for { border-color: #4fb38a; background: rgba(79, 179, 138, 0.12); box-shadow: 0 0 18px rgba(79, 179, 138, 0.35); }
+.bd-tile.is-against { border-color: #e0707a; background: rgba(224, 112, 122, 0.12); box-shadow: 0 0 18px rgba(224, 112, 122, 0.35); }
+.bd-tile.is-abstain { border-color: #d9a441; background: rgba(217, 164, 65, 0.12); box-shadow: 0 0 18px rgba(217, 164, 65, 0.35); }
 .bd-tile.is-for span { color: #8fd6b5; }
 .bd-tile.is-against span { color: #f0a0a7; }
 .bd-tile.is-abstain span { color: #ecc87f; }
 
-.board-note { flex: none; margin-top: 8px; font-size: 13px; color: var(--text-faint); }
+.board-note { flex: none; margin-top: 0.8vh; font-size: clamp(10px, 1.6vh, 13px); color: var(--text-faint); }
 .board-note:empty { display: none; }
 
-/* smaller screens: more columns, same single screen */
+/* narrower screens: more columns, more rows, still one screen */
 @media (max-width: 1100px) {
-  .board-grid {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-    grid-template-rows: repeat(9, minmax(0, 1fr));
-  }
+  .board-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(18, minmax(0, 1fr)); }
 }
 @media (max-width: 700px) {
-  .board { padding: 14px 12px 10px; }
-  .board-tally { grid-template-columns: repeat(2, 1fr); }
-  .board-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-template-rows: repeat(12, minmax(0, 1fr));
-    gap: 8px 6px;
-  }
+  .board { padding: 1.4vh 3vw 1vh; }
+  .board-tally { grid-template-columns: repeat(2, 1fr); gap: 2vw; }
+  .board-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(24, minmax(0, 1fr)); gap: 0.5vh 1.5vw; }
+  .bd-tile { padding: 0 2vw; gap: 2vw; }
   .bd-tile span { font-size: 9px; }
 }
 
@@ -2263,8 +2265,5 @@ body {
 .pa-flag { width: 44px; height: auto; border-radius: 3px; flex-shrink: 0; }
 .pa-item { align-items: center; }
 .pa-item > span:last-child { margin-left: auto; }
-.alloc-vote-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-.alloc-vote-flag { width: 44px; height: auto; border-radius: 3px; }
-.alloc-vote-name { font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif; font-size: 22px; font-weight: 500; color: var(--text); }
 
 .pa-help { font-size: 15px; line-height: 1.6; color: var(--text-dim); margin-bottom: 14px; max-width: 70ch; }
