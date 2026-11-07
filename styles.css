@@ -1088,11 +1088,11 @@ a { color: inherit; }
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 56px;
-    height: 56px;
-    font-size: 22px;
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
     border: 1px solid var(--pill-border);
-    border-radius: 13px;
+    border-radius: 11px;
     background: rgba(255,255,255,0.06);
     cursor: pointer;
     flex-shrink: 0;
@@ -1716,7 +1716,7 @@ body {
   border-radius: 3px;
   display: inline-block;
   vertical-align: -5px;
-  margin-right: 13px;
+  margin-right: 0;
 }
 
 /* room rows carry longer labels ("Workshop Day Room") than Committee /
@@ -1744,38 +1744,31 @@ body {
 
 .alloc-line dt { padding-top: 7px; }
 
-/* the committee page link says what it does in words — a bare arrow next
-   to the name read as decoration for the full-name line, so few tapped it */
+/* committee page link: a filled button that names its destination. No arrow —
+   the arrow next to a name read as decoration, not as something to press. */
 .alloc-committee-cta {
   display: inline-block;
   margin-top: 16px;
-  padding: 9px 18px;
-  border: 1px solid var(--pill-border);
+  padding: 10px 20px;
+  border: 1px solid #ffffff;
   border-radius: var(--radius-full);
+  background: #ffffff;
+  color: #0b0d18;
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.2;
-  color: var(--text);
   text-decoration: none;
-  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .alloc-committee-cta[hidden] { display: none; }
 
-.alloc-cta-arrow {
-  display: inline-block;
-  margin-left: 4px;
-  transition: transform 0.3s cubic-bezier(.2,.7,.3,1);
+.alloc-committee-cta:hover,
+.alloc-committee-cta:focus-visible {
+  background: transparent;
+  color: #ffffff;
 }
-
-.alloc-committee-cta:hover {
-  background: var(--text);
-  border-color: var(--text);
-  color: #0b0d18;
-}
-
-.alloc-committee-cta:hover .alloc-cta-arrow { transform: translateX(4px); }
 
 /* -- 5. 리스트 hover: 글자가 살짝 밝아지고 화살표가 움직인다 -- */
 
@@ -1891,7 +1884,7 @@ body {
 .alloc-flag-row {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -2113,66 +2106,101 @@ body {
 .alloc-vote-msg { margin-top: 14px; min-height: 1.4em; color: var(--text); }
 
 /* =========================================================
-   VOTE BOARD (full screen, projected)
+   VOTE BOARD (full screen, projected) — the whole board fits one screen
    ========================================================= */
-.board { max-width: 1400px; margin: 0 auto; padding: 36px 48px 56px; }
+.board-body { height: 100vh; height: 100dvh; overflow: hidden; }
 
-.board-head { margin-bottom: 26px; }
-.board-eyebrow { font-size: 14px; letter-spacing: 2.6px; text-transform: uppercase; color: var(--text-faint); }
+.board {
+  box-sizing: border-box;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  margin: 0;
+  padding: 22px 32px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.board-head { flex: none; margin-bottom: 14px; }
+.board-eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--text-faint); }
 .board-topic {
-  margin-top: 10px;
+  margin-top: 4px;
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-weight: 500;
-  font-size: clamp(30px, 4.2vw, 56px);
-  line-height: 1.1;
+  font-size: clamp(20px, 2.6vw, 38px);
+  line-height: 1.15;
   color: var(--text);
 }
-.board-open { margin-top: 12px; font-size: 18px; color: var(--text-faint); }
+.board-open { margin-top: 4px; font-size: 15px; color: var(--text-faint); }
 .board-open.is-open { color: #4fb38a; }
 
 .board-tally {
+  flex: none;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 30px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 .tally {
-  padding: 18px 20px;
-  border-radius: 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
   border: 1px solid var(--border-soft);
   background: rgba(255, 255, 255, 0.025);
 }
 .tally-num {
-  display: block;
   font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
   font-weight: 500;
-  font-size: clamp(34px, 4vw, 56px);
+  font-size: clamp(22px, 2.4vw, 34px);
   line-height: 1;
 }
-.tally-label { display: block; margin-top: 8px; font-size: 14px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--text-faint); }
+.tally-label { font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-faint); }
 .tally-for .tally-num { color: #4fb38a; }
 .tally-against .tally-num { color: #e0707a; }
 .tally-abstain .tally-num { color: #d9a441; }
 .tally-none .tally-num { color: var(--text-dim); }
 
+/* 72 voting units fill a 12 x 6 grid on a wide screen; the rows share the
+   remaining height, so nothing has to scroll */
 .board-grid {
+  flex: 1 1 0;
+  min-height: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 18px 16px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  gap: 10px;
 }
-.bd-tile { display: flex; flex-direction: column; gap: 9px; transition: opacity 0.4s ease, filter 0.4s ease; }
+.bd-tile {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
 .bd-tile img {
+  flex: 1 1 0;
+  height: 0;
+  min-height: 0;
   width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 5px;
+  object-fit: contain;
+  border-radius: 4px;
   transition: box-shadow 0.4s ease;
 }
-.bd-tile span { font-size: 14px; line-height: 1.3; color: var(--text-dim); }
+.bd-tile span {
+  flex: none;
+  font-size: clamp(10px, 0.95vw, 13px);
+  line-height: 1.2;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .bd-tile.is-none img { filter: grayscale(1); opacity: 0.32; }
 .bd-tile.is-none span { color: #c3c7d6; }
-
 .bd-tile.is-for img { box-shadow: 0 0 0 3px #4fb38a, 0 0 26px rgba(79, 179, 138, 0.45); }
 .bd-tile.is-against img { box-shadow: 0 0 0 3px #e0707a, 0 0 26px rgba(224, 112, 122, 0.45); }
 .bd-tile.is-abstain img { box-shadow: 0 0 0 3px #d9a441, 0 0 26px rgba(217, 164, 65, 0.45); }
@@ -2180,11 +2208,25 @@ body {
 .bd-tile.is-against span { color: #f0a0a7; }
 .bd-tile.is-abstain span { color: #ecc87f; }
 
-.board-note { margin-top: 18px; color: var(--text-faint); }
+.board-note { flex: none; margin-top: 8px; font-size: 13px; color: var(--text-faint); }
+.board-note:empty { display: none; }
 
+/* smaller screens: more columns, same single screen */
+@media (max-width: 1100px) {
+  .board-grid {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    grid-template-rows: repeat(9, minmax(0, 1fr));
+  }
+}
 @media (max-width: 700px) {
-  .board { padding: 24px 18px 40px; }
+  .board { padding: 14px 12px 10px; }
   .board-tally { grid-template-columns: repeat(2, 1fr); }
+  .board-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-rows: repeat(12, minmax(0, 1fr));
+    gap: 8px 6px;
+  }
+  .bd-tile span { font-size: 9px; }
 }
 
 /* =========================================================
