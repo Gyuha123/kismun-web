@@ -220,12 +220,13 @@
         // the pick raises that delegation's placard, so the counts change right now
         session.pick = { id: r.id };
         session.placard = session.placard || {};
+        if (r.previous) delete session.placard[r.previous];
         session.placard[r.id] = { t: Date.now() };
         renderPlacards();
         VoteData.refresh();
         return;
       }
-      say($('pickNote'), r.error === 'no-candidates' ? 'Every delegation has raised its placard.' : errorText(r.error));
+      say($('pickNote'), r.error === 'no-candidates' ? 'No other delegation can be picked.' : errorText(r.error));
     }).catch(function (e) { $('pickBtn').disabled = false; say($('pickNote'), failure(e)); });
   });
 
