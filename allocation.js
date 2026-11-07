@@ -319,7 +319,8 @@
       if (r.placardRaised) setPlacardRaised(true);
       watchPlacard();
       if (r.voted) { say(vote.name + ' has already voted: ' + LABEL[r.voted] + '.'); voteForm.hidden = true; voteTabs.hidden = false; showTab('vote'); return; }
-      if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); voteForm.hidden = true; voteTabs.hidden = false; showTab('vote'); return; }
+      // closed: keep the code form so the delegate can check again once voting opens
+      if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); voteTabs.hidden = false; showTab('vote'); return; }
       showChoiceStep();
       say('Choose one. ' + vote.name + ' can vote once.');
     }).catch(networkProblem);
