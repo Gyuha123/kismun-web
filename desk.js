@@ -201,15 +201,6 @@
   $('openBtn').addEventListener('click', function () { toggle('open'); });
   $('closeBtn').addEventListener('click', function () { toggle('close'); });
 
-  $('resetBtn').addEventListener('click', function () {
-    if (!confirm('Clear every vote?')) return;
-    say(note, '');
-    deskCall('reset_votes').then(function (r) {
-      say(note, r.ok ? 'All votes cleared.' : errorText(r.error), r.ok);
-      if (r.ok) { votes = {}; renderSummary(); VoteData.refresh(); }
-    }).catch(function (e) { say(note, failure(e)); });
-  });
-
   $('placardClearBtn').addEventListener('click', function () {
     if (!confirm('Clear every placard and the random pick?')) return;
     var placardNote = $('placardNote');
@@ -226,7 +217,7 @@
     deskCall('pick_random').then(function (r) {
       $('pickBtn').disabled = false;
       if (r.ok) { session.pick = { id: r.id }; renderPlacards(); VoteData.refresh(); return; }
-      say($('pickNote'), r.error === 'no-placards' ? 'No placards are raised yet.' : errorText(r.error));
+      say($('pickNote'), r.error === 'no-candidates' ? 'Every delegation has raised its placard.' : errorText(r.error));
     }).catch(function (e) { $('pickBtn').disabled = false; say($('pickNote'), failure(e)); });
   });
 

@@ -14,7 +14,7 @@ const crypto = require('crypto');
 const DB = 'https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app';
 const SITE_HOST_ANY = true;        // origin must match the host this function was called on
 const CHOICES = ['for', 'against', 'abstain'];
-const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all', 'pick_random', 'clear_placards'];
+const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'unblock_all', 'pick_random', 'clear_placards'];
 
 // limits
 const MAX_BODY_BYTES = 2048;
@@ -334,19 +334,19 @@ exports.handler = async function (event) {
         await write('PATCH', 'session', { open: true });
       } else if (action === 'close') {
         await clearPaths({ 'session/open': false, 'session/topic': null, votes: null });
-      } else if (action === 'reset_votes') {
-        await clearPaths({ votes: null });
       } else if (action === 'clear_placards') {
         await clearPaths({ 'session/placard': null, 'session/pick': null });
       } else if (action === 'unblock_all') {
         await write('PATCH', '', { 'security/ip': null });
       } else if (action === 'pick_random') {
-        // one delegation among the raised placards; a new one each time when possible
-        const raised = Object.keys((await read('session/placard')) || {});
-        if (!raised.length) return json(200, { error: 'no-placards' });
+        // one delegation among those that have NOT raised a placard;
+        // a new one each time when possible
+        const raised = (await read('session/placard')) || {};
+        const waiting = Object.keys(hashMap()).map(sanitizeKey).filter(function (k) { return !raised[k]; });
+        if (!waiting.length) return json(200, { error: 'no-candidates' });
         const current = await read('session/pick');
-        const others = raised.filter(function (k) { return !current || k !== current.id; });
-        const pool = others.length ? others : raised;
+        const others = waiting.filter(function (k) { return !current || k !== current.id; });
+        const pool = others.length ? others : waiting;
         const id = pool[crypto.randomInt(pool.length)];
         await write('PATCH', 'session', { pick: { id: id, t: { '.sv': 'timestamp' } } });
         await audit(action, ipHash);
