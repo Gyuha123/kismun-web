@@ -227,7 +227,7 @@ exports.handler = async function (event) {
     try {
       const res = json(200, await publicState());
       res.headers['Cache-Control'] = 'public, max-age=0, must-revalidate';
-      res.headers['Netlify-CDN-Cache-Control'] = 'public, max-age=1';
+      res.headers['Netlify-CDN-Cache-Control'] = 'public, durable, max-age=1';
       return res;
     } catch (err) {
       return json(503, { error: 'server' });
