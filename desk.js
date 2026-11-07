@@ -17,7 +17,11 @@
   var LABEL = { 'for': 'For', 'against': 'Against', 'abstain': 'Abstain' };
   var votes = {}, session = {};
 
-  function say(el, text) { el.textContent = text || ''; }
+  // ok = true shows the message as a success, otherwise as a warning
+  function say(el, text, ok) {
+    el.textContent = text || '';
+    el.classList.toggle('is-ok', !!ok);
+  }
 
   function errorText(code) {
     if (code === 'password') return 'Wrong password.';
@@ -174,21 +178,26 @@
     var topic = topicInput.value.trim();
     if (!topic) { say(topicNote, 'Type the topic first.'); return; }
     deskCall('set_topic', { topic: topic }).then(function (r) {
-      say(topicNote, r.ok ? 'Topic saved.' : errorText(r.error));
+      say(topicNote, r.ok ? 'Topic saved.' : errorText(r.error), r.ok);
       if (r.ok) { session.topic = topic; VoteData.refresh(); }
     }).catch(function () { say(topicNote, 'Could not save the topic.'); });
   });
 
   function toggle(action) {
-    if (action === 'close' && !confirm('Close voting and delete every vote and placard?')) return;
+    if (action === 'close' && !confirm('Close voting and delete the topic, every vote and every placard?')) return;
     say(note, '');
     $('openBtn').disabled = true;
     $('closeBtn').disabled = true;
     deskCall(action).then(function (r) {
       if (r.ok) {
         session.open = action === 'open';
-        say(note, session.open ? 'Voting is open.' : 'Voting is closed. All votes and placards deleted.');
-        if (!session.open) clearLocally();
+        say(note, session.open ? 'Voting is open.' : 'Voting is closed. Topic, votes and placards deleted.', true);
+        if (!session.open) {
+          delete session.topic;
+          topicInput.value = '';
+          say(topicNote, '');
+          clearLocally();
+        }
         VoteData.refresh();
       } else {
         say(note, errorText(r.error));
@@ -203,7 +212,7 @@
     if (!confirm('Clear every vote and placard and start a new round?')) return;
     say(note, '');
     deskCall('reset_votes').then(function (r) {
-      say(note, r.ok ? 'All votes and placards cleared.' : errorText(r.error));
+      say(note, r.ok ? 'All votes and placards cleared.' : errorText(r.error), r.ok);
       if (r.ok) { clearLocally(); VoteData.refresh(); }
     }).catch(function (e) { say(note, failure(e)); });
   });
@@ -222,7 +231,7 @@
     if (!confirm('Unblock every network that was locked by wrong codes?')) return;
     say(note, '');
     deskCall('unblock_all').then(function (r) {
-      say(note, r.ok ? 'All networks unblocked.' : errorText(r.error));
+      say(note, r.ok ? 'All networks unblocked.' : errorText(r.error), r.ok);
     }).catch(function (e) { say(note, failure(e)); });
   });
 })();

@@ -1950,6 +1950,8 @@ body {
 .pa-btn-ghost:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
 
 .pa-error { margin-top: 12px; font-size: 14px; color: #f0a08c; min-height: 1.2em; }
+.pa-error.is-ok { color: #8fd6b5; }
+.pa-error.is-ok:not(:empty)::before { content: "\2713"; margin-right: 6px; font-weight: 600; }
 
 .pa-bar {
   display: flex;

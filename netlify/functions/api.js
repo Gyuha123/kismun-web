@@ -133,7 +133,7 @@ async function write(method, path, body) {
 }
 
 // Ends a round in ONE request, so it either happens completely or not at all.
-// A null value in a multi-path update removes that path. The topic stays.
+// A null value in a multi-path update removes that path.
 function clearRound(extra) {
   return write('PATCH', '', Object.assign({ votes: null, 'session/placard': null, 'session/pick': null }, extra || {}));
 }
@@ -332,7 +332,7 @@ exports.handler = async function (event) {
       } else if (action === 'open') {
         await write('PATCH', 'session', { open: true });
       } else if (action === 'close') {
-        await clearRound({ 'session/open': false });
+        await clearRound({ 'session/open': false, 'session/topic': null });
       } else if (action === 'reset_votes') {
         await clearRound();
       } else if (action === 'unblock_all') {
