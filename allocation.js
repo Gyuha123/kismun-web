@@ -218,6 +218,7 @@
     });
     placardPanel.hidden = name !== 'placard';
     voteMsg.hidden = name !== 'vote';
+    voteTopic.hidden = name !== 'vote';   // the topic belongs to Vote only
     renderVote();
   }
 
@@ -272,6 +273,7 @@
     voteTabs.hidden = true;
     placardPanel.hidden = true;
     voteMsg.hidden = false;
+    voteTopic.hidden = false;
   }
 
   function showCodeStep() {

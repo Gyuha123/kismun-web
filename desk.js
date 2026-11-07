@@ -65,7 +65,7 @@
       var up = !!raised[k];
       if (up) count++;
       if (k === pick) picked = x;
-      placardList.appendChild(item(x, 'pa-item' + (k === pick ? ' is-picked' : up ? ' is-raised' : ''), x.label + (up ? ' — raised' : ' — not raised')));
+      placardList.appendChild(item(x, 'pa-item ' + (k === pick ? 'is-picked' : up ? 'is-raised' : 'is-none'), x.label + (up ? ' — raised' : ' — not raised')));
     });
     $('sRaised').textContent = count;
     $('sLowered').textContent = countries.length - count;
@@ -103,14 +103,6 @@
     if (t) showTab(t.getAttribute('data-tab'));
   });
 
-  function clearLocally() {
-    votes = {};
-    delete session.placard;
-    delete session.pick;
-    renderSummary();
-    renderPlacards();
-  }
-
   function renderSummary() {
     var c = { 'for': 0, against: 0, abstain: 0, none: 0 };
     countries.forEach(function (x) {
@@ -125,7 +117,7 @@
     list.textContent = '';
     countries.forEach(function (x) {
       var v = votes[VoteData.key(x.id)];
-      list.appendChild(item(x, 'pa-item' + (v ? ' is-' + v.choice : ''), x.label + (v ? ' — ' + LABEL[v.choice] : ' — not voted')));
+      list.appendChild(item(x, 'pa-item ' + (v ? 'is-' + v.choice : 'is-none'), x.label + (v ? ' — ' + LABEL[v.choice] : ' — not voted')));
     });
   }
 
@@ -184,19 +176,20 @@
   });
 
   function toggle(action) {
-    if (action === 'close' && !confirm('Close voting and delete the topic, every vote and every placard?')) return;
+    if (action === 'close' && !confirm('Close voting and delete the topic and every vote?')) return;
     say(note, '');
     $('openBtn').disabled = true;
     $('closeBtn').disabled = true;
     deskCall(action).then(function (r) {
       if (r.ok) {
         session.open = action === 'open';
-        say(note, session.open ? 'Voting is open.' : 'Voting is closed. Topic, votes and placards deleted.', true);
+        say(note, session.open ? 'Voting is open.' : 'Voting is closed. Topic and votes deleted.', true);
         if (!session.open) {
           delete session.topic;
           topicInput.value = '';
           say(topicNote, '');
-          clearLocally();
+          votes = {};
+          renderSummary();
         }
         VoteData.refresh();
       } else {
@@ -209,12 +202,22 @@
   $('closeBtn').addEventListener('click', function () { toggle('close'); });
 
   $('resetBtn').addEventListener('click', function () {
-    if (!confirm('Clear every vote and placard and start a new round?')) return;
+    if (!confirm('Clear every vote?')) return;
     say(note, '');
     deskCall('reset_votes').then(function (r) {
-      say(note, r.ok ? 'All votes and placards cleared.' : errorText(r.error), r.ok);
-      if (r.ok) { clearLocally(); VoteData.refresh(); }
+      say(note, r.ok ? 'All votes cleared.' : errorText(r.error), r.ok);
+      if (r.ok) { votes = {}; renderSummary(); VoteData.refresh(); }
     }).catch(function (e) { say(note, failure(e)); });
+  });
+
+  $('placardClearBtn').addEventListener('click', function () {
+    if (!confirm('Clear every placard and the random pick?')) return;
+    var placardNote = $('placardNote');
+    say(placardNote, '');
+    deskCall('clear_placards').then(function (r) {
+      say(placardNote, r.ok ? 'All placards cleared.' : errorText(r.error), r.ok);
+      if (r.ok) { delete session.placard; delete session.pick; renderPlacards(); VoteData.refresh(); }
+    }).catch(function (e) { say(placardNote, failure(e)); });
   });
 
   $('pickBtn').addEventListener('click', function () {
@@ -227,11 +230,13 @@
     }).catch(function (e) { $('pickBtn').disabled = false; say($('pickNote'), failure(e)); });
   });
 
-  $('unblockBtn').addEventListener('click', function () {
+  function unblock(noteEl) {
     if (!confirm('Unblock every network that was locked by wrong codes?')) return;
-    say(note, '');
+    say(noteEl, '');
     deskCall('unblock_all').then(function (r) {
-      say(note, r.ok ? 'All networks unblocked.' : errorText(r.error), r.ok);
-    }).catch(function (e) { say(note, failure(e)); });
-  });
+      say(noteEl, r.ok ? 'All networks unblocked.' : errorText(r.error), r.ok);
+    }).catch(function (e) { say(noteEl, failure(e)); });
+  }
+  $('unblockBtn').addEventListener('click', function () { unblock(note); });
+  $('placardUnblockBtn').addEventListener('click', function () { unblock($('placardNote')); });
 })();

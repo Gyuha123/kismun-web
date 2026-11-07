@@ -117,6 +117,15 @@
       <p class="pa-label">Delegations</p>
       <ul class="pa-list" id="paList"></ul>
     </div>
+
+    <div class="pa-block pa-danger">
+      <p class="pa-label">Maintenance</p>
+      <div class="pa-actions">
+        <button type="button" class="pa-btn pa-btn-ghost" id="resetBtn">All clear</button>
+        <button type="button" class="pa-btn pa-btn-ghost" id="unblockBtn">Unblock all networks</button>
+      </div>
+      <p class="pa-error" id="paNote" aria-live="polite"></p>
+    </div>
     </div>
 
     <div id="deskPlacard" hidden>
@@ -143,15 +152,15 @@
         <p class="pa-label">Delegations</p>
         <ul class="pa-list" id="placardList"></ul>
       </div>
-    </div>
 
-    <div class="pa-block pa-danger">
-      <p class="pa-label">Maintenance</p>
-      <div class="pa-actions">
-        <button type="button" class="pa-btn pa-btn-ghost" id="resetBtn">All clear (votes and placards)</button>
-        <button type="button" class="pa-btn pa-btn-ghost" id="unblockBtn">Unblock all networks</button>
+      <div class="pa-block pa-danger">
+        <p class="pa-label">Maintenance</p>
+        <div class="pa-actions">
+          <button type="button" class="pa-btn pa-btn-ghost" id="placardClearBtn">All clear</button>
+          <button type="button" class="pa-btn pa-btn-ghost" id="placardUnblockBtn">Unblock all networks</button>
+        </div>
+        <p class="pa-error" id="placardNote" aria-live="polite"></p>
       </div>
-      <p class="pa-error" id="paNote" aria-live="polite"></p>
     </div>
 
   </section>

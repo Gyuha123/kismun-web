@@ -14,7 +14,7 @@ const crypto = require('crypto');
 const DB = 'https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app';
 const SITE_HOST_ANY = true;        // origin must match the host this function was called on
 const CHOICES = ['for', 'against', 'abstain'];
-const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all', 'pick_random'];
+const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'reset_votes', 'unblock_all', 'pick_random', 'clear_placards'];
 
 // limits
 const MAX_BODY_BYTES = 2048;
@@ -132,10 +132,11 @@ async function write(method, path, body) {
   }
 }
 
-// Ends a round in ONE request, so it either happens completely or not at all.
-// A null value in a multi-path update removes that path.
-function clearRound(extra) {
-  return write('PATCH', '', Object.assign({ votes: null, 'session/placard': null, 'session/pick': null }, extra || {}));
+// Every clear is ONE request, so it happens completely or not at all. A null value in
+// a multi-path update removes that path. Vote and Placard are independent: clearing
+// one never touches the other.
+function clearPaths(paths) {
+  return write('PATCH', '', paths);
 }
 
 // The public state: the same data the database shows to anyone (never security/*).
@@ -332,9 +333,11 @@ exports.handler = async function (event) {
       } else if (action === 'open') {
         await write('PATCH', 'session', { open: true });
       } else if (action === 'close') {
-        await clearRound({ 'session/open': false, 'session/topic': null });
+        await clearPaths({ 'session/open': false, 'session/topic': null, votes: null });
       } else if (action === 'reset_votes') {
-        await clearRound();
+        await clearPaths({ votes: null });
+      } else if (action === 'clear_placards') {
+        await clearPaths({ 'session/placard': null, 'session/pick': null });
       } else if (action === 'unblock_all') {
         await write('PATCH', '', { 'security/ip': null });
       } else if (action === 'pick_random') {
