@@ -1908,7 +1908,7 @@ body {
 .alloc-placard-hint[hidden] { display: none; }
 
 /* -- placard desk (admin) -- */
-.pa-page { max-width: 900px; margin: 0 auto; padding: 40px 40px 100px; }
+.pa-page { max-width: none; margin: 0; padding: 40px 3vw 100px; }
 
 .pa-label {
   display: block;
@@ -2245,25 +2245,35 @@ body {
 .pa-summary { display: flex; gap: 26px; flex-wrap: wrap; font-size: 18px; color: var(--text-dim); }
 .pa-summary strong { font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif; font-weight: 500; font-size: 24px; color: var(--text); margin-left: 4px; }
 
-.pa-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px 16px; }
+/* delegation list: compact tiles, flag + name only. Voting state is shown by
+   the tile's colour alone (the counts are already in the summary above). */
+.pa-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 6px;
+}
 .pa-item {
   display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 9px 12px;
-  border-radius: 8px;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 7px;
   border: 1px solid var(--border-soft);
-  font-size: 15px;
-  color: var(--text-faint);
+  border-left-width: 3px;
+  font-size: 13px;
+  color: var(--text-dim);
+  min-width: 0;
 }
-.pa-item.is-for { color: #8fd6b5; border-color: rgba(79, 179, 138, 0.5); }
-.pa-item.is-against { color: #f0a0a7; border-color: rgba(224, 112, 122, 0.5); }
-.pa-item.is-abstain { color: #ecc87f; border-color: rgba(217, 164, 65, 0.5); }
+.pa-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pa-item.is-for { border-left-color: #4fb38a; background: rgba(79, 179, 138, 0.08); color: #8fd6b5; }
+.pa-item.is-against { border-left-color: #e0707a; background: rgba(224, 112, 122, 0.08); color: #f0a0a7; }
+.pa-item.is-abstain { border-left-color: #d9a441; background: rgba(217, 164, 65, 0.08); color: #ecc87f; }
+.pa-flag { width: 30px; height: auto; border-radius: 2px; flex-shrink: 0; }
 
 .pa-danger .pa-label { color: #e0a090; }
 
 .pa-flag { width: 44px; height: auto; border-radius: 3px; flex-shrink: 0; }
 .pa-item { align-items: center; }
-.pa-item > span:last-child { margin-left: auto; }
 
 .pa-help { font-size: 15px; line-height: 1.6; color: var(--text-dim); margin-bottom: 14px; max-width: 70ch; }

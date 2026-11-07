@@ -44,6 +44,7 @@
       var v = votes[VoteData.key(x.id)];
       var li = document.createElement('li');
       li.className = 'pa-item' + (v ? ' is-' + v.choice : '');
+      li.title = x.label + (v ? ' — ' + LABEL[v.choice] : ' — not voted');
       var flag = document.createElement('img');
       flag.className = 'pa-flag';
       flag.src = x.kind === 'un' ? 'unflag.png' : 'flags/4x3/' + x.flag + '.svg';
@@ -51,10 +52,7 @@
       var name = document.createElement('span');
       name.textContent = x.label;
       li.appendChild(flag);
-      var state = document.createElement('span');
-      state.textContent = v ? LABEL[v.choice] : 'Not voted';
       li.appendChild(name);
-      li.appendChild(state);
       list.appendChild(li);
     });
   }
