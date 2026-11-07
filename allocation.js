@@ -32,6 +32,10 @@
   var voteCodeInput = document.getElementById('allocVoteCode');
   var voteChoices = document.getElementById('allocVoteChoices');
   var voteMsg = document.getElementById('allocVoteMsg');
+  var voteTabs = document.getElementById('allocVoteTabs');
+  var placardPanel = document.getElementById('allocPlacardPanel');
+  var placardBtn = document.getElementById('allocPlacardBtn');
+  var placardMsg = document.getElementById('allocPlacardMsg');
   var committeeLink = document.getElementById('allocCommitteeLink');
   var roomWorkshopLine = document.getElementById('allocRoomWorkshopLine');
   var roomKismunLine = document.getElementById('allocRoomKismunLine');
@@ -177,8 +181,46 @@
   var topicWatching = false;
 
   function say(text) { voteMsg.textContent = text || ''; }
+  var checkedCode = '';     // the code that passed the check, kept for Placard
+  var choiceReady = false;  // For / Against / Abstain may be shown on the Vote tab
+  var activeTab = 'vote';
+  var stopPlacardWatch = null;
+
+  // follow this unit's placard live, so All clear re-enables the button without a reload
+  function watchPlacard() {
+    if (stopPlacardWatch) stopPlacardWatch();
+    stopPlacardWatch = null;
+    if (!vote || !window.VoteData || !VoteData.configured()) return;
+    stopPlacardWatch = VoteData.watch('session/placard/' + VoteData.key(vote.code), function (p, err) {
+      if (err) return;
+      if (!p && placardBtn.classList.contains('is-raised')) { setPlacardRaised(false); say2('Placard cleared. You can raise it again.'); return; }
+      if (p && !placardBtn.disabled) setPlacardRaised(true);
+    });
+  }
+
+  function say2(text) { placardMsg.textContent = text || ''; }
+  function setPlacardRaised(raised) {
+    placardBtn.disabled = raised;
+    placardBtn.textContent = raised ? 'Placard raised' : 'Raise Placard';
+    placardBtn.classList.toggle('is-raised', raised);
+  }
+  function showTab(name) {
+    activeTab = name;
+    Array.prototype.forEach.call(voteTabs.querySelectorAll('.alloc-tab'), function (t) {
+      var on = t.getAttribute('data-tab') === name;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    placardPanel.hidden = name !== 'placard';
+    voteChoices.hidden = name !== 'vote' || !choiceReady;
+    voteMsg.hidden = name !== 'vote';
+  }
   function showCodeStep() {
     voteForm.hidden = false;
+    voteTabs.hidden = true;
+    placardPanel.hidden = true;
+    choiceReady = false;
+    checkedCode = '';
     voteChoices.hidden = true;
     voteCodeInput.value = '';
     voteCodeInput.disabled = false;
@@ -186,14 +228,24 @@
   }
   function showChoiceStep() {
     voteForm.hidden = true;
-    voteChoices.hidden = false;
+    choiceReady = true;
+    voteTabs.hidden = false;
+    showTab('vote');
   }
   function hideVote() {
     voteLine.hidden = true;
     voteForm.hidden = true;
     voteChoices.hidden = true;
+    voteTabs.hidden = true;
+    placardPanel.hidden = true;
+    choiceReady = false;
+    checkedCode = '';
     say('');
+    say2('');
+    setPlacardRaised(false);
     pendingCode = '';
+    if (stopPlacardWatch) stopPlacardWatch();
+    stopPlacardWatch = null;
   }
   function networkProblem() { say('Could not reach the vote server. Please try again.'); }
 
@@ -230,6 +282,24 @@
     say('');
   });
 
+  voteTabs.addEventListener('click', function (e) {
+    var t = e.target.closest('.alloc-tab');
+    if (t) showTab(t.getAttribute('data-tab'));
+  });
+
+  placardBtn.addEventListener('click', function () {
+    if (!vote || !checkedCode || placardBtn.disabled) return;
+    placardBtn.disabled = true;
+    say2('Raising…');
+    VoteData.api('placard', { country: vote.code, code: checkedCode }).then(function (r) {
+      if (r.ok) { setPlacardRaised(true); say2('Your placard is raised.'); return; }
+      if (r.error === 'already') { setPlacardRaised(true); say2('The placard for ' + vote.name + ' is already raised.'); return; }
+      if (r.error === 'blocked') { setPlacardRaised(false); say2('This network has been blocked. Please ask the desk.'); return; }
+      if (r.error === 'wrong') { setPlacardRaised(false); say2('The code no longer matches. Please enter it again.'); checkedCode = ''; showCodeStep(); return; }
+      setPlacardRaised(false); say2('Something went wrong. Please try again.');
+    }).catch(function () { setPlacardRaised(false); say2('Could not reach the vote server. Please try again.'); });
+  });
+
   voteForm.addEventListener('submit', function (e) {
     e.preventDefault();
     if (!vote) return;
@@ -244,9 +314,12 @@
       if (r.error === 'format') { say('Enter the 4 digits.'); return; }
       if (r.error === 'unknown-country') { say('This delegation does not vote.'); return; }
       if (r.error) { say('Something went wrong. Please try again.'); return; }
-      if (r.voted) { say(vote.name + ' has already voted: ' + LABEL[r.voted] + '.'); voteForm.hidden = true; return; }
-      if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); pendingCode = code; return; }
+      checkedCode = code;
       pendingCode = code;
+      if (r.placardRaised) setPlacardRaised(true);
+      watchPlacard();
+      if (r.voted) { say(vote.name + ' has already voted: ' + LABEL[r.voted] + '.'); voteForm.hidden = true; voteTabs.hidden = false; showTab('vote'); return; }
+      if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); voteForm.hidden = true; voteTabs.hidden = false; showTab('vote'); return; }
       showChoiceStep();
       say('Choose one. ' + vote.name + ' can vote once.');
     }).catch(networkProblem);

@@ -1,18 +1,18 @@
-// Full-screen vote board. Read-only: it follows the shared votes live.
-// Shows every voting delegation as a flag. Not voted = greyed flag; once a
-// delegation has voted, its flag lights up in the colour of its choice.
+// Full-screen board with two views.
+//  Vote:    the live vote grid, with the overview (topic, open state, counts).
+//  Placard: the same grid of units, lit when a placard is raised. No overview.
+// Read-only: it follows the shared data live.
 (function () {
   var data = window.KISMUN_ALLOCATION;
   var $ = function (id) { return document.getElementById(id); };
   var grid = $('boardGrid');
   var note = $('boardNote');
+  var main = document.querySelector('.board');
 
   if (!data) { note.textContent = 'Country data is missing.'; return; }
 
   // every voting unit: each country, plus the UN group of chairs
   var countries = VoteData.voters(data);
-
-  var LABEL = { 'for': 'For', 'against': 'Against', 'abstain': 'Abstain' };
   var tiles = {};
   countries.forEach(function (c) {
     var el = document.createElement('div');
@@ -28,15 +28,20 @@
     tiles[VoteData.key(c.id)] = el;
   });
 
-  function render(votes) {
+  var votes = {}, raised = {}, view = 'vote';
+
+  function paint() {
     var counts = { 'for': 0, 'against': 0, 'abstain': 0, none: 0 };
     countries.forEach(function (c) {
       var k = VoteData.key(c.id);
-      var v = votes && votes[k];
+      var v = votes[k];
+      if (v && counts.hasOwnProperty(v.choice)) counts[v.choice]++; else counts.none++;
       var el = tiles[k];
-      el.className = 'bd-tile ' + (v ? 'is-' + v.choice : 'is-none');
-      if (v && counts.hasOwnProperty(v.choice)) counts[v.choice]++;
-      else counts.none++;
+      if (view === 'placard') {
+        el.className = 'bd-tile ' + (raised[k] ? 'is-raised' : 'is-none');
+      } else {
+        el.className = 'bd-tile ' + (v ? 'is-' + v.choice : 'is-none');
+      }
     });
     $('nFor').textContent = counts['for'];
     $('nAgainst').textContent = counts.against;
@@ -44,16 +49,38 @@
     $('nNone').textContent = counts.none;
   }
 
+  function setView(name) {
+    view = name;
+    main.classList.toggle('view-placard', name === 'placard');
+    Array.prototype.forEach.call(document.querySelectorAll('.board-tab'), function (t) {
+      var on = t.getAttribute('data-view') === name;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    paint();
+  }
+  document.querySelector('.board-tabs').addEventListener('click', function (e) {
+    var t = e.target.closest('.board-tab');
+    if (t) setView(t.getAttribute('data-view'));
+  });
+
   if (!VoteData.configured()) {
     note.textContent = 'The vote service is not connected yet.';
-    render({});
+    paint();
     return;
   }
 
-  VoteData.watch('votes', function (votes, err) {
+  VoteData.watch('votes', function (v, err) {
     if (err) { note.textContent = 'Lost the connection. Reload to continue.'; return; }
     note.textContent = '';
-    render(votes || {});
+    votes = v || {};
+    paint();
+  });
+
+  VoteData.watch('session/placard', function (p, err) {
+    if (err) return;
+    raised = p || {};
+    paint();
   });
 
   VoteData.watch('session', function (s) {
@@ -61,6 +88,6 @@
     $('boardOpen').textContent = s && s.open ? 'Voting is open' : 'Voting is closed';
     $('boardOpen').classList.toggle('is-open', !!(s && s.open));
   });
-  render({});
-  void LABEL;
+
+  paint();
 })();

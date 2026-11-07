@@ -224,7 +224,7 @@ exports.handler = async function (event) {
 
   try {
     // ---- voter actions --------------------------------------------------
-    if (action === 'check' || action === 'vote') {
+    if (action === 'check' || action === 'vote' || action === 'placard') {
       if (await ipBlocked(ipHash)) return json(200, { error: 'blocked' });
 
       const country = String(body.country || '');
@@ -246,7 +246,17 @@ exports.handler = async function (event) {
 
       if (action === 'check') {
         const existing = await read('votes/' + key);
-        return json(200, { ok: true, topic: topic, open: open, voted: existing ? existing.choice : null });
+        const raised = await read('session/placard/' + key);
+        return json(200, { ok: true, topic: topic, open: open, voted: existing ? existing.choice : null, placardRaised: !!raised });
+      }
+
+      // Raise Placard: one per unit per round. It does not depend on voting being open.
+      if (action === 'placard') {
+        const result = await update('session/placard/' + key, function (cur) {
+          if (cur) return { write: false, result: { error: 'already' } };
+          return { write: true, value: { t: { '.sv': 'timestamp' } }, result: { ok: true } };
+        });
+        return json(200, result);
       }
 
       if (CHOICES.indexOf(body.choice) === -1) return json(200, { error: 'choice' });
@@ -279,6 +289,7 @@ exports.handler = async function (event) {
         await rtdb('PATCH', 'session', { open: action === 'open' });
       } else if (action === 'reset_votes') {
         await rtdb('DELETE', 'votes');
+        await rtdb('DELETE', 'session/placard');
       } else if (action === 'unblock_all') {
         await rtdb('DELETE', 'security/ip');
       }

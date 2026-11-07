@@ -260,6 +260,14 @@
               <button type="submit" class="alloc-vote-btn">Confirm</button>
             </div>
           </form>
+          <div class="alloc-tabs" id="allocVoteTabs" role="tablist" hidden>
+            <button type="button" class="alloc-tab is-active" role="tab" data-tab="vote" aria-selected="true">Vote</button>
+            <button type="button" class="alloc-tab" role="tab" data-tab="placard" aria-selected="false">Placard</button>
+          </div>
+          <div class="alloc-placard" id="allocPlacardPanel" hidden>
+            <button type="button" class="placard-round" id="allocPlacardBtn">Raise Placard</button>
+            <p class="alloc-vote-msg" id="allocPlacardMsg" aria-live="polite"></p>
+          </div>
           <div class="alloc-vote-choices" id="allocVoteChoices" hidden>
             <button type="button" class="alloc-vote-btn" data-choice="for">For</button>
             <button type="button" class="alloc-vote-btn" data-choice="against">Against</button>

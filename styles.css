@@ -2114,6 +2114,35 @@ body {
    ========================================================= */
 .board-body { height: 100vh; height: 100dvh; overflow: hidden; }
 
+/* top tabs: Vote (left) and Placard (right) */
+.board-tabs {
+  flex: none;
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.2vh;
+}
+.board-tab {
+  padding: 0.6vh 1.4vw;
+  border: 1px solid var(--pill-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: clamp(12px, 1.8vh, 16px);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.board-tab:hover { color: var(--text); }
+.board-tab.is-active { background: #ffffff; color: #0b0d18; border-color: #ffffff; }
+
+/* Placard view: the same grid, no overview */
+.view-placard .board-head,
+.view-placard .board-tally,
+.view-placard .board-note { display: none; }
+.bd-tile.is-raised { border-color: #ffffff; background: rgba(255, 255, 255, 0.1); box-shadow: 0 0 18px rgba(255, 255, 255, 0.35); }
+.bd-tile.is-raised span { color: #ffffff; }
+.bd-tile.is-raised img { opacity: 1; filter: none; }
+
 .board {
   box-sizing: border-box;
   height: 100vh;
@@ -2277,3 +2306,49 @@ body {
 .pa-item { align-items: center; }
 
 .pa-help { font-size: 15px; line-height: 1.6; color: var(--text-dim); margin-bottom: 14px; max-width: 70ch; }
+
+/* -- Vote / Placard tabs on the delegate panel and the board -- */
+.alloc-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 14px;
+  border: 1px solid var(--pill-border);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.04);
+}
+.alloc-tabs[hidden] { display: none; }
+.alloc-tab {
+  padding: 7px 16px;
+  border: 0;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.alloc-tab:hover { color: var(--text); }
+.alloc-tab.is-active { background: #ffffff; color: #0b0d18; }
+
+/* big round Raise Placard button */
+.alloc-placard { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.alloc-placard[hidden] { display: none; }
+.placard-round {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  background: #ffffff;
+  color: #0b0d18;
+  font-family: "Clash Grotesk Variable", "Clash Grotesk", sans-serif;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+.placard-round:hover:not(:disabled) { background: transparent; color: #ffffff; }
+.placard-round:disabled { cursor: default; opacity: 0.55; }
+.placard-round.is-raised { background: transparent; color: #ffffff; border-color: rgba(255, 255, 255, 0.5); }
