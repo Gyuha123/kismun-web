@@ -31,6 +31,10 @@ var PLACARD_CONFIG = {
   var firebaseLive = false, firebaseDenied = false, connectionWatched = false;
   var fresh = false;
   var pollTimer = null, polling = false, pollFails = 0;
+  // After this page changes something, a read that left before the change would
+  // paint the old state over the new one. Each change starts a new epoch, and
+  // reads from an older epoch are dropped.
+  var epoch = 0, pollAgain = false;
 
   function load() {
     if (!PLACARD_CONFIG.databaseURL) return Promise.reject(new Error('not-configured'));
@@ -68,18 +72,19 @@ var PLACARD_CONFIG = {
     pollTimer = null;
     if (polling || firebaseLive || !watchers.length) return;
     polling = true;
+    var started = epoch;
     Promise.race([fetchState(), new Promise(function (resolve, reject) {
       setTimeout(function () { reject(new Error('timeout')); }, POLL_TIMEOUT_MS);
     })]).then(function (state) {
       pollFails = 0;
-      if (firebaseLive) return;
+      if (firebaseLive || started !== epoch) return;
       watchers.slice().forEach(function (w) { deliver(w, pick(state, w.path)); });
     }).catch(function (err) {
       if (++pollFails < 3) return;
       watchers.slice().forEach(function (w) { w.last = '__error__'; w.cb(undefined, err); });
     }).then(function () {
       polling = false;
-      schedulePoll();
+      if (pollAgain) { pollAgain = false; pollNow(); } else schedulePoll();
     });
   }
 
@@ -114,7 +119,7 @@ var PLACARD_CONFIG = {
     useFreshReads: function () { fresh = true; },
 
     // Fetch now, after this page changed something.
-    refresh: function () { pollNow(); },
+    refresh: function () { epoch++; if (polling) pollAgain = true; else pollNow(); },
 
     // Live value of one path. Calls back now and on every change; returns unsubscribe.
     watch: function (path, cb) {

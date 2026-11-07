@@ -2423,6 +2423,7 @@ button.alloc-placard-hint:hover,
   flex-direction: column;
   height: 100vh;
   height: 100dvh;
+  overflow: hidden;
 }
 .board-shell > .board-tabs { flex: none; margin: 1.8vh 2.4vw 0; }
 .board-row {
@@ -2475,7 +2476,8 @@ button.alloc-placard-hint:hover,
 .console-toggle:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.4); }
 .console-toggle svg { width: 15px; height: 15px; transition: transform 0.3s ease; }
 .console-closed .console { width: 0; border-left-color: transparent; }
-.console-closed .console-inner { opacity: 0; visibility: hidden; }
+/* folded: the contents leave the layout, so nothing reaches past the screen edge */
+.console-closed .console-inner { display: none; }
 .console-closed .console-toggle { left: -42px; }
 .console-closed .console-toggle svg { transform: rotate(180deg); }
 
