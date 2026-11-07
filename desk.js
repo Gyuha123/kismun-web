@@ -112,13 +112,15 @@
   });
 
   function toggle(action) {
+    if (action === 'close' && !confirm('Close voting and delete every vote and placard?')) return;
     say(note, '');
     $('openBtn').disabled = true;
     $('closeBtn').disabled = true;
     deskCall(action).then(function (r) {
       if (r.ok) {
         session.open = action === 'open';
-        say(note, session.open ? 'Voting is open.' : 'Voting is closed.');
+        say(note, session.open ? 'Voting is open.' : 'Voting is closed. All votes and placards deleted.');
+        if (!session.open) { votes = {}; renderSummary(); }
         VoteData.refresh();
       } else {
         say(note, errorText(r.error));

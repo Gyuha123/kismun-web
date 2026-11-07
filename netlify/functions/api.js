@@ -321,6 +321,11 @@ exports.handler = async function (event) {
         await write('PATCH', 'session', { topic: cleanTopic(body.topic) });
       } else if (action === 'open' || action === 'close') {
         await write('PATCH', 'session', { open: action === 'open' });
+        // closing ends the round: every vote and placard is removed, the topic stays
+        if (action === 'close') {
+          await write('DELETE', 'votes');
+          await write('DELETE', 'session/placard');
+        }
       } else if (action === 'reset_votes') {
         await write('DELETE', 'votes');
         await write('DELETE', 'session/placard');

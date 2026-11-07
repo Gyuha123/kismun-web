@@ -187,6 +187,7 @@
   var actedAt = { vote: 0, placard: 0 };
   var stopSession = null;
   var stopUnit = [];
+  var recheck = { vote: function () {}, placard: function () {} };
 
   function say(text) { voteMsg.textContent = text || ''; }
   function say2(text) { placardMsg.textContent = text || ''; }
@@ -228,21 +229,36 @@
   function followUnit() {
     stopFollowingUnit();
     var key = VoteData.key(vote.code);
+    var seenVote = null, seenPlacard = null, stopped = false;
+    stopUnit.push(function () { stopped = true; });
+
+    function applyVote() {
+      myVote = seenVote ? seenVote.choice : null;
+      if (!seenVote) votedHere = false;
+      renderVote();
+    }
+    function applyPlacard() {
+      var raised = placardBtn.classList.contains('is-raised');
+      if (seenPlacard && !raised) setPlacardRaised(true);
+      if (!seenPlacard && raised) { setPlacardRaised(false); say2('Placard cleared. You can raise it again.'); }
+    }
+    // Cast and deleted between two reads, a vote never shows up as a change.
+    // So the page compares once more after acting, when reads have caught up.
+    recheck.vote = function () { if (!stopped) applyVote(); };
+    recheck.placard = function () { if (!stopped) applyPlacard(); };
     stopUnit.push(VoteData.watch('votes/' + key, function (v, err) {
       if (err) return;
-      if (!v && Date.now() - actedAt.vote < STALE_MS) return;
-      myVote = v ? v.choice : null;
-      if (!v) votedHere = false;
-      renderVote();
+      seenVote = v;
+      var wait = STALE_MS - (Date.now() - actedAt.vote);
+      if (!v && wait > 0) { setTimeout(function () { if (!stopped) applyVote(); }, wait); return; }
+      applyVote();
     }));
     stopUnit.push(VoteData.watch('session/placard/' + key, function (p, err) {
       if (err) return;
-      if (!p) {
-        if (Date.now() - actedAt.placard < STALE_MS) return;
-        if (placardBtn.classList.contains('is-raised')) { setPlacardRaised(false); say2('Placard cleared. You can raise it again.'); }
-        return;
-      }
-      if (!placardBtn.classList.contains('is-raised')) setPlacardRaised(true);
+      seenPlacard = p;
+      var wait = STALE_MS - (Date.now() - actedAt.placard);
+      if (!p && wait > 0) { setTimeout(function () { if (!stopped) applyPlacard(); }, wait); return; }
+      applyPlacard();
     }));
   }
 
@@ -324,6 +340,7 @@
     VoteData.api('placard', { country: vote.code, code: checkedCode }).then(function (r) {
       if (r.ok || r.error === 'already') {
         actedAt.placard = Date.now();
+        setTimeout(recheck.placard, STALE_MS);
         setPlacardRaised(true);
         say2(r.ok ? 'Your placard is raised.' : 'The placard for ' + vote.name + ' is already raised.');
         return;
@@ -376,6 +393,7 @@
       sending = false;
       if (r.ok || r.error === 'already') {
         actedAt.vote = Date.now();
+        setTimeout(recheck.vote, STALE_MS);
         myVote = r.choice;
         votedHere = !!r.ok;
         renderVote();
