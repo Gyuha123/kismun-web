@@ -11,6 +11,8 @@
 
   if (!data) { note.textContent = 'Country data is missing.'; return; }
 
+  VoteData.useFreshReads();
+
   // every voting unit: each country, plus the UN group of chairs
   var countries = VoteData.voters(data);
   var tiles = {};
@@ -52,6 +54,7 @@
   function setView(name) {
     view = name;
     main.classList.toggle('view-placard', name === 'placard');
+    document.querySelector('.board-tabs').setAttribute('data-active', name);
     Array.prototype.forEach.call(document.querySelectorAll('.board-tab'), function (t) {
       var on = t.getAttribute('data-view') === name;
       t.classList.toggle('is-active', on);
@@ -83,7 +86,8 @@
     paint();
   });
 
-  VoteData.watch('session', function (s) {
+  VoteData.watch('session', function (s, err) {
+    if (err) return;
     $('boardTopic').textContent = s && s.topic ? s.topic : 'Waiting for the topic';
     $('boardOpen').textContent = s && s.open ? 'Voting is open' : 'Voting is closed';
     $('boardOpen').classList.toggle('is-open', !!(s && s.open));

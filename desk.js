@@ -11,6 +11,7 @@
   var note = $('paNote');
   var list = $('paList');
 
+  VoteData.useFreshReads();
   var countries = VoteData.voters(data);
   var LABEL = { 'for': 'For', 'against': 'Against', 'abstain': 'Abstain' };
   var votes = {}, session = {};
@@ -67,13 +68,16 @@
   }
 
   function start() {
+    renderSummary();
+    renderSession();
     if (!VoteData.configured()) { say(note, 'The vote service is not connected yet.'); return; }
     VoteData.watch('votes', function (v, e) {
       if (e) { say(note, 'Lost the connection. Reload to continue.'); return; }
       votes = v || {};
       renderSummary();
     });
-    VoteData.watch('session', function (s) {
+    VoteData.watch('session', function (s, e) {
+      if (e) return;
       session = s || {};
       renderSession();
     });
@@ -103,23 +107,34 @@
     if (!topic) { say(topicNote, 'Type the topic first.'); return; }
     deskCall('set_topic', { topic: topic }).then(function (r) {
       say(topicNote, r.ok ? 'Topic saved.' : errorText(r.error));
+      if (r.ok) { session.topic = topic; VoteData.refresh(); }
     }).catch(function () { say(topicNote, 'Could not save the topic.'); });
   });
 
   function toggle(action) {
     say(note, '');
+    $('openBtn').disabled = true;
+    $('closeBtn').disabled = true;
     deskCall(action).then(function (r) {
-      if (!r.ok) say(note, errorText(r.error));
-    }).catch(function () { say(note, 'Could not reach the server.'); });
+      if (r.ok) {
+        session.open = action === 'open';
+        say(note, session.open ? 'Voting is open.' : 'Voting is closed.');
+        VoteData.refresh();
+      } else {
+        say(note, errorText(r.error));
+      }
+      renderSession();
+    }).catch(function () { renderSession(); say(note, 'The server could not save this. Please try again.'); });
   }
   $('openBtn').addEventListener('click', function () { toggle('open'); });
   $('closeBtn').addEventListener('click', function () { toggle('close'); });
 
   $('resetBtn').addEventListener('click', function () {
-    if (!confirm('Clear every vote and start a new round?')) return;
+    if (!confirm('Clear every vote and placard and start a new round?')) return;
     say(note, '');
     deskCall('reset_votes').then(function (r) {
-      say(note, r.ok ? 'All votes cleared.' : errorText(r.error));
+      say(note, r.ok ? 'All votes and placards cleared.' : errorText(r.error));
+      if (r.ok) VoteData.refresh();
     }).catch(function () { say(note, 'Could not reach the server.'); });
   });
 

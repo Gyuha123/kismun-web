@@ -122,6 +122,22 @@ async function rtdb(method, path, body, headers) {
   });
 }
 
+// A desk action must never report success when the database refused the write.
+async function write(method, path, body) {
+  const res = await rtdb(method, path, body);
+  if (!res.ok) throw new Error('write');
+}
+
+// The public state: the same data the database shows to anyone (never security/*).
+// This is how a browser follows the session when it cannot reach Firebase directly,
+// for example on a school network that blocks the database host.
+async function publicState() {
+  const parts = await Promise.all([read('session'), read('votes')]);
+  const votes = {};
+  Object.keys(parts[1] || {}).forEach(function (k) { votes[k] = { choice: parts[1][k].choice }; });
+  return { session: parts[0] || {}, votes: votes };
+}
+
 async function read(path) {
   const res = await rtdb('GET', path);
   if (!res.ok) throw new Error('read');
@@ -205,6 +221,18 @@ function deskPasswordOk(password) {
 }
 
 exports.handler = async function (event) {
+  // GET ?state=1 is cached by the CDN for one second, so any number of delegates
+  // polling it costs about one function call per second.
+  if (event.httpMethod === 'GET' && event.queryStringParameters && event.queryStringParameters.state) {
+    try {
+      const res = json(200, await publicState());
+      res.headers['Cache-Control'] = 'public, max-age=0, must-revalidate';
+      res.headers['Netlify-CDN-Cache-Control'] = 'public, max-age=1';
+      return res;
+    } catch (err) {
+      return json(503, { error: 'server' });
+    }
+  }
   if (event.httpMethod !== 'POST') return json(405, { error: 'method' });
   if (!fromThisSite(event)) return json(403, { error: 'origin' });
 
@@ -217,6 +245,12 @@ exports.handler = async function (event) {
   if (!body || typeof body !== 'object') return json(400, { error: 'bad-json' });
 
   const action = String(body.action || '');
+
+  // the uncached read, for the desk and the board
+  if (action === 'state') {
+    try { return json(200, await publicState()); } catch (err) { return json(503, { error: 'server' }); }
+  }
+
   const ipHash = sha256Hex((process.env.IP_SALT || 'kismun-ip') + clientIp(event));
 
   // a small, fixed-ish delay on every request slows down scripted guessing
@@ -284,14 +318,14 @@ exports.handler = async function (event) {
 
 
       if (action === 'set_topic') {
-        await rtdb('PATCH', 'session', { topic: cleanTopic(body.topic) });
+        await write('PATCH', 'session', { topic: cleanTopic(body.topic) });
       } else if (action === 'open' || action === 'close') {
-        await rtdb('PATCH', 'session', { open: action === 'open' });
+        await write('PATCH', 'session', { open: action === 'open' });
       } else if (action === 'reset_votes') {
-        await rtdb('DELETE', 'votes');
-        await rtdb('DELETE', 'session/placard');
+        await write('DELETE', 'votes');
+        await write('DELETE', 'session/placard');
       } else if (action === 'unblock_all') {
-        await rtdb('DELETE', 'security/ip');
+        await write('DELETE', 'security/ip');
       }
       await audit(action, ipHash);
       return json(200, { ok: true });

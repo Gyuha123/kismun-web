@@ -176,76 +176,105 @@
   // The code is only kept in memory for this page visit; every check and
   // every vote is verified by the server, which also counts wrong codes.
   var LABEL = { 'for': 'For', 'against': 'Against', 'abstain': 'Abstain' };
+  var STALE_MS = 4000;      // a cached read may lag behind what this page just did
   var vote = null;          // {code, name} while a delegation is selected
-  var pendingCode = '';     // checked code, used for the vote itself
-  var topicWatching = false;
+  var checkedCode = '';     // the code that passed the check, used for Vote and Placard
+  var sessionOpen = false;  // follows the desk live
+  var myVote = null;        // this unit's choice, followed live
+  var votedHere = false;    // the vote was cast on this page
+  var sending = false;
+  var activeTab = 'vote';
+  var actedAt = { vote: 0, placard: 0 };
+  var stopSession = null;
+  var stopUnit = [];
 
   function say(text) { voteMsg.textContent = text || ''; }
-  var checkedCode = '';     // the code that passed the check, kept for Placard
-  var choiceReady = false;  // For / Against / Abstain may be shown on the Vote tab
-  var activeTab = 'vote';
-  var stopPlacardWatch = null;
-
-  // follow this unit's placard live, so All clear re-enables the button without a reload
-  function watchPlacard() {
-    if (stopPlacardWatch) stopPlacardWatch();
-    stopPlacardWatch = null;
-    if (!vote || !window.VoteData || !VoteData.configured()) return;
-    stopPlacardWatch = VoteData.watch('session/placard/' + VoteData.key(vote.code), function (p, err) {
-      if (err) return;
-      if (!p && placardBtn.classList.contains('is-raised')) { setPlacardRaised(false); say2('Placard cleared. You can raise it again.'); return; }
-      if (p && !placardBtn.disabled) setPlacardRaised(true);
-    });
-  }
-
   function say2(text) { placardMsg.textContent = text || ''; }
+
   function setPlacardRaised(raised) {
     placardBtn.disabled = raised;
     placardBtn.textContent = raised ? 'Placard raised' : 'Raise Placard';
     placardBtn.classList.toggle('is-raised', raised);
   }
+
+  // The Vote tab always reflects the live session: when the desk opens voting the
+  // choices appear by themselves; when it closes or clears, they follow.
+  function renderVote() {
+    if (!checkedCode || sending) return;
+    voteChoices.hidden = activeTab !== 'vote' || !!myVote || !sessionOpen;
+    if (myVote) say(votedHere ? 'Vote received: ' + LABEL[myVote] + '. Thank you.' : vote.name + ' has already voted: ' + LABEL[myVote] + '.');
+    else if (sessionOpen) say('Choose one. ' + vote.name + ' can vote once.');
+    else say('Voting is not open yet. This page updates by itself.');
+  }
+
   function showTab(name) {
     activeTab = name;
+    voteTabs.setAttribute('data-active', name);
     Array.prototype.forEach.call(voteTabs.querySelectorAll('.alloc-tab'), function (t) {
       var on = t.getAttribute('data-tab') === name;
       t.classList.toggle('is-active', on);
       t.setAttribute('aria-selected', on ? 'true' : 'false');
     });
     placardPanel.hidden = name !== 'placard';
-    voteChoices.hidden = name !== 'vote' || !choiceReady;
     voteMsg.hidden = name !== 'vote';
+    renderVote();
   }
-  function showCodeStep() {
-    voteForm.hidden = false;
+
+  function stopFollowingUnit() {
+    stopUnit.forEach(function (stop) { stop(); });
+    stopUnit = [];
+  }
+
+  function followUnit() {
+    stopFollowingUnit();
+    var key = VoteData.key(vote.code);
+    stopUnit.push(VoteData.watch('votes/' + key, function (v, err) {
+      if (err) return;
+      if (!v && Date.now() - actedAt.vote < STALE_MS) return;
+      myVote = v ? v.choice : null;
+      if (!v) votedHere = false;
+      renderVote();
+    }));
+    stopUnit.push(VoteData.watch('session/placard/' + key, function (p, err) {
+      if (err) return;
+      if (!p) {
+        if (Date.now() - actedAt.placard < STALE_MS) return;
+        if (placardBtn.classList.contains('is-raised')) { setPlacardRaised(false); say2('Placard cleared. You can raise it again.'); }
+        return;
+      }
+      if (!placardBtn.classList.contains('is-raised')) setPlacardRaised(true);
+    }));
+  }
+
+  function leaveChecked() {
+    stopFollowingUnit();
+    checkedCode = '';
+    myVote = null;
+    votedHere = false;
+    sending = false;
+    voteChoices.hidden = true;
     voteTabs.hidden = true;
     placardPanel.hidden = true;
-    choiceReady = false;
-    checkedCode = '';
-    voteChoices.hidden = true;
+    voteMsg.hidden = false;
+  }
+
+  function showCodeStep() {
+    leaveChecked();
+    voteForm.hidden = false;
     voteCodeInput.value = '';
     voteCodeInput.disabled = false;
     voteCodeInput.focus();
   }
-  function showChoiceStep() {
-    voteForm.hidden = true;
-    choiceReady = true;
-    voteTabs.hidden = false;
-    showTab('vote');
-  }
+
   function hideVote() {
+    leaveChecked();
+    if (stopSession) stopSession();
+    stopSession = null;
     voteLine.hidden = true;
     voteForm.hidden = true;
-    voteChoices.hidden = true;
-    voteTabs.hidden = true;
-    placardPanel.hidden = true;
-    choiceReady = false;
-    checkedCode = '';
     say('');
     say2('');
     setPlacardRaised(false);
-    pendingCode = '';
-    if (stopPlacardWatch) stopPlacardWatch();
-    stopPlacardWatch = null;
   }
   function networkProblem() { say('Could not reach the vote server. Please try again.'); }
 
@@ -264,12 +293,13 @@
     hideVote();
   }
 
-  function watchTopic() {
-    if (topicWatching || !window.VoteData || !VoteData.configured()) return;
-    topicWatching = true;
-    VoteData.watch('session', function (s, err) {
-      if (err) { voteTopic.textContent = ''; return; }
+  function followSession() {
+    if (stopSession || !window.VoteData || !VoteData.configured()) return;
+    stopSession = VoteData.watch('session', function (s, err) {
+      if (err) return;
       voteTopic.textContent = s && s.topic ? 'Topic: ' + s.topic : 'The voting topic will appear here.';
+      sessionOpen = !!(s && s.open);
+      renderVote();
     });
   }
 
@@ -277,7 +307,7 @@
     if (!vote) return;
     if (!window.VoteData || !VoteData.configured()) { voteLine.hidden = false; say('Voting is not connected yet.'); return; }
     voteLine.hidden = false;
-    watchTopic();
+    followSession();
     showCodeStep();
     say('');
   });
@@ -292,11 +322,16 @@
     placardBtn.disabled = true;
     say2('Raising…');
     VoteData.api('placard', { country: vote.code, code: checkedCode }).then(function (r) {
-      if (r.ok) { setPlacardRaised(true); say2('Your placard is raised.'); return; }
-      if (r.error === 'already') { setPlacardRaised(true); say2('The placard for ' + vote.name + ' is already raised.'); return; }
-      if (r.error === 'blocked') { setPlacardRaised(false); say2('This network has been blocked. Please ask the desk.'); return; }
-      if (r.error === 'wrong') { setPlacardRaised(false); say2('The code no longer matches. Please enter it again.'); checkedCode = ''; showCodeStep(); return; }
-      setPlacardRaised(false); say2('Something went wrong. Please try again.');
+      if (r.ok || r.error === 'already') {
+        actedAt.placard = Date.now();
+        setPlacardRaised(true);
+        say2(r.ok ? 'Your placard is raised.' : 'The placard for ' + vote.name + ' is already raised.');
+        return;
+      }
+      setPlacardRaised(false);
+      if (r.error === 'blocked') { say2('This network has been blocked. Please ask the desk.'); return; }
+      if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
+      say2('Something went wrong. Please try again.');
     }).catch(function () { setPlacardRaised(false); say2('Could not reach the vote server. Please try again.'); });
   });
 
@@ -314,33 +349,44 @@
       if (r.error === 'format') { say('Enter the 4 digits.'); return; }
       if (r.error === 'unknown-country') { say('This delegation does not vote.'); return; }
       if (r.error) { say('Something went wrong. Please try again.'); return; }
+      // from here the page follows the desk by itself: no second code entry
+      var now = Date.now();
       checkedCode = code;
-      pendingCode = code;
-      if (r.placardRaised) setPlacardRaised(true);
-      watchPlacard();
-      if (r.voted) { say(vote.name + ' has already voted: ' + LABEL[r.voted] + '.'); voteForm.hidden = true; voteTabs.hidden = false; showTab('vote'); return; }
-      // closed: keep the code form so the delegate can check again once voting opens
-      if (!r.open) { say('Voting is not open yet. Check again when the desk opens it.'); voteTabs.hidden = false; showTab('vote'); return; }
-      showChoiceStep();
-      say('Choose one. ' + vote.name + ' can vote once.');
+      sessionOpen = !!r.open;
+      myVote = r.voted || null;
+      votedHere = false;
+      actedAt.vote = r.voted ? now : 0;
+      actedAt.placard = r.placardRaised ? now : 0;
+      setPlacardRaised(!!r.placardRaised);
+      voteForm.hidden = true;
+      voteTabs.hidden = false;
+      followUnit();
+      showTab('vote');
     }).catch(networkProblem);
   });
 
   voteChoices.addEventListener('click', function (e) {
     var btn = e.target.closest('button[data-choice]');
-    if (!btn || !vote || !pendingCode) return;
+    if (!btn || !vote || !checkedCode || sending) return;
     var choice = btn.getAttribute('data-choice');
+    sending = true;
     voteChoices.hidden = true;
     say('Sending…');
-    VoteData.api('vote', { country: vote.code, code: pendingCode, choice: choice }).then(function (r) {
-      if (r.ok) { pendingCode = ''; say('Vote received: ' + LABEL[r.choice] + '. Thank you.'); return; }
-      if (r.error === 'already') { pendingCode = ''; say(vote.name + ' has already voted: ' + LABEL[r.choice] + '.'); return; }
-      if (r.error === 'closed') { pendingCode = ''; say('Voting has closed.'); return; }
-      if (r.error === 'blocked') { pendingCode = ''; say('This network has been blocked. Please ask the desk.'); return; }
-      if (r.error === 'wrong') { pendingCode = ''; showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
-      voteChoices.hidden = false;
+    VoteData.api('vote', { country: vote.code, code: checkedCode, choice: choice }).then(function (r) {
+      sending = false;
+      if (r.ok || r.error === 'already') {
+        actedAt.vote = Date.now();
+        myVote = r.choice;
+        votedHere = !!r.ok;
+        renderVote();
+        return;
+      }
+      if (r.error === 'closed') { sessionOpen = false; renderVote(); return; }
+      if (r.error === 'blocked') { leaveChecked(); say('This network has been blocked. Please ask the desk.'); return; }
+      if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
+      renderVote();
       say('Something went wrong. Please try again.');
-    }).catch(function () { voteChoices.hidden = false; networkProblem(); });
+    }).catch(function () { sending = false; renderVote(); networkProblem(); });
   });
 
   function reset() {
