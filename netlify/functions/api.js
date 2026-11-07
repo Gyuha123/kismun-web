@@ -339,21 +339,32 @@ exports.handler = async function (event) {
       } else if (action === 'unblock_all') {
         await write('PATCH', '', { 'security/ip': null });
       } else if (action === 'pick_random') {
-        // One delegation at a time, among those that have NOT raised a placard. Being
-        // picked raises its placard; the next pick lowers it again. Placards the
-        // delegations raised themselves stay up. All of it is one request.
+        // `count` delegations at a time, among those that have NOT raised a placard.
+        // Being picked raises their placards; the next pick lowers them again and
+        // picks others where it can. Placards the delegations raised themselves
+        // stay up. All of it is one request.
+        const units = Object.keys(hashMap()).map(sanitizeKey);
+        const count = Math.max(1, Math.min(units.length, parseInt(body.count, 10) || 1));
         const raised = (await read('session/placard')) || {};
-        const current = await read('session/pick');
-        const previous = current ? current.id : '';
-        const waiting = Object.keys(hashMap()).map(sanitizeKey).filter(function (k) { return !raised[k] && k !== previous; });
-        if (!waiting.length) return json(200, { error: 'no-candidates' });
-        const id = waiting[crypto.randomInt(waiting.length)];
+        const current = (await read('session/pick')) || {};
+        const previous = current.ids || (current.id ? [current.id] : []);
+        const fresh = units.filter(function (k) { return !raised[k]; });
+        // the previous picks go back down, so they may come up again when nobody else is left
+        let pool = fresh.length >= count ? fresh : fresh.concat(previous.filter(function (k) { return raised[k] && units.indexOf(k) !== -1; }));
+        if (!pool.length) return json(200, { error: 'no-candidates' });
+        pool = pool.slice();
+        for (let i = pool.length - 1; i > 0; i--) {
+          const j = crypto.randomInt(i + 1);
+          const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        }
+        const ids = pool.slice(0, count);
         const stamp = { '.sv': 'timestamp' };
-        const paths = { ['session/placard/' + id]: { t: stamp }, 'session/pick': { id: id, t: stamp } };
-        if (previous) paths['session/placard/' + previous] = null;
+        const paths = { 'session/pick': { ids: ids, t: stamp } };
+        previous.forEach(function (k) { paths['session/placard/' + k] = null; });
+        ids.forEach(function (k) { paths['session/placard/' + k] = { t: stamp }; });
         await write('PATCH', '', paths);
         await audit(action, ipHash);
-        return json(200, { ok: true, id: id, previous: previous });
+        return json(200, { ok: true, ids: ids, previous: previous.filter(function (k) { return ids.indexOf(k) === -1; }) });
       }
       await audit(action, ipHash);
       return json(200, { ok: true });

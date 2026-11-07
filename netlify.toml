@@ -18,6 +18,13 @@
 [build.processing.images]
   compress = false
 
+# The desk is part of the board page now
+[[redirects]]
+  from = "/desk.html"
+  to = "/board.html"
+  status = 301
+  force = true
+
 # Security headers for every page and file
 [[headers]]
   for = "/*"

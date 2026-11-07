@@ -38,11 +38,13 @@
 </head>
 <body class="board-body">
 
+<div class="board-shell" id="boardShell">
+<nav class="seg board-tabs" role="tablist" aria-label="Board view" data-active="vote">
+  <button type="button" class="board-tab is-active" role="tab" data-view="vote" aria-selected="true">Vote</button>
+  <button type="button" class="board-tab" role="tab" data-view="placard" aria-selected="false">Placard</button>
+</nav>
+<div class="board-row">
 <main class="board">
-  <nav class="seg board-tabs" role="tablist" aria-label="Board view" data-active="vote">
-    <button type="button" class="board-tab is-active" role="tab" data-view="vote" aria-selected="true">Vote</button>
-    <button type="button" class="board-tab" role="tab" data-view="placard" aria-selected="false">Placard</button>
-  </nav>
   <header class="board-head">
     <p class="board-eyebrow">KISMUN 2026 &middot; Vote</p>
     <h1 class="board-topic" id="boardTopic">Waiting for the topic</h1>
@@ -59,6 +61,92 @@
   <section class="board-grid" id="boardGrid" aria-label="Delegations"></section>
   <p class="board-note" id="boardNote"></p>
 </main>
+
+<aside class="console" id="console" aria-label="Desk">
+  <button type="button" class="console-toggle" id="consoleToggle" aria-controls="consoleInner" aria-expanded="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+  <div class="console-inner" id="consoleInner">
+    <p class="console-title">Desk</p>
+
+    <section class="pa-gate" id="paGate">
+      <form id="paForm" autocomplete="off">
+        <label class="pa-label" for="paPass">Password</label>
+        <div class="pa-row">
+          <input id="paPass" class="pa-input" type="password" required />
+          <button type="submit" class="pa-btn">Enter</button>
+        </div>
+        <p class="pa-error" id="paError" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="pa-panel" id="paPanel" hidden>
+      <div id="deskVote">
+        <div class="pa-block">
+          <p class="pa-label">Topic</p>
+          <form id="topicForm" class="pa-row">
+            <input id="topicInput" class="pa-input" type="text" maxlength="200" placeholder="e.g. Resolution 1/2026" />
+            <button type="submit" class="pa-btn">Save topic</button>
+          </form>
+          <p class="pa-error" id="topicNote" aria-live="polite"></p>
+        </div>
+
+        <div class="pa-block pa-status">
+          <div>
+            <p class="pa-label">Voting</p>
+            <p class="pa-count" id="voteState">Closed</p>
+          </div>
+          <div class="pa-actions">
+            <button type="button" class="pa-btn" id="openBtn">Open voting</button>
+            <button type="button" class="pa-btn pa-btn-ghost" id="closeBtn">Close voting</button>
+          </div>
+        </div>
+
+        <div class="pa-block pa-danger">
+          <p class="pa-label">Maintenance</p>
+          <div class="pa-actions">
+            <button type="button" class="pa-btn pa-btn-ghost" id="unblockBtn">Unblock all networks</button>
+          </div>
+          <p class="pa-error" id="paNote" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div id="deskPlacard" hidden>
+        <div class="pa-block">
+          <p class="pa-label">Random pick</p>
+          <div class="pa-row">
+            <label class="pa-count-field" for="pickCount">
+              <span>Delegations</span>
+              <input id="pickCount" class="pa-input" type="number" inputmode="numeric" min="1" max="72" step="1" value="1" />
+            </label>
+            <button type="button" class="pa-btn" id="pickBtn">Pick</button>
+          </div>
+          <ul class="pa-pick" id="pickResult"></ul>
+          <p class="pa-error" id="pickNote" aria-live="polite"></p>
+        </div>
+
+        <div class="pa-block">
+          <p class="pa-label">Live summary</p>
+          <div class="pa-summary">
+            <span>Raised <strong id="sRaised">0</strong></span>
+            <span>Not raised <strong id="sLowered">0</strong></span>
+          </div>
+        </div>
+
+        <div class="pa-block pa-danger">
+          <p class="pa-label">Maintenance</p>
+          <div class="pa-actions">
+            <button type="button" class="pa-btn pa-btn-ghost" id="placardClearBtn">All clear</button>
+            <button type="button" class="pa-btn pa-btn-ghost" id="placardUnblockBtn">Unblock all networks</button>
+          </div>
+          <p class="pa-error" id="placardNote" aria-live="polite"></p>
+        </div>
+      </div>
+    </section>
+  </div>
+</aside>
+</div>
+</div>
 
 <script src="allocation-data.js"></script>
 <script src="vote-data.js"></script>
