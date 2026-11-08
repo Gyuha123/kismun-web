@@ -25,6 +25,34 @@
   status = 301
   force = true
 
+# Live reads: this site's own /live/... is passed straight to the database's REST
+# address. A proxy costs no function calls, and browsers only ever talk to this
+# site, so it works on networks that block the database host. Only the two public
+# trees are passed on, and the database rules keep them read-only.
+[[redirects]]
+  from = "/live/session/*"
+  to = "https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app/session/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/live/votes/*"
+  to = "https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app/votes/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/live/session.json"
+  to = "https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app/session.json"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/live/votes.json"
+  to = "https://kismun-placard-default-rtdb.asia-southeast1.firebasedatabase.app/votes.json"
+  status = 200
+  force = true
+
 # Security headers for every page and file
 [[headers]]
   for = "/*"

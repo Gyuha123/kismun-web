@@ -18,13 +18,12 @@ var PLACARD_CONFIG = {
   var APP = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   var DB = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
   var API = '/.netlify/functions/api';
-  // Function calls are budgeted (125,000 a month on this plan), so pages read the
-  // state the CDN caches for one second: however many people watch, the function
-  // runs about once a second. Only the page that just changed something reads past
-  // the cache, for a moment, so its own change shows at once.
-  var POLL_MS = 2000;       // delegates
+  var LIVE = '/live/';
+  // Reads go through the /live/ proxy and cost no function calls (the plan allows
+  // 125,000 a month; delegates polling the function would use that up in under an
+  // hour). Delegates read only the few small values they need.
+  var POLL_MS = 3000;       // delegates
   var POLL_FRESH_MS = 1000; // desk and board
-  var FRESH_AFTER_ACTION_MS = 1500;
   var POLL_TIMEOUT_MS = 8000; // a hung request must not stop the page updating
   var loaded = null;
 
@@ -39,7 +38,7 @@ var PLACARD_CONFIG = {
   // After this page changes something, a read that left before the change would
   // paint the old state over the new one. Each change starts a new epoch, and
   // reads from an older epoch are dropped.
-  var epoch = 0, pollAgain = false, freshUntil = 0;
+  var epoch = 0, pollAgain = false;
 
   function load() {
     if (!PLACARD_CONFIG.databaseURL) return Promise.reject(new Error('not-configured'));
@@ -64,11 +63,28 @@ var PLACARD_CONFIG = {
     return path.split('/').reduce(function (o, k) { return o === null || o === undefined ? null : o[k]; }, state);
   }
 
+  // One read per path the page follows, through this site's /live/ proxy to the
+  // database. A path inside another one the page also follows is taken from that one.
+  function livePath(path) {
+    return LIVE + path.split('/').map(encodeURIComponent).join('/') + '.json';
+  }
   function fetchState() {
-    if (Date.now() < freshUntil) return window.VoteData.api('state');
-    return fetch(API + '?state=1').then(function (res) {
-      if (!res.ok) throw new Error('http-' + res.status);
-      return res.json();
+    var paths = watchers.map(function (w) { return w.path; }).filter(function (p, i, all) {
+      return all.indexOf(p) === i && !all.some(function (q) { return q !== p && p.indexOf(q + '/') === 0; });
+    });
+    return Promise.all(paths.map(function (p) {
+      return fetch(livePath(p), { cache: 'no-store' }).then(function (res) {
+        if (!res.ok) throw new Error('http-' + res.status);
+        return res.json();
+      });
+    })).then(function (values) {
+      var state = {};
+      paths.forEach(function (p, i) {
+        var parts = p.split('/'), o = state;
+        for (var k = 0; k < parts.length - 1; k++) { o[parts[k]] = o[parts[k]] || {}; o = o[parts[k]]; }
+        o[parts[parts.length - 1]] = values[i];
+      });
+      return state;
     });
   }
 
@@ -126,17 +142,20 @@ var PLACARD_CONFIG = {
   window.VoteData = {
     configured: function () { return !!PLACARD_CONFIG.databaseURL; },
 
-    // Desk and board: read a little more often than delegates.
+    // Desk and board: read more often, and follow the database live where it is reachable.
     useFreshReads: function () { fresh = true; },
 
     // Fetch now, after this page changed something.
-    refresh: function () { epoch++; freshUntil = Date.now() + FRESH_AFTER_ACTION_MS; pollNow(); },
+    refresh: function () { epoch++; pollNow(); },
 
     // Live value of one path. Calls back now and on every change; returns unsubscribe.
     watch: function (path, cb) {
       var w = { path: path, cb: cb, last: '__none__', stopped: false, unsubscribe: null };
       watchers.push(w);
       pollNow();
+      // Only the board and desk keep a live database connection. The free plan
+      // allows 100 at once, and hundreds of delegates would take them all.
+      if (!fresh) return function () { w.stopped = true; watchers = watchers.filter(function (o) { return o !== w; }); };
       load().then(function (x) {
         if (w.stopped) return;
         watchConnection(x);
