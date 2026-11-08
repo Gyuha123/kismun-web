@@ -18,8 +18,13 @@ var PLACARD_CONFIG = {
   var APP = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   var DB = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
   var API = '/.netlify/functions/api';
-  var POLL_MS = 1500;       // delegates (cached state)
-  var POLL_FRESH_MS = 500;  // desk and board (uncached state)
+  // Function calls are budgeted (125,000 a month on this plan), so pages read the
+  // state the CDN caches for one second: however many people watch, the function
+  // runs about once a second. Only the page that just changed something reads past
+  // the cache, for a moment, so its own change shows at once.
+  var POLL_MS = 2000;       // delegates
+  var POLL_FRESH_MS = 1000; // desk and board
+  var FRESH_AFTER_ACTION_MS = 1500;
   var POLL_TIMEOUT_MS = 8000; // a hung request must not stop the page updating
   var loaded = null;
 
@@ -34,7 +39,7 @@ var PLACARD_CONFIG = {
   // After this page changes something, a read that left before the change would
   // paint the old state over the new one. Each change starts a new epoch, and
   // reads from an older epoch are dropped.
-  var epoch = 0, pollAgain = false;
+  var epoch = 0, pollAgain = false, freshUntil = 0;
 
   function load() {
     if (!PLACARD_CONFIG.databaseURL) return Promise.reject(new Error('not-configured'));
@@ -60,7 +65,7 @@ var PLACARD_CONFIG = {
   }
 
   function fetchState() {
-    if (fresh) return window.VoteData.api('state');
+    if (Date.now() < freshUntil) return window.VoteData.api('state');
     return fetch(API + '?state=1').then(function (res) {
       if (!res.ok) throw new Error('http-' + res.status);
       return res.json();
@@ -74,7 +79,7 @@ var PLACARD_CONFIG = {
     clearTimeout(pollTimer);
     pollTimer = null;
     if (firebaseLive || !watchers.length) return;
-    if (inFlight >= (fresh ? 3 : 1)) { pollAgain = true; return; }
+    if (inFlight >= 2) { pollAgain = true; return; }
     inFlight++;
     var id = ++sequence, started = epoch;
     Promise.race([fetchState(), new Promise(function (resolve, reject) {
@@ -121,11 +126,11 @@ var PLACARD_CONFIG = {
   window.VoteData = {
     configured: function () { return !!PLACARD_CONFIG.databaseURL; },
 
-    // Desk and board: read the uncached state. Delegates share the cached one.
+    // Desk and board: read a little more often than delegates.
     useFreshReads: function () { fresh = true; },
 
     // Fetch now, after this page changed something.
-    refresh: function () { epoch++; pollNow(); },
+    refresh: function () { epoch++; freshUntil = Date.now() + FRESH_AFTER_ACTION_MS; pollNow(); },
 
     // Live value of one path. Calls back now and on every change; returns unsubscribe.
     watch: function (path, cb) {

@@ -18,7 +18,7 @@ const DESK_ACTIONS = ['auth', 'set_topic', 'open', 'close', 'unblock_all', 'pick
 
 // limits
 const MAX_BODY_BYTES = 2048;
-const IP_MAX_FAILS = 5;                 // per network: blocks after 5 wrong codes (kept as requested)
+const IP_MAX_FAILS = 5;                 // per network AND delegation: 5 wrong codes for one delegation block it there
 const DESK_MAX_FAILS = 5;               // per network, wrong desk passwords
 const DESK_LOCK_MS = 15 * 60 * 1000;
 const TOPIC_MAX = 120;
@@ -166,7 +166,8 @@ async function publicState() {
   const parts = await Promise.all([read('session'), read('votes')]);
   const votes = {};
   Object.keys(parts[1] || {}).forEach(function (k) { votes[k] = { choice: parts[1][k].choice }; });
-  return { session: parts[0] || {}, votes: votes };
+  // `at` is when the function ran: identical values on many answers mean the CDN served them
+  return { session: parts[0] || {}, votes: votes, at: Date.now() };
 }
 
 async function read(path) {
@@ -298,9 +299,15 @@ exports.handler = async function (event) {
       const code = String(body.code || '');
       const key = sanitizeKey(country);
 
+      // The lock counts wrong codes per network AND per delegation. On a school network
+      // everyone shares one address, so a lock on the whole network would let five
+      // typos from five students stop the room. Guessing one delegation's code is
+      // still stopped after five tries. Names that are not delegations share one count.
+      const lockKey = sha256Hex(ipHash + '|' + (knownCountry(country) ? key : '?'));
+
       // everything this request may need, read at once instead of one after another
       const got = await Promise.all([
-        read('security/ip/' + ipHash),
+        read('security/ip/' + lockKey),
         read('session'),
         action === 'check' ? read('votes/' + key) : null,
         action === 'check' ? read('session/placard/' + key) : null
@@ -311,7 +318,7 @@ exports.handler = async function (event) {
       const valid = knownCountry(country) && codeMatches(country, code);
       if (!valid) {
         // unknown units are counted exactly like wrong codes, so they cannot be probed
-        const ip = await recordIpFailure(ipHash);
+        const ip = await recordIpFailure(lockKey);
         if (ip.fails >= IP_MAX_FAILS) return json(200, { error: 'blocked' });
         return json(200, { error: 'wrong', left: IP_MAX_FAILS - ip.fails });
       }

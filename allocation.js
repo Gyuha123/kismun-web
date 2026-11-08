@@ -194,7 +194,7 @@
   function say2(text, error) { placardMsg.textContent = text || ''; placardMsg.classList.toggle('is-error', !!error); }
   function attemptsLeft(r) {
     var n = r.left;
-    return 'Wrong code. ' + (n === 1 ? '1 attempt left' : n + ' attempts left') + ' before this network is blocked.';
+    return 'Wrong code. ' + (n === 1 ? '1 attempt left' : n + ' attempts left') + ' before ' + vote.name + ' is blocked on this network.';
   }
 
   function setPlacardRaised(raised) {
@@ -354,7 +354,7 @@
         return;
       }
       setPlacardRaised(false);
-      if (r.error === 'blocked') { say2('This network has been blocked. Please ask the desk.', true); return; }
+      if (r.error === 'blocked') { say2(vote.name + ' is blocked on this network after too many wrong codes. Please ask the desk.', true); return; }
       if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.', true); return; }
       say2('Something went wrong. Please try again.', true);
     }).catch(function () { setPlacardRaised(false); say2('Could not reach the vote server. Please try again.', true); });
@@ -370,7 +370,7 @@
     VoteData.api('check', { country: vote.code, code: code }).then(function (r) {
       voteCodeInput.disabled = false;
       if (r.error === 'wrong') { say(attemptsLeft(r), true); voteCodeInput.select(); return; }
-      if (r.error === 'blocked') { say('This network has been blocked after too many wrong codes. Please ask the desk.', true); return; }
+      if (r.error === 'blocked') { say(vote.name + ' is blocked on this network after too many wrong codes. Please ask the desk.', true); return; }
       if (r.error === 'format') { say('Enter the 4 digits.', true); return; }
       if (r.error === 'unknown-country') { say('This delegation does not vote.', true); return; }
       if (r.error) { say('Something went wrong. Please try again.', true); return; }
@@ -408,7 +408,7 @@
         return;
       }
       if (r.error === 'closed') { sessionOpen = false; renderVote(); return; }
-      if (r.error === 'blocked') { leaveChecked(); say('This network has been blocked. Please ask the desk.', true); return; }
+      if (r.error === 'blocked') { leaveChecked(); say(vote.name + ' is blocked on this network after too many wrong codes. Please ask the desk.', true); return; }
       if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.', true); return; }
       renderVote();
       say('Something went wrong. Please try again.');
