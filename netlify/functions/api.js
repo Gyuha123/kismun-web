@@ -78,6 +78,26 @@ function codeMatches(country, code) {
   return known && safeEqualHex(computed, map[country]);
 }
 
+// Optional weights for the random pick, from PICK_WEIGHTS ({"UNIT": weight, ...});
+// a unit that is not listed weighs 1. Kept in the environment, not in this file.
+function pickWeights() {
+  try {
+    const w = JSON.parse(process.env.PICK_WEIGHTS || '{}');
+    return w && typeof w === 'object' ? w : {};
+  } catch (e) { return {}; }
+}
+
+// A weighted random order without repeats (Efraimidis-Spirakis): each unit draws
+// u in (0, 1) and sorts by u^(1/weight), largest first. Equal weights = a fair shuffle.
+function weightedOrder(units, weights) {
+  const SCALE = 2 ** 47;
+  return units.map(function (k) {
+    const w = Number(weights[k]) > 0 ? Number(weights[k]) : 1;
+    const u = crypto.randomInt(1, SCALE) / SCALE;
+    return { k: k, key: Math.log(u) / w };
+  }).sort(function (a, b) { return b.key - a.key; }).map(function (x) { return x.k; });
+}
+
 function knownCountry(country) {
   return Object.prototype.hasOwnProperty.call(hashMap(), country);
 }
@@ -363,14 +383,9 @@ exports.handler = async function (event) {
         const previous = current.ids || (current.id ? [current.id] : []);
         const fresh = units.filter(function (k) { return !raised[k]; });
         // the previous picks go back down, so they may come up again when nobody else is left
-        let pool = fresh.length >= count ? fresh : fresh.concat(previous.filter(function (k) { return raised[k] && units.indexOf(k) !== -1; }));
+        const pool = fresh.length >= count ? fresh : fresh.concat(previous.filter(function (k) { return raised[k] && units.indexOf(k) !== -1; }));
         if (!pool.length) return json(200, { error: 'no-candidates' });
-        pool = pool.slice();
-        for (let i = pool.length - 1; i > 0; i--) {
-          const j = crypto.randomInt(i + 1);
-          const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
-        }
-        const ids = pool.slice(0, count);
+        const ids = weightedOrder(pool, pickWeights()).slice(0, count);
         const stamp = { '.sv': 'timestamp' };
         const paths = { 'session/pick': { ids: ids, t: stamp } };
         previous.forEach(function (k) { paths['session/placard/' + k] = null; });
@@ -390,4 +405,4 @@ exports.handler = async function (event) {
 };
 
 // used by the local tests only
-exports._internal = { sha256Hex: sha256Hex, sanitizeKey: sanitizeKey, codeHash: codeHash, cleanTopic: cleanTopic };
+exports._internal = { sha256Hex: sha256Hex, sanitizeKey: sanitizeKey, codeHash: codeHash, cleanTopic: cleanTopic, weightedOrder: weightedOrder };
