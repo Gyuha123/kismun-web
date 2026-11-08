@@ -189,8 +189,13 @@
   var stopUnit = [];
   var recheck = { vote: function () {}, placard: function () {} };
 
-  function say(text) { voteMsg.textContent = text || ''; }
-  function say2(text) { placardMsg.textContent = text || ''; }
+  // error = true shows the message in red
+  function say(text, error) { voteMsg.textContent = text || ''; voteMsg.classList.toggle('is-error', !!error); }
+  function say2(text, error) { placardMsg.textContent = text || ''; placardMsg.classList.toggle('is-error', !!error); }
+  function attemptsLeft(r) {
+    var n = r.left;
+    return 'Wrong code. ' + (n === 1 ? '1 attempt left' : n + ' attempts left') + ' before this network is blocked.';
+  }
 
   function setPlacardRaised(raised) {
     placardBtn.disabled = raised;
@@ -295,13 +300,13 @@
     say2('');
     setPlacardRaised(false);
   }
-  function networkProblem() { say('Could not reach the vote server. Please try again.'); }
+  function networkProblem() { say('Could not reach the vote server. Please try again.', true); }
 
   // the voting unit a delegate belongs to: their country, or the UN group for chairs.
   // The Secretariat (and anyone without a flag) has no vote.
   function voteTargetFor(d) {
     if (d.c === 'Secretariat') return null;
-    if (d.d === 'UN') return { code: 'UN', name: 'UN (Chairs)', flag: 'unflag.png' };
+    if (d.d === 'UN') return { code: 'UN ' + d.c, name: d.c, flag: 'unflag.png' };
     if (!data.flags[d.d]) return null;
     return { code: d.d, name: data.names[d.d] || d.d, flag: 'flags/4x3/' + data.flags[d.d] + '.svg' };
   }
@@ -349,26 +354,26 @@
         return;
       }
       setPlacardRaised(false);
-      if (r.error === 'blocked') { say2('This network has been blocked. Please ask the desk.'); return; }
-      if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
-      say2('Something went wrong. Please try again.');
-    }).catch(function () { setPlacardRaised(false); say2('Could not reach the vote server. Please try again.'); });
+      if (r.error === 'blocked') { say2('This network has been blocked. Please ask the desk.', true); return; }
+      if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.', true); return; }
+      say2('Something went wrong. Please try again.', true);
+    }).catch(function () { setPlacardRaised(false); say2('Could not reach the vote server. Please try again.', true); });
   });
 
   voteForm.addEventListener('submit', function (e) {
     e.preventDefault();
     if (!vote) return;
     var code = voteCodeInput.value.trim();
-    if (!/^\d{4}$/.test(code)) { say('Enter the 4 digits.'); return; }
+    if (!/^\d{4}$/.test(code)) { say('Enter the 4 digits.', true); return; }
     voteCodeInput.disabled = true;
     say('Checking…');
     VoteData.api('check', { country: vote.code, code: code }).then(function (r) {
       voteCodeInput.disabled = false;
-      if (r.error === 'wrong') { say('Wrong code. Attempts are limited.'); voteCodeInput.select(); return; }
-      if (r.error === 'blocked') { say('This network has been blocked after too many wrong codes. Please ask the desk.'); return; }
-      if (r.error === 'format') { say('Enter the 4 digits.'); return; }
-      if (r.error === 'unknown-country') { say('This delegation does not vote.'); return; }
-      if (r.error) { say('Something went wrong. Please try again.'); return; }
+      if (r.error === 'wrong') { say(attemptsLeft(r), true); voteCodeInput.select(); return; }
+      if (r.error === 'blocked') { say('This network has been blocked after too many wrong codes. Please ask the desk.', true); return; }
+      if (r.error === 'format') { say('Enter the 4 digits.', true); return; }
+      if (r.error === 'unknown-country') { say('This delegation does not vote.', true); return; }
+      if (r.error) { say('Something went wrong. Please try again.', true); return; }
       // from here the page follows the desk by itself: no second code entry
       var now = Date.now();
       checkedCode = code;
@@ -403,8 +408,8 @@
         return;
       }
       if (r.error === 'closed') { sessionOpen = false; renderVote(); return; }
-      if (r.error === 'blocked') { leaveChecked(); say('This network has been blocked. Please ask the desk.'); return; }
-      if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.'); return; }
+      if (r.error === 'blocked') { leaveChecked(); say('This network has been blocked. Please ask the desk.', true); return; }
+      if (r.error === 'wrong') { showCodeStep(); say('The code no longer matches. Please enter it again.', true); return; }
       renderVote();
       say('Something went wrong. Please try again.');
     }).catch(function () { sending = false; renderVote(); networkProblem(); });

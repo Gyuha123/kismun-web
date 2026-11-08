@@ -459,18 +459,6 @@ a { color: inherit; }
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-.day-tab:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  right: -1px;
-  top: 20%;
-  bottom: 20%;
-  width: 1px;
-  background: var(--border-soft);
-}
-
-.day-tab.active::after,
-.day-tab.active + .day-tab::after { display: none; }
 
 .day-tab.active {
   background: rgba(255,255,255,0.08);
@@ -2108,6 +2096,7 @@ body {
 .alloc-vote-choices[hidden], .alloc-vote-form[hidden] { display: none; }
 
 .alloc-vote-msg { margin-top: 14px; min-height: 1.4em; color: var(--text); }
+.alloc-vote-msg.is-error { color: #f0868f; }
 
 /* =========================================================
    VOTE BOARD (full screen, projected)
@@ -2185,16 +2174,17 @@ body {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   grid-template-rows: repeat(12, minmax(0, 1fr));
-  gap: 0.6vh 0.8vw;
+  gap: 6px;
 }
 .bd-tile {
   min-width: 0;
   min-height: 0;
   display: flex;
   align-items: center;
-  gap: 0.8vw;
-  padding: 0 0.9vw;
-  border-radius: 8px;
+  gap: 0.5em;
+  padding: 0 0.55em;
+  border-radius: 7px;
+  font-size: var(--tile-font, clamp(10px, 1.9vh, 17px));
   border: 1px solid var(--border-soft);
   background: rgba(255, 255, 255, 0.02);
   transition: opacity 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
@@ -2210,7 +2200,7 @@ body {
 .bd-tile span {
   flex: 1;
   min-width: 0;
-  font-size: clamp(10px, 1.9vh, 17px);
+  font-size: inherit;
   line-height: 1.2;
   color: var(--text-dim);
   white-space: nowrap;
@@ -2237,8 +2227,6 @@ body {
 @container board (max-width: 560px) {
   .board-tally { grid-template-columns: repeat(2, 1fr); gap: 2vw; }
   .board-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(24, minmax(0, 1fr)); gap: 0.5vh 1.5vw; }
-  .bd-tile { padding: 0 2vw; gap: 2vw; }
-  .bd-tile span { font-size: 9px; }
 }
 @media (max-width: 700px) {
   .board { padding: 1.4vh 3vw 1vh; }

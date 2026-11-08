@@ -38,6 +38,29 @@
 
   function flagSrc(c) { return c.kind === 'un' ? 'unflag.png' : 'flags/4x3/' + c.flag + '.svg'; }
 
+  // Pack the tiles to the space there is: as many columns as fit a compact tile, rows
+  // to match, so every unit is on screen whether the desk is open or folded. The
+  // text size follows the tile, so a tile carries its flag and name and little else.
+  var GAP = 6;
+  function layoutGrid() {
+    var box = grid.getBoundingClientRect();
+    if (!box.width || !box.height) return;
+    var n = countries.length;
+    var minTile = box.width < 600 ? 112 : 150;
+    var cols = Math.max(3, Math.min(n, Math.floor((box.width + GAP) / (minTile + GAP))));
+    var rows = Math.ceil(n / cols);
+    var tileW = (box.width - GAP * (cols - 1)) / cols;
+    var tileH = (box.height - GAP * (rows - 1)) / rows;
+    var flagW = tileH * 0.6 * 4 / 3;
+    var font = Math.max(9, Math.min(18, tileH * 0.36, (tileW - flagW - 22) / 8.2));
+    grid.style.gridTemplateColumns = 'repeat(' + cols + ', minmax(0, 1fr))';
+    grid.style.gridTemplateRows = 'repeat(' + rows + ', minmax(0, 1fr))';
+    grid.style.gap = GAP + 'px';
+    grid.style.setProperty('--tile-font', font.toFixed(1) + 'px');
+  }
+  if (window.ResizeObserver) new ResizeObserver(layoutGrid).observe(grid);
+  window.addEventListener('resize', layoutGrid);
+
   // the random pick: { ids: [...] } (older data used { id })
   function pickIds(s) {
     if (!s || !s.pick) return [];
@@ -92,6 +115,7 @@
     $('deskVote').hidden = name !== 'vote';
     $('deskPlacard').hidden = name !== 'placard';
     paint();
+    layoutGrid();
   }
   document.querySelector('.board-tabs').addEventListener('click', function (e) {
     var t = e.target.closest('.board-tab');
@@ -192,33 +216,35 @@
     e.preventDefault();
     var topic = topicInput.value.trim();
     if (!topic) { say(topicNote, 'Type the topic first.'); return; }
+    var before = session.topic;
+    session.topic = topic;
+    say(topicNote, 'Topic saved.', true);
+    paint();
     deskCall('set_topic', { topic: topic }).then(function (r) {
-      say(topicNote, r.ok ? 'Topic saved.' : errorText(r.error), r.ok);
-      if (r.ok) { session.topic = topic; paint(); VoteData.refresh(); }
-    }).catch(function () { say(topicNote, 'Could not save the topic.'); });
+      if (r.ok) { VoteData.refresh(); return; }
+      session.topic = before; paint();
+      say(topicNote, errorText(r.error));
+    }).catch(function () { session.topic = before; paint(); say(topicNote, 'Could not save the topic.'); });
   });
 
   function toggle(action) {
     if (action === 'close' && !confirm('Close voting and delete the topic and every vote?')) return;
-    say(deskNote, '');
-    $('openBtn').disabled = true;
-    $('closeBtn').disabled = true;
-    deskCall(action).then(function (r) {
-      if (r.ok) {
-        session.open = action === 'open';
-        say(deskNote, session.open ? 'Voting is open.' : 'Voting is closed. Topic and votes deleted.', true);
-        if (!session.open) {
-          delete session.topic;
-          topicInput.value = '';
-          say(topicNote, '');
-          votes = {};
-        }
-        VoteData.refresh();
-      } else {
-        say(deskNote, errorText(r.error));
-      }
+    var before = { open: session.open, topic: session.topic, votes: votes };
+    // show it straight away; the server confirms, or the page puts it back
+    session.open = action === 'open';
+    if (!session.open) { delete session.topic; topicInput.value = ''; say(topicNote, ''); votes = {}; }
+    say(deskNote, session.open ? 'Voting is open.' : 'Voting is closed. Topic and votes deleted.', true);
+    paint();
+    function undo() {
+      session.open = before.open;
+      if (before.topic) session.topic = before.topic;
+      votes = before.votes;
       paint();
-    }).catch(function (e) { paint(); say(deskNote, failure(e)); });
+    }
+    deskCall(action).then(function (r) {
+      if (!r.ok) { undo(); say(deskNote, errorText(r.error)); return; }
+      VoteData.refresh();
+    }).catch(function (e) { undo(); say(deskNote, failure(e)); });
   }
   $('openBtn').addEventListener('click', function () { toggle('open'); });
   $('closeBtn').addEventListener('click', function () { toggle('close'); });

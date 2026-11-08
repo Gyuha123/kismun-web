@@ -18,8 +18,8 @@ var PLACARD_CONFIG = {
   var APP = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   var DB = 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
   var API = '/.netlify/functions/api';
-  var POLL_MS = 2000;       // delegates (cached state)
-  var POLL_FRESH_MS = 1200; // desk and board (uncached state)
+  var POLL_MS = 1500;       // delegates (cached state)
+  var POLL_FRESH_MS = 500;  // desk and board (uncached state)
   var POLL_TIMEOUT_MS = 8000; // a hung request must not stop the page updating
   var loaded = null;
 
@@ -30,7 +30,7 @@ var PLACARD_CONFIG = {
   var watchers = [];
   var firebaseLive = false, firebaseDenied = false, connectionWatched = false;
   var fresh = false;
-  var pollTimer = null, polling = false, pollFails = 0;
+  var pollTimer = null, inFlight = 0, pollFails = 0, sequence = 0, applied = 0;
   // After this page changes something, a read that left before the change would
   // paint the old state over the new one. Each change starts a new epoch, and
   // reads from an older epoch are dropped.
@@ -67,31 +67,37 @@ var PLACARD_CONFIG = {
     });
   }
 
+  // Reads overlap: the next one leaves on time even while the last is still on its
+  // way, so a slow server answer does not slow the page down. Answers older than one
+  // already shown, or older than this page's last action, are dropped.
   function pollNow() {
     clearTimeout(pollTimer);
     pollTimer = null;
-    if (polling || firebaseLive || !watchers.length) return;
-    polling = true;
-    var started = epoch;
+    if (firebaseLive || !watchers.length) return;
+    if (inFlight >= (fresh ? 3 : 1)) { pollAgain = true; return; }
+    inFlight++;
+    var id = ++sequence, started = epoch;
     Promise.race([fetchState(), new Promise(function (resolve, reject) {
       setTimeout(function () { reject(new Error('timeout')); }, POLL_TIMEOUT_MS);
     })]).then(function (state) {
       pollFails = 0;
-      if (firebaseLive || started !== epoch) return;
+      if (firebaseLive || started !== epoch || id < applied) return;
+      applied = id;
       watchers.slice().forEach(function (w) { deliver(w, pick(state, w.path)); });
     }).catch(function (err) {
       if (++pollFails < 3) return;
       watchers.slice().forEach(function (w) { w.last = '__error__'; w.cb(undefined, err); });
     }).then(function () {
-      polling = false;
-      if (pollAgain) { pollAgain = false; pollNow(); } else schedulePoll();
+      inFlight--;
+      if (pollAgain) { pollAgain = false; pollNow(); }
     });
+    schedulePoll();
   }
 
   function schedulePoll() {
     clearTimeout(pollTimer);
     pollTimer = null;
-    if (polling || firebaseLive || !watchers.length) return;
+    if (firebaseLive || !watchers.length) return;
     pollTimer = setTimeout(function () {
       if (document.hidden) schedulePoll(); else pollNow();
     }, fresh ? POLL_FRESH_MS : POLL_MS);
@@ -99,7 +105,7 @@ var PLACARD_CONFIG = {
 
   function setFirebaseLive(live) {
     firebaseLive = live && !firebaseDenied;
-    if (firebaseLive) { clearTimeout(pollTimer); pollTimer = null; } else if (!pollTimer) schedulePoll();
+    if (firebaseLive) { clearTimeout(pollTimer); pollTimer = null; } else if (!pollTimer) pollNow();
   }
 
   function watchConnection(x) {
@@ -119,13 +125,13 @@ var PLACARD_CONFIG = {
     useFreshReads: function () { fresh = true; },
 
     // Fetch now, after this page changed something.
-    refresh: function () { epoch++; if (polling) pollAgain = true; else pollNow(); },
+    refresh: function () { epoch++; pollNow(); },
 
     // Live value of one path. Calls back now and on every change; returns unsubscribe.
     watch: function (path, cb) {
       var w = { path: path, cb: cb, last: '__none__', stopped: false, unsubscribe: null };
       watchers.push(w);
-      if (polling) w.last = '__none__'; else pollNow();
+      pollNow();
       load().then(function (x) {
         if (w.stopped) return;
         watchConnection(x);
@@ -165,14 +171,15 @@ var PLACARD_CONFIG = {
     key: function (name) { return String(name).replace(/[.#$\[\]\/]/g, '_'); },
 
     // Everyone who can vote, one entry per voting unit. Each delegation is its own
-    // country. The 18 committee chairs form ONE unit, "UN", that votes with the UN
-    // flag, exactly like a country. The Secretariat does not vote.
+    // country. The chairs of each committee form one unit that votes with the UN
+    // flag under the committee's name, exactly like a country (nine in all).
+    // The Secretariat does not vote.
     voters: function (data) {
-      var out = [], seen = {}, chairs = 0;
+      var out = [], seen = {}, committees = [];
       if (!data) return out;
       data.delegates.forEach(function (d) {
         if (d.c === 'Secretariat') return;
-        if (d.d === 'UN') { chairs++; return; }
+        if (d.d === 'UN') { if (committees.indexOf(d.c) === -1) committees.push(d.c); return; }
         if (!data.flags[d.d] || seen[d.d]) return;
         seen[d.d] = true;
         // short labels for the longest names, shown on the board and desk
@@ -180,8 +187,9 @@ var PLACARD_CONFIG = {
         var label = short[d.d] || data.names[d.d] || d.d;
         out.push({ id: d.d, kind: 'country', name: data.names[d.d] || d.d, label: label, flag: data.flags[d.d] });
       });
-      if (chairs) out.push({ id: 'UN', kind: 'un', name: 'UN', label: 'UN (Chairs)', flag: 'unflag' });
       out.sort(function (a, b) { return a.label.localeCompare(b.label); });
+      // the committees follow the countries, in the conference's own order
+      committees.forEach(function (c) { out.push({ id: 'UN ' + c, kind: 'un', name: c, label: c, flag: 'unflag' }); });
       return out;
     }
   };

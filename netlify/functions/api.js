@@ -61,11 +61,11 @@ function codeHash(country, code) {
   return crypto.createHmac('sha256', pepper).update(country + '|' + code).digest('hex').slice(0, 32);
 }
 
-// Country -> keyed hash. Stored in code-hashes.json (safe to publish: each value is an
-// HMAC keyed with CODE_PEPPER, which is the secret). PLACARD_CODE_HASHES, if set, overrides it.
+// Unit -> keyed hash. Stored in code-hashes.json (safe to publish: each value is an
+// HMAC keyed with CODE_PEPPER, which is the secret). TEST_CODE_HASHES is for local tests only.
 function hashMap() {
-  if (process.env.PLACARD_CODE_HASHES) {
-    try { return JSON.parse(process.env.PLACARD_CODE_HASHES); } catch (e) { return {}; }
+  if (process.env.TEST_CODE_HASHES) {
+    try { return JSON.parse(process.env.TEST_CODE_HASHES); } catch (e) { return {}; }
   }
   try { return require('./code-hashes.json'); } catch (e) { return {}; }
 }
@@ -223,12 +223,16 @@ function cleanTopic(raw) {
 }
 
 // scrypt is deliberately slow and memory-hungry, so guessing offline is costly.
-function deskPasswordOk(password) {
+function deskPasswordCheck(password) {
   const [saltHex, hashHex] = String(process.env.DESK_PASSWORD_SCRYPT || '').split(':');
-  if (!saltHex || !hashHex) return false;
-  const computed = crypto.scryptSync(String(password || ''), Buffer.from(saltHex, 'hex'), 64);
-  const want = Buffer.from(hashHex, 'hex');
-  return want.length === computed.length && crypto.timingSafeEqual(computed, want);
+  if (!saltHex || !hashHex) return Promise.resolve(false);
+  return new Promise(function (resolve) {
+    crypto.scrypt(String(password || ''), Buffer.from(saltHex, 'hex'), 64, function (err, computed) {
+      if (err) return resolve(false);
+      const want = Buffer.from(hashHex, 'hex');
+      resolve(want.length === computed.length && crypto.timingSafeEqual(computed, want));
+    });
+  });
 }
 
 exports.handler = async function (event) {
@@ -264,35 +268,40 @@ exports.handler = async function (event) {
 
   const ipHash = sha256Hex((process.env.IP_SALT || 'kismun-ip') + clientIp(event));
 
-  // a small, fixed-ish delay on every request slows down scripted guessing
-  await sleep(80 + Math.floor(Math.random() * 120));
-
   try {
     // ---- voter actions --------------------------------------------------
     if (action === 'check' || action === 'vote' || action === 'placard') {
-      if (await ipBlocked(ipHash)) return json(200, { error: 'blocked' });
+      // a short random delay slows scripted guessing; the network lock does the rest
+      await sleep(20 + Math.floor(Math.random() * 40));
 
       const country = String(body.country || '');
       const code = String(body.code || '');
-      if (!/^\d{4}$/.test(code)) return json(200, { error: 'format' });
-
       const key = sanitizeKey(country);
+
+      // everything this request may need, read at once instead of one after another
+      const got = await Promise.all([
+        read('security/ip/' + ipHash),
+        read('session'),
+        action === 'check' ? read('votes/' + key) : null,
+        action === 'check' ? read('session/placard/' + key) : null
+      ]);
+      if (got[0] && got[0].blocked) return json(200, { error: 'blocked' });
+      if (!/^\d{4}$/.test(code)) return json(200, { error: 'format' });
 
       const valid = knownCountry(country) && codeMatches(country, code);
       if (!valid) {
-        // unknown countries are counted exactly like wrong codes, so they cannot be probed
+        // unknown units are counted exactly like wrong codes, so they cannot be probed
         const ip = await recordIpFailure(ipHash);
-        return json(200, { error: ip.fails >= IP_MAX_FAILS ? 'blocked' : 'wrong' });
+        if (ip.fails >= IP_MAX_FAILS) return json(200, { error: 'blocked' });
+        return json(200, { error: 'wrong', left: IP_MAX_FAILS - ip.fails });
       }
 
-      const session = (await read('session')) || {};
+      const session = got[1] || {};
       const open = !!session.open;
       const topic = session.topic || '';
 
       if (action === 'check') {
-        const existing = await read('votes/' + key);
-        const raised = await read('session/placard/' + key);
-        return json(200, { ok: true, topic: topic, open: open, voted: existing ? existing.choice : null, placardRaised: !!raised });
+        return json(200, { ok: true, topic: topic, open: open, voted: got[2] ? got[2].choice : null, placardRaised: !!got[3] });
       }
 
       // Raise Placard: one per unit per round. It does not depend on voting being open.
@@ -320,12 +329,16 @@ exports.handler = async function (event) {
 
     // ---- desk actions: password, with its own lock per network -----------
     if (DESK_ACTIONS.indexOf(action) !== -1) {
-      if (await deskLocked(ipHash)) return json(200, { error: 'locked' });
-      if (!deskPasswordOk(body.password)) {
+      // the lock read and the (deliberately slow) password check run side by side
+      const gate = await Promise.all([deskLocked(ipHash), deskPasswordCheck(body.password)]);
+      if (gate[0]) return json(200, { error: 'locked' });
+      if (!gate[1]) {
         await recordDeskFailure(ipHash);
         return json(200, { error: 'password' });
       }
       if (action === 'auth') return json(200, { ok: true });
+      // the audit entry is written alongside the action, not after it
+      const logged = audit(action, ipHash);
 
 
       if (action === 'set_topic') {
@@ -363,10 +376,10 @@ exports.handler = async function (event) {
         previous.forEach(function (k) { paths['session/placard/' + k] = null; });
         ids.forEach(function (k) { paths['session/placard/' + k] = { t: stamp }; });
         await write('PATCH', '', paths);
-        await audit(action, ipHash);
+        await logged;
         return json(200, { ok: true, ids: ids, previous: previous.filter(function (k) { return ids.indexOf(k) === -1; }) });
       }
-      await audit(action, ipHash);
+      await logged;
       return json(200, { ok: true });
     }
 
