@@ -263,7 +263,9 @@ exports.handler = async function (event) {
     try {
       const res = json(200, await publicState());
       res.headers['Cache-Control'] = 'public, max-age=0, must-revalidate';
-      res.headers['Netlify-CDN-Cache-Control'] = 'public, durable, max-age=1';
+      // stale-while-revalidate: while one background call refreshes the copy, everyone
+      // else gets the copy that is a second or two old, so readers do not pile onto the function
+      res.headers['Netlify-CDN-Cache-Control'] = 'public, durable, max-age=1, stale-while-revalidate=10';
       return res;
     } catch (err) {
       return json(503, { error: 'server' });
