@@ -319,12 +319,20 @@
 
   function followSession() {
     if (stopSession || !window.VoteData || !VoteData.configured()) return;
-    stopSession = VoteData.watch('session', function (s, err) {
-      if (err) return;
-      voteTopic.textContent = s && s.topic ? 'Topic: ' + s.topic : 'The voting topic will appear here.';
-      sessionOpen = !!(s && s.open);
-      renderVote();
-    });
+    // just the two small values this page needs, not the whole session (which carries
+    // every placard), to keep each read a few bytes
+    var stops = [
+      VoteData.watch('session/topic', function (t, err) {
+        if (err) return;
+        voteTopic.textContent = t ? 'Topic: ' + t : 'The voting topic will appear here.';
+      }),
+      VoteData.watch('session/open', function (o, err) {
+        if (err) return;
+        sessionOpen = !!o;
+        renderVote();
+      })
+    ];
+    stopSession = function () { stops.forEach(function (stop) { stop(); }); };
   }
 
   voteBtn.addEventListener('click', function () {
