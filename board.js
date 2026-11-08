@@ -233,7 +233,7 @@
     // show it straight away; the server confirms, or the page puts it back
     session.open = action === 'open';
     if (!session.open) { delete session.topic; topicInput.value = ''; say(topicNote, ''); votes = {}; }
-    say(deskNote, session.open ? 'Voting is open.' : 'Voting is closed. Topic and votes deleted.', true);
+    say(deskNote, session.open ? '' : 'Voting is closed. Topic and votes deleted.', true);
     paint();
     function undo() {
       session.open = before.open;
@@ -277,7 +277,7 @@
     var placardNote = $('placardNote');
     say(placardNote, '');
     deskCall('clear_placards').then(function (r) {
-      say(placardNote, r.ok ? 'All placards cleared.' : errorText(r.error), r.ok);
+      say(placardNote, r.ok ? '' : errorText(r.error), r.ok);
       if (r.ok) { delete session.placard; delete session.pick; paint(); VoteData.refresh(); }
     }).catch(function (e) { say(placardNote, failure(e)); });
   });

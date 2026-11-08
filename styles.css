@@ -2092,7 +2092,71 @@ body {
 .alloc-vote-btn:hover:not(:disabled) { background: #ffffff; color: #0b0d18; }
 .alloc-vote-btn:disabled { opacity: 0.45; cursor: default; }
 
-.alloc-vote-choices { display: flex; gap: 10px; flex-wrap: wrap; }
+/* For / Against / Abstain: three cards in the board's colours */
+.alloc-vote-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 340px;
+}
+.vote-choice {
+  --tone: 255, 255, 255;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 6px 14px;
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015));
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.3, 1.35, 0.5, 1), border-color 0.25s ease, background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.vote-for { --tone: 79, 179, 138; }
+.vote-against { --tone: 224, 112, 122; }
+.vote-abstain { --tone: 217, 164, 65; }
+.vote-mark {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(var(--tone), 0.45);
+  background: rgba(var(--tone), 0.12);
+  color: rgb(var(--tone));
+  transition: background 0.25s ease, color 0.25s ease, transform 0.3s cubic-bezier(0.3, 1.35, 0.5, 1);
+}
+.vote-mark svg { width: 18px; height: 18px; }
+.vote-choice:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--tone), 0.6);
+  background: linear-gradient(180deg, rgba(var(--tone), 0.16), rgba(var(--tone), 0.05));
+  color: var(--text);
+  box-shadow: 0 10px 26px rgba(var(--tone), 0.16);
+}
+.vote-choice:hover .vote-mark { background: rgb(var(--tone)); color: #0b0d18; transform: scale(1.06); }
+.vote-choice:active { transform: scale(0.96); }
+.vote-choice:focus-visible { outline: 2px solid rgba(var(--tone), 0.8); outline-offset: 3px; }
+.vote-choice { min-width: 0; }
+.vote-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 520px) {
+  .alloc-vote-choices { gap: 7px; }
+  .vote-choice { gap: 7px; padding: 12px 2px 10px; border-radius: 13px; font-size: 12.5px; letter-spacing: 0; }
+  .vote-mark { width: 30px; height: 30px; }
+  .vote-mark svg { width: 15px; height: 15px; }
+}
+/* phones: the vote line drops under its label and takes the full width */
+@media (max-width: 520px) {
+  .alloc-line.alloc-vote-line { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .alloc-line.alloc-vote-line dt { padding-top: 0; }
+  .alloc-vote-choices, .alloc-tabs { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) { .vote-choice, .vote-mark { transition: none; } }
 .alloc-vote-choices[hidden], .alloc-vote-form[hidden] { display: none; }
 
 .alloc-vote-msg { margin-top: 14px; min-height: 1.4em; color: var(--text); }
